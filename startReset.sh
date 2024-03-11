@@ -36,7 +36,7 @@ if ! docker network ls --format "{{.Name}}" | grep -w "^ubo-network$"; then
   # Créer le réseau si ce n'est pas le cas
   docker network create --driver bridge ubo-network
 else
-  echo "Le réseau nomreseau existe déjà."
+  echo "Le réseau ubo-network existe déjà."
 fi
 
 # Lancez les services définis dans votre docker-compose.yml
