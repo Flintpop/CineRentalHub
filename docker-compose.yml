@@ -1,18 +1,18 @@
 version: '3.8'
 services:
-  vuejs-client:
-    build:
-       context: ./front
-    ports:
-      - "8080:8080"
-    networks:
-      - ubo-network
+#  vuejs-client:
+#    build:
+#       context: ./front
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - ubo-network
 
   mariadb:
     image: mariadb:11.3.2
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: uboeventflow_bdd
+      MYSQL_DATABASE: cine_rental_hub
     ports:
       - "3306:3306"
     volumes:
@@ -24,7 +24,7 @@ services:
   mongo:
     build:
       context:
-        ./dockerMongodb
+        ./back/mongodb
     ports:
       - "27017:27017"
     networks:
