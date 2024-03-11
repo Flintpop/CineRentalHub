@@ -63,6 +63,42 @@ paths:
       responses:
         '204':
           description: Movie successfully deleted
+  /movies/{movieId}/main_image:
+    get:
+      summary: Get the main image of a movie
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The main image of the movie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Image'
+    put:
+      summary: Set the main image of a movie
+      parameters:
+        - name: movieId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image_id:
+                  type: integer
+      responses:
+        '200':
+          description: Main image successfully set
   /movies/{movieId}/image:
     parameters:
       - name: movieId
