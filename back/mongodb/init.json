@@ -1,7 +1,0 @@
-{
-  "film_id": "123",
-  "user_id": "456",
-  "comment_text": "J'ai vraiment aimé ce film !",
-  "comment_date": { "$date": "2024-03-11T00:00:00Z" },
-  "photo_urls": ["url1", "url2"]
-}
