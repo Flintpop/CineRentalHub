@@ -8,18 +8,18 @@ services:
 #    networks:
 #      - ubo-network
 
-#  mariadb:
-#    image: mariadb:11.3.2
-#    environment:
-#      MYSQL_ROOT_PASSWORD: root
-#      MYSQL_DATABASE: cine_rental_hub
-#    ports:
-#      - "3306:3306"
-#    volumes:
-#      - ./back/mariadb/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
-#      - mariadb-data:/var/lib/mysql
-#    networks:
-#      - ubo-network
+  mariadb:
+    image: mariadb:11.3.2
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: cine_rental_hub
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./back/mariadb/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - ubo-network
 
 #  mongo:
 #    build:
