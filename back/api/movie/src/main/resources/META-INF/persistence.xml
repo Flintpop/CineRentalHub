@@ -3,41 +3,25 @@
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
-  <persistence-unit name="default">
+    <persistence-unit name="default" transaction-type="RESOURCE_LOCAL">
+        <class>mariadbPojo.CommentsPojo</class>
+        <class>mariadbPojo.ImagesPojo</class>
+        <class>mariadbPojo.MoviesPojo</class>
+        <class>mariadbPojo.PurchasesPojo</class>
+        <class>mariadbPojo.RentalsPojo</class>
+        <class>mariadbPojo.ShoppingCartPojo</class>
+        <class>mariadbPojo.UsersPojo</class>
+        <class>mariadbPojo.ViewsPojo</class>
 
-      <class>mariadbPojo.Comments</class>
-      <class>mariadbPojo.Images</class>
-      <class>mariadbPojo.Movies</class>
-      <class>mariadbPojo.Purchases</class>
-      <class>mariadbPojo.Rentals</class>
-      <class>mariadbPojo.ShoppingCart</class>
-      <class>mariadbPojo.Users</class>
-      <class>mariadbPojo.Views</class>
-      <class>mariadbPojo.CommentsPojo</class>
-      <class>mariadbPojo.ImagesPojo</class>
-      <class>mariadbPojo.MoviesPojo</class>
-      <class>mariadbPojo.PurchasesPojo</class>
-      <class>mariadbPojo.RentalsPojo</class>
-      <class>mariadbPojo.ShoppingCartPojo</class>
-      <class>mariadbPojo.UsersPojo</class>
-      <class>mariadbPojo.ViewsPojo</class>
-      <properties>
-          <property name="toplink.jdbc.url" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>
-          <property name="toplink.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
-          <property name="toplink.jdbc.user" value="root"/>
-          <property name="toplink.jdbc.password" value="root"/>
-          <property name="hibernate.connection.url" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>
-          <property name="hibernate.connection.driver_class" value="org.mariadb.jdbc.Driver"/>
-          <property name="hibernate.connection.username" value="root"/>
-          <property name="hibernate.connection.password" value="root"/>
-          <property name="openjpa.ConnectionURL" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>
-          <property name="openjpa.ConnectionDriverName" value="org.mariadb.jdbc.Driver"/>
-          <property name="openjpa.ConnectionUserName" value="root"/>
-          <property name="openjpa.ConnectionPassword" value="root"/>
-          <property name="eclipselink.jdbc.url" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>
-          <property name="eclipselink.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
-          <property name="eclipselink.jdbc.user" value="root"/>
-          <property name="eclipselink.jdbc.password" value="root"/>
-      </properties>
-  </persistence-unit>
+        <properties>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>
+            <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.user" value="root"/>
+            <property name="jakarta.persistence.jdbc.password" value="root"/>
+            <!-- Hibernate spécifiques -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
 </persistence>

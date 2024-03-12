@@ -7,7 +7,7 @@ import java.sql.Date;
 import java.util.Collection;
 
 @Entity
-@Table(name = "movies", schema = "cine_rental_hub", catalog = "")
+@Table(name = "movies", schema = "cine_rental_hub")
 public class MoviesPojo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
@@ -44,8 +44,6 @@ public class MoviesPojo {
   private Collection<RentalsPojo> rentalsById;
   @OneToMany(mappedBy = "moviesByMovieId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
-  @OneToMany(mappedBy = "moviesByMovieId")
-  private Collection<ViewsPojo> viewsById;
 
   public int getId() {
     return id;
@@ -184,11 +182,4 @@ public class MoviesPojo {
     this.shoppingCartsById = shoppingCartsById;
   }
 
-  public Collection<ViewsPojo> getViewsById() {
-    return viewsById;
-  }
-
-  public void setViewsById(Collection<ViewsPojo> viewsById) {
-    this.viewsById = viewsById;
-  }
 }

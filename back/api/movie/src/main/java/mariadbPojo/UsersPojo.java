@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.Collection;
 
 @Entity
-@Table(name = "users", schema = "cine_rental_hub", catalog = "")
+@Table(name = "users", schema = "cine_rental_hub")
 public class UsersPojo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
@@ -34,8 +34,6 @@ public class UsersPojo {
   private Collection<RentalsPojo> rentalsById;
   @OneToMany(mappedBy = "usersByUserId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
-  @OneToMany(mappedBy = "usersByUserId")
-  private Collection<ViewsPojo> viewsById;
 
   public int getId() {
     return id;
@@ -143,13 +141,5 @@ public class UsersPojo {
 
   public void setShoppingCartsById(Collection<ShoppingCartPojo> shoppingCartsById) {
     this.shoppingCartsById = shoppingCartsById;
-  }
-
-  public Collection<ViewsPojo> getViewsById() {
-    return viewsById;
-  }
-
-  public void setViewsById(Collection<ViewsPojo> viewsById) {
-    this.viewsById = viewsById;
   }
 }

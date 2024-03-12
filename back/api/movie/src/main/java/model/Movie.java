@@ -1,11 +1,21 @@
 package model;
 
+import database.MariaDB;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
 import mariadbPojo.MoviesPojo;
 
 import java.util.List;
 
 public class Movie {
   public static MoviesPojo getMovieById(Integer id) {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.find(MoviesPojo.class, id);
+    } finally {
+      em.close();
+    }
+
     return null;
   }
 
@@ -22,6 +32,11 @@ public class Movie {
   }
 
   public static List<MoviesPojo> getListMovie() {
-    return null;
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      return em.createQuery("SELECT m FROM MoviesPojo m", MoviesPojo.class).getResultList();
+    } finally {
+      em.close();
+    }
   }
 }

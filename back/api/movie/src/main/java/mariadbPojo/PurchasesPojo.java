@@ -5,18 +5,12 @@ import jakarta.persistence.*;
 import java.sql.Date;
 
 @Entity
-@Table(name = "purchases", schema = "cine_rental_hub", catalog = "")
+@Table(name = "purchases", schema = "cine_rental_hub")
 public class PurchasesPojo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   @Column(name = "id", nullable = false)
   private int id;
-  @Basic
-  @Column(name = "user_id", nullable = false)
-  private int userId;
-  @Basic
-  @Column(name = "movie_id", nullable = false)
-  private int movieId;
   @Basic
   @Column(name = "purchase_date", nullable = false)
   private Date purchaseDate;
@@ -35,22 +29,6 @@ public class PurchasesPojo {
     this.id = id;
   }
 
-  public int getUserId() {
-    return userId;
-  }
-
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
-
-  public int getMovieId() {
-    return movieId;
-  }
-
-  public void setMovieId(int movieId) {
-    this.movieId = movieId;
-  }
-
   public Date getPurchaseDate() {
     return purchaseDate;
   }
@@ -67,8 +45,6 @@ public class PurchasesPojo {
     PurchasesPojo that = (PurchasesPojo) o;
 
     if (id != that.id) return false;
-    if (userId != that.userId) return false;
-    if (movieId != that.movieId) return false;
     if (purchaseDate != null ? !purchaseDate.equals(that.purchaseDate) : that.purchaseDate != null) return false;
 
     return true;
@@ -77,8 +53,6 @@ public class PurchasesPojo {
   @Override
   public int hashCode() {
     int result = id;
-    result = 31 * result + userId;
-    result = 31 * result + movieId;
     result = 31 * result + (purchaseDate != null ? purchaseDate.hashCode() : 0);
     return result;
   }

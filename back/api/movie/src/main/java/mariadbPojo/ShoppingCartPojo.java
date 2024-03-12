@@ -3,7 +3,7 @@ package mariadbPojo;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "shopping_cart", schema = "cine_rental_hub", catalog = "")
+@Table(name = "shopping_cart", schema = "cine_rental_hub")
 public class ShoppingCartPojo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
@@ -12,12 +12,6 @@ public class ShoppingCartPojo {
   @Basic
   @Column(name = "cart_type", nullable = false)
   private Object cartType;
-  @Basic
-  @Column(name = "user_id", nullable = false)
-  private int userId;
-  @Basic
-  @Column(name = "movie_id", nullable = false)
-  private int movieId;
   @Basic
   @Column(name = "rental_duration", nullable = false)
   private int rentalDuration;
@@ -44,22 +38,6 @@ public class ShoppingCartPojo {
     this.cartType = cartType;
   }
 
-  public int getUserId() {
-    return userId;
-  }
-
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
-
-  public int getMovieId() {
-    return movieId;
-  }
-
-  public void setMovieId(int movieId) {
-    this.movieId = movieId;
-  }
-
   public int getRentalDuration() {
     return rentalDuration;
   }
@@ -76,8 +54,6 @@ public class ShoppingCartPojo {
     ShoppingCartPojo that = (ShoppingCartPojo) o;
 
     if (id != that.id) return false;
-    if (userId != that.userId) return false;
-    if (movieId != that.movieId) return false;
     if (rentalDuration != that.rentalDuration) return false;
     if (cartType != null ? !cartType.equals(that.cartType) : that.cartType != null) return false;
 
@@ -88,8 +64,6 @@ public class ShoppingCartPojo {
   public int hashCode() {
     int result = id;
     result = 31 * result + (cartType != null ? cartType.hashCode() : 0);
-    result = 31 * result + userId;
-    result = 31 * result + movieId;
     result = 31 * result + rentalDuration;
     return result;
   }

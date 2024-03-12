@@ -5,18 +5,12 @@ import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "rentals", schema = "cine_rental_hub", catalog = "")
+@Table(name = "rentals", schema = "cine_rental_hub")
 public class RentalsPojo {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   @Column(name = "id", nullable = false)
   private int id;
-  @Basic
-  @Column(name = "user_id", nullable = false)
-  private int userId;
-  @Basic
-  @Column(name = "movie_id", nullable = false)
-  private int movieId;
   @Basic
   @Column(name = "rental_date", nullable = false)
   private Timestamp rentalDate;
@@ -36,22 +30,6 @@ public class RentalsPojo {
 
   public void setId(int id) {
     this.id = id;
-  }
-
-  public int getUserId() {
-    return userId;
-  }
-
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
-
-  public int getMovieId() {
-    return movieId;
-  }
-
-  public void setMovieId(int movieId) {
-    this.movieId = movieId;
   }
 
   public Timestamp getRentalDate() {
@@ -78,8 +56,6 @@ public class RentalsPojo {
     RentalsPojo that = (RentalsPojo) o;
 
     if (id != that.id) return false;
-    if (userId != that.userId) return false;
-    if (movieId != that.movieId) return false;
     if (rentalDate != null ? !rentalDate.equals(that.rentalDate) : that.rentalDate != null) return false;
     if (returnDate != null ? !returnDate.equals(that.returnDate) : that.returnDate != null) return false;
 
@@ -89,8 +65,6 @@ public class RentalsPojo {
   @Override
   public int hashCode() {
     int result = id;
-    result = 31 * result + userId;
-    result = 31 * result + movieId;
     result = 31 * result + (rentalDate != null ? rentalDate.hashCode() : 0);
     result = 31 * result + (returnDate != null ? returnDate.hashCode() : 0);
     return result;

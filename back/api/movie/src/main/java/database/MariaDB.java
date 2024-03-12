@@ -6,7 +6,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
 public class MariaDB {
-  private static final String PERSISTENCE_UNIT_NAME = "lieuPU";
+  private static final String PERSISTENCE_UNIT_NAME = "default";
   private static volatile EntityManagerFactory entityManagerFactory = null;
 
   private MariaDB() {
