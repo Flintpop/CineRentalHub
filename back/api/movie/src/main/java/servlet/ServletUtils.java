@@ -1,8 +1,8 @@
 package servlet;
 
+import dto.MovieDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import mariadbPojo.MoviesPojo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,14 +57,14 @@ public class ServletUtils {
   }
 
 
-  public static MoviesPojo extraireEtValiderCommentaire(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public static MovieDTO extraireEtValiderCommentaire(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String pathInfo = request.getPathInfo();
     Integer id = extraireEtValiderId(pathInfo, response, true);
     if (id == null) {
       return null; // Une réponse a déjà été envoyée par extraireEtValiderId
     }
 
-    MoviesPojo moviePojo = model.Movie.getMovieById(id);
+    MovieDTO moviePojo = model.Movie.getMovieById(id);
     if (moviePojo == null) {
       envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Commentaire non trouvé.\"}");
       return null;

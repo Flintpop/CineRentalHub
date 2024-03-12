@@ -2,6 +2,7 @@ package servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import dto.MovieDTO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,13 +30,13 @@ public class MovieServlet extends HttpServlet {
 
     if (movieId == -1) {
       // Aucun ID spécifique, renvoie la liste de tous les films
-      List<MoviesPojo> movies = Movie.getListMovie();
+      List<MovieDTO> movies = Movie.getListMovie();
       ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_OK, gson.toJson(movies));
       return;
     }
 
     // Requête pour un film spécifique par ID
-    MoviesPojo movieEntity = Movie.getMovieById(movieId);
+    MovieDTO movieEntity = Movie.getMovieById(movieId);
     if (movieEntity == null) {
       ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
     } else {
