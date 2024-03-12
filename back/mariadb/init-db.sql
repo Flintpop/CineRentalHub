@@ -49,8 +49,7 @@ DROP TABLE IF EXISTS movies;
 
 
 -- Création de la table Films
- CREATE TABLE IF NOT EXISTS movies
-        (
+ CREATE TABLE IF NOT EXISTS movies(
         id                 INT AUTO_INCREMENT PRIMARY KEY,
         available          BOOLEAN default TRUE NOT NULL,
         title              VARCHAR(255)         NOT NULL,
@@ -59,7 +58,8 @@ DROP TABLE IF EXISTS movies;
         purchase_price     DECIMAL(10, 2)       NOT NULL, -- Pareil que location, -1 == pas vendable. Attention si pas vendable ni louable pas afficher ou bug
         description        TEXT                 NOT NULL,
         link               VARCHAR(2000)        NOT NULL  -- chatGPT a voir taille max lien attention mettre verif dans le front
-        );
+);
+
 
 -- Création de la table Utilisateurs
 CREATE TABLE IF NOT EXISTS users
@@ -710,6 +710,7 @@ END //
 DELIMITER ;
 
 -- CALL delete_comment(1);
+
 
 
 
