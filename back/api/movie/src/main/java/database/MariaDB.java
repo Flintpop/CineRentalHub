@@ -27,5 +27,4 @@ public class MariaDB {
     }
     return entityManagerFactory.createEntityManager();
   }
-
 }
