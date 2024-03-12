@@ -3,8 +3,8 @@
     <ul>
       <li v-for="movie in movies" :key="movie.id">
         <h2>{{ movie.title }}</h2>
-        <p>Date de sortie: {{ movie.release_date }}</p>
-        <p>Prix d'achat: {{ movie.purchase_price }}</p>
+        <p>Date de sortie: {{ movie.releaseDate }}</p>
+        <p>Prix d'achat: {{ movie.dailyRentalPrice }}</p>
       </li>
     </ul>
   </div>
@@ -14,18 +14,18 @@
 import axios from 'axios';
 
 export default {
-  name: 'ListeLieux',
+  name: 'MovieList',
   data() {
     return {
       movies: [],
     };
   },
   created() {
-    this.fetchLieux();
+    this.fetchMovies();
   },
   methods: {
-    fetchLieux() {
-      axios.get('http://localhost:8082/movies')
+    fetchMovies() {
+      axios.get('http://localhost:3000/movies')
           .then(response => {
             this.movies = response.data;
           })

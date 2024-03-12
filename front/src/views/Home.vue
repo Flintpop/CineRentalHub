@@ -13,7 +13,7 @@
     <section class="events">
       <h2>Films</h2>
       <div class="event-list">
-        <Movies></Movies>
+        <MovieList></MovieList>
       </div>
     </section>
 
@@ -38,14 +38,14 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from "../components/Footer.vue";
-import Movies from "../components/Movies.vue";
+import MovieList from "../components/Movies.vue";
 
 export default {
   name: 'Home',
   components: {
     Footer,
     Navbar,
-    Movies
+    MovieList
   },
 
   mounted() {
