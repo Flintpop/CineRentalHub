@@ -11,13 +11,9 @@
 
     <!-- Section Événements -->
     <section class="events">
-      <h2>Évènements à Venir</h2>
+      <h2>Films</h2>
       <div class="event-list">
-        <EventCard v-for="event in events" :key="event.id" :event="event" />
-        <ListeLieux></ListeLieux>
-        <Commentaires></Commentaires>
-        <Membres></Membres>
-        <Evenement></Evenement>
+        <Movies></Movies>
       </div>
     </section>
 
@@ -41,24 +37,16 @@
 
 <script>
 import Navbar from '../components/Navbar.vue';
-import EventCard from '../components/EventCard.vue';
 import Footer from "../components/Footer.vue";
-import Commentaires from "../components/Commentaire.vue";
-import Membres from "../components/Membres.vue";
-import ListeLieux from "../components/Lieux.vue";
-import Evenement from "../components/Evenement.vue";
+import Movies from "../components/Movies.vue";
 import axios from 'axios';
 
 export default {
   name: 'Home',
   components: {
     Footer,
-    ListeLieux,
     Navbar,
-    EventCard,
-    Commentaires,
-    Membres,
-    Evenement,
+    Movies
   },
 
   mounted() {
