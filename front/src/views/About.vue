@@ -2,48 +2,48 @@
   <Navbar />
   <div class="about-page-container">
     <div class="about-page-content">
-      <h1>À Propos de Tux & Co</h1>
+      <h1>À Propos de CineRentalHub</h1>
       <div class="text-section">
         <p>
-          "Tux & Co" est une application web innovante conçue pour simplifier la gestion d'événements au sein des associations. Développée par des étudiants passionnés du Master 1ère année TIIL-A & ILIADE à l'UBO, cette plateforme permet aux membres d'une association de se connecter, de s'inscrire à des événements, et de participer activement à la vie associative.
+          "CineRentalHub" est une plateforme de location de films en ligne conçue pour offrir une expérience utilisateur immersive et intuitive. Développée par des passionnés de cinéma et de technologie à l'UBO, notre application permet aux utilisateurs de découvrir, louer et commenter un large éventail de films.
         </p>
       </div>
 
       <div class="section">
         <h2>Notre Mission</h2>
         <p>
-          Notre mission est de fournir une solution intuitive et complète pour la gestion d'événements, en facilitant l'organisation, la participation, et le partage d'expériences au sein des associations. Nous visons à rassembler les professionnels du secteur pour partager connaissances et innovations, en offrant une plateforme centralisée pour tous leurs besoins événementiels.
+          Notre mission est de révolutionner la manière dont les films sont loués et appréciés, en fournissant un accès facile à une variété de titres, de genres et de formats. Nous nous engageons à offrir une plateforme conviviale qui encourage la découverte de films et le partage d'opinions au sein de notre communauté.
         </p>
       </div>
 
       <div class="section">
         <h2>Fonctionnalités Clés</h2>
         <ul>
-          <li>Gestion complète des membres, avec système d'authentification.</li>
-          <li>Création, modification, et suppression d'événements par les membres.</li>
-          <li>Système d'inscription aux événements, avec gestion des contraintes de capacité et de chevauchement d'horaire.</li>
-          <li>Commentaires sur les événements pour favoriser l'interaction et le retour d'expérience.</li>
-          <li>Intégration d'OpenStreetMap pour localiser les lieux d'événements.</li>
+          <li>Large catalogue de films avec options de recherche et de filtrage avancées.</li>
+          <li>Système de location intuitive avec gestion de panier.</li>
+          <li>Création de compte utilisateur et système d'authentification.</li>
+          <li>Section de commentaires pour partager et lire des avis sur les films.</li>
+          <li>Recommandations personnalisées basées sur les préférences et l'historique de location.</li>
         </ul>
       </div>
 
       <div class="section">
         <h2>Technologies Utilisées</h2>
         <p>
-          L'application "Tux & Co" s'appuie sur une architecture moderne et robuste, utilisant des technologies de pointe pour le développement web :
+          CineRentalHub utilise une architecture n-tiers avec des technologies modernes pour offrir une expérience utilisateur fluide et sécurisée :
         </p>
         <ul>
-          <li>Front-end : Vue.js</li>
-          <li>Back-end : Spring pour la logique métier, Servlets pour les services web simples.</li>
-          <li>Bases de données : SQL pour les données relationnelles, MongoDB pour les commentaires.</li>
-          <li>API REST pour faciliter la communication entre le front-end et le back-end.</li>
+          <li>Front-end :  Vue.js pour une interface utilisateur dynamique.</li>
+          <li>Back-end : Node.js avec Express pour la gestion des authentifications et des autorisations, servlet pour l'accès aux données.</li>
+          <li>Bases de données : MongoDB pour stocker les statistiques et SQL pour gérer le catalogue de films, les utilisateurs et les commentaires.</li>
+          <li>Communication en temps réel avec les Websockets pour le chat .</li>
         </ul>
       </div>
 
       <div class="section">
         <h2>L'Équipe de Développement</h2>
         <p>
-          Ce projet est le fruit du travail collaboratif de trois étudiants ambitieux : THOMAS Antoine, LE GOFF Tanguy, et AMIL Abdelaziz, guidés par la passion de créer des solutions technologiques innovantes pour répondre aux besoins réels des utilisateurs.
+          CineRentalHub est le résultat du travail acharné et de la passion d'une équipe dédiée d'étudiants à l'UBO, qui ont collaboré pour créer une plateforme innovante qui répond aux besoins des cinéphiles modernes.
         </p>
       </div>
     </div>
