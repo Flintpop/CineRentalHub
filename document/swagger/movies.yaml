@@ -132,16 +132,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Image'
-  /movies/{movieId}/image/{imageId}:
+  /movies/image/{imageId}:
     delete:
-      summary: Delete an image from a movie
+      summary: Delete an image from an id
       parameters:
         - name: imageId
-          in: path
-          required: true
-          schema:
-            type: integer
-        - name: movieId
           in: path
           required: true
           schema:
