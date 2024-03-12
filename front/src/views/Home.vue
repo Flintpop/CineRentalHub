@@ -39,7 +39,6 @@
 import Navbar from '../components/Navbar.vue';
 import Footer from "../components/Footer.vue";
 import Movies from "../components/Movies.vue";
-import axios from 'axios';
 
 export default {
   name: 'Home',
@@ -59,32 +58,6 @@ export default {
       events: [],
 
     };
-  },
-  methods: {
-    // ...
-    fetchEvenements() {
-      axios.get('http://localhost:8085/events')
-          .then(response => {
-            console.log(response.data);
-            const events = response.data;
-            return Promise.all(events.map(evenement => {
-              return axios.get(`http://localhost:8085/lieux/${evenement.lieuId}`)
-                  .then(response => {
-                    evenement.lieu = response.data;
-                    return evenement;
-                  });
-            }));
-          })
-          .then(evenementsAvecLieux => {
-            this.events = evenementsAvecLieux;
-          })
-          .catch(error => {
-            console.error(error);
-          });
-    },
-  },
-  created() {
-    this.fetchEvenements();
   },
 
 };
