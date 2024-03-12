@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS users
     first_name VARCHAR(255)                NOT NULL,
     email      VARCHAR(255)                NOT NULL UNIQUE,
     activated  BOOLEAN        default TRUE NOT NULL,
-    password   CHAR(255)                   NOT NULL, -- sha512, est-ce que c'est la bonne taille ?
+    password   CHAR(128)                   NOT NULL, -- sha512, est-ce que c'est la bonne taille ?
     role       ENUM ('user', 'admin')      NOT NULL  -- connexion avec email + mdp
 );
 
