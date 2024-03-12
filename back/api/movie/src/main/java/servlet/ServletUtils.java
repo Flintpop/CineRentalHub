@@ -22,7 +22,7 @@ public class ServletUtils {
   public static Integer extraireEtValiderId(String pathInfo, HttpServletResponse response, boolean expectedId) throws IOException {
     if (pathInfo == null || pathInfo.length() <= 1) {
       if (expectedId) {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'ID du commentaire est manquant ou invalide.\"}");
+        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'id est manquant ou invalide.\"}");
       }
       return -1;
     }
@@ -30,7 +30,7 @@ public class ServletUtils {
     try {
       int id = Integer.parseInt(pathInfo.substring(1));
       if (id < 0) {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'ID du commentaire doit être un entier positif.\"}");
+        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'id doit être un entier positif.\"}");
         return null;
       }
       return id;
@@ -57,7 +57,7 @@ public class ServletUtils {
   }
 
 
-  public static MovieDTO extraireEtValiderCommentaire(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public static MovieDTO extraireEtValiderMovie(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String pathInfo = request.getPathInfo();
     Integer id = extraireEtValiderId(pathInfo, response, true);
     if (id == null) {
@@ -66,7 +66,7 @@ public class ServletUtils {
 
     MovieDTO moviePojo = model.Movie.getMovieById(id);
     if (moviePojo == null) {
-      envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Commentaire non trouvé.\"}");
+      envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Movie non trouvé.\"}");
       return null;
     }
 
