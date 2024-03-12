@@ -135,3 +135,7 @@ dist
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/Projet-Si-Sor.iml
 /.idea/vcs.xml
+/back/api/movie/target/
+/back/api/movie/.idea/
+/back/api/movie/movie.iml
+/back/api/movie/.mvn/
