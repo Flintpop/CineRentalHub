@@ -23,7 +23,7 @@ public class MovieServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-    Integer movieId = ServletUtils.extraireEtValiderId(request.getPathInfo(), response, false);
+    Integer movieId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, false);
     if (movieId == null) {
       return; // La validation de l'ID a échoué.
     }
@@ -31,52 +31,52 @@ public class MovieServlet extends HttpServlet {
     if (movieId == -1) {
       // Aucun ID spécifique, renvoie la liste de tous les films
       List<MovieDTO> movies = Movie.getListMovie();
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_OK, gson.toJson(movies));
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(movies));
       return;
     }
 
     // Requête pour un film spécifique par ID
     MovieDTO movieEntity = Movie.getMovieById(movieId);
     if (movieEntity == null) {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
     } else {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_OK, gson.toJson(movieEntity));
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(movieEntity));
     }
   }
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonBody = ServletUtils.lireCorpsRequete(request);
+    String jsonBody = ServletUtils.readRequestBody(request);
     try {
       MoviesPojo movieEntity = gson.fromJson(jsonBody, MoviesPojo.class);
       // Ici, implémentez la validation du film si nécessaire
       MoviesPojo createdMovie = Movie.createMovie(movieEntity);
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_CREATED, gson.toJson(createdMovie));
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(createdMovie));
     } catch (JsonSyntaxException e) {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     }
   }
 
   @Override
   protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer movieId = ServletUtils.extraireEtValiderId(request.getPathInfo(), response, true);
+    Integer movieId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
     if (movieId == null || movieId < 0) {
       return; // La validation de l'ID a échoué
     }
 
-    String jsonBody = ServletUtils.lireCorpsRequete(request);
+    String jsonBody = ServletUtils.readRequestBody(request);
     try {
       MoviesPojo movieToUpdate = gson.fromJson(jsonBody, MoviesPojo.class);
       MoviesPojo updatedMovie = Movie.updateMovie(movieId, movieToUpdate);
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_OK, gson.toJson(updatedMovie));
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(updatedMovie));
     } catch (JsonSyntaxException e) {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     }
   }
 
   @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer movieId = ServletUtils.extraireEtValiderId(request.getPathInfo(), response, true);
+    Integer movieId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
     if (movieId == null || movieId < 0) {
       return; // La validation de l'ID a échoué.
     }
@@ -84,12 +84,12 @@ public class MovieServlet extends HttpServlet {
     try {
       boolean deleted = Movie.deleteMovie(movieId);
       if (deleted) {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_NO_CONTENT, "");
+        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_NO_CONTENT, "");
       } else {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
+        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
       }
     } catch (Exception e) {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"Une erreur s'est produite.\"}");
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"Une erreur s'est produite.\"}");
     }
   }
 }

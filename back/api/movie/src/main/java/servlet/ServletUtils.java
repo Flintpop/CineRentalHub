@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class ServletUtils {
-  public static String lireCorpsRequete(HttpServletRequest request) throws IOException {
+  public static String readRequestBody(HttpServletRequest request) throws IOException {
     StringBuilder jsonBody = new StringBuilder();
     try (BufferedReader reader = request.getReader()) {
       String line;
@@ -19,24 +19,27 @@ public class ServletUtils {
     return jsonBody.toString();
   }
 
-  public static Integer extraireEtValiderId(String pathInfo, HttpServletResponse response, boolean expectedId) throws IOException {
+  public static Integer extractAndValidateId(String pathInfo, HttpServletResponse response, boolean idAlwaysDemanded) throws IOException {
     if (pathInfo == null || pathInfo.length() <= 1) {
-      if (expectedId) {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'id est manquant ou invalide.\"}");
+      if (idAlwaysDemanded) {
+        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+                "{\"error\":\"L'id est manquant ou invalide.\"}");
       }
-      return -1;
+      return -1; // ID non spécifié, erreur si on le demandait obligatoirement
     }
 
     try {
       int id = Integer.parseInt(pathInfo.substring(1));
       if (id < 0) {
-        ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"L'id doit être un entier positif.\"}");
+        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+                "{\"error\":\"L'id doit être un entier positif.\"}");
         return null;
       }
       return id;
     } catch (NumberFormatException e) {
-      ServletUtils.envoyerReponseJson(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de l'ID invalide, n'est pas un chiffre.\"}");
-      return null;
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+              "{\"error\":\"Format de l'ID invalide, n'est pas un chiffre.\"}");
+      return null; // il y a un ID, mais il n'est pas un nombre donc erreur
     }
   }
 
@@ -48,7 +51,7 @@ public class ServletUtils {
    * @param message    Le message à envoyer.
    * @throws IOException Si une erreur d'entrée/sortie survient.
    */
-  public static void envoyerReponseJson(HttpServletResponse response, int statusCode, String message) throws IOException {
+  public static void sendJsonResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(statusCode);
@@ -57,16 +60,16 @@ public class ServletUtils {
   }
 
 
-  public static MovieDTO extraireEtValiderMovie(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public static MovieDTO extractIdAndGetMovie(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String pathInfo = request.getPathInfo();
-    Integer id = extraireEtValiderId(pathInfo, response, true);
-    if (id == null) {
+    Integer id = extractAndValidateId(pathInfo, response, true);
+    if (id == null || id == -1) {
       return null; // Une réponse a déjà été envoyée par extraireEtValiderId
     }
 
     MovieDTO moviePojo = model.Movie.getMovieById(id);
     if (moviePojo == null) {
-      envoyerReponseJson(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Movie non trouvé.\"}");
+      sendJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Movie non trouvé.\"}");
       return null;
     }
 

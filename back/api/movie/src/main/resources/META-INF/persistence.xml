@@ -11,7 +11,6 @@
         <class>mariadbPojo.RentalsPojo</class>
         <class>mariadbPojo.ShoppingCartPojo</class>
         <class>mariadbPojo.UsersPojo</class>
-        <class>mariadbPojo.ViewsPojo</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/cine_rental_hub"/>

@@ -5,6 +5,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 
+/**
+ * Singleton pour la connexion à MariaDB
+ */
 public class MariaDB {
   private static final String PERSISTENCE_UNIT_NAME = "default";
   private static volatile EntityManagerFactory entityManagerFactory = null;
