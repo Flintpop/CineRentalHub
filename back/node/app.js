@@ -1,19 +1,22 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
-const API_SERVICE_URL = "http://movie-api"; // Remplacez par l'URL réelle de l'API
+const API_SERVICE_URL = "http://localhost:8082";
+
+app.use(cors()); // Active CORS pour toutes les routes
 
 // Middleware pour parser le corps JSON des requêtes
 app.use(express.json());
 
-// Fonction de middleware pour rediriger les requêtes vers l'API
-const proxy = createProxyMiddleware({
+// Configuration du middleware de proxy
+const proxyOptions = {
     target: API_SERVICE_URL,
     changeOrigin: true,
     pathRewrite: {
-        [`^/movies`]: '/movies', // Conserve le préfixe /movies dans l'URL de destination
+        [`^/movies`]: '/movies',
     },
     onProxyReq: (proxyReq, req, res) => {
         if (req.body && req.headers['content-type']) {
@@ -22,10 +25,10 @@ const proxy = createProxyMiddleware({
             proxyReq.write(bodyData);
         }
     }
-});
+};
 
 // Utilisation du middleware de proxy pour différents chemins
-app.use('/movies', proxy); // Gère à la fois /movies et /movies/{movieId}
-app.use('/movies/image', proxy); // Gère /movies/image et /movies/image/{imageId}
+app.use('/movies', createProxyMiddleware(proxyOptions));
+app.use('/movies/image', createProxyMiddleware(proxyOptions));
 
 app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
