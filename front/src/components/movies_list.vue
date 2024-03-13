@@ -1,7 +1,7 @@
 <template>
   <div class="movie-card-grid">
     <div class="movie-card" v-for="film in films" :key="film.id">
-      <img :src="film.link" :alt="film.title" class="movie-image"/>
+      <img :src="film.main_image_url" :alt="film.title" class="movie-image"/>
       <div class="movie-info">
         <h3>{{ film.title }}</h3>
         <p>{{ film.release_date | formatDate }}</p>

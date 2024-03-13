@@ -69,6 +69,16 @@ export default {
         .catch(error => {
           console.log(error);
         });
+
+      for (let i = 0; i < this.movies.length; i++) {
+        axios.get("http://localhost:3000/movies/main_image/" + this.movies[i].id)
+          .then(response => {
+            this.movies[i].main_image_url = response.data[0].image_url;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }
       // this.movies = [
         // {
         //   id: 1,
