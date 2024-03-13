@@ -2,13 +2,10 @@ package dto;
 
 import mariadbPojo.UsersPojo;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-
 public class UserLowDTO {
   private int id;
-  private String lastName;
-  private String firstName;
+  private String last_name;
+  private String first_name;
   private String email;
   private boolean activated;
   private String role;
@@ -17,8 +14,8 @@ public class UserLowDTO {
   // Constructeur qui accepte un UserPojo
   public UserLowDTO(UsersPojo user) {
     this.id = user.getId();
-    this.lastName = user.getLastName();
-    this.firstName = user.getFirstName();
+    this.last_name = user.getLastName();
+    this.first_name = user.getFirstName();
     this.email = user.getEmail();
     this.activated = user.isActivated();
     this.role = user.getRole().toString();
