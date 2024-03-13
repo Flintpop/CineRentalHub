@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
-const API_SERVICE_URL = "http://localhost:8082";
+const API_SERVICE_URL = "http://movie-api:8080";
 
 app.use(cors()); // Active CORS pour toutes les routes
 
