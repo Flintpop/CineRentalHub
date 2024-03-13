@@ -8,14 +8,13 @@ import lombok.Setter;
 public class ImageDTO {
   private int id;
   private int movie_id;
-  private String imageUrl;
-  private Boolean mainImage;
+  private String image_url;
+  private Boolean main_image;
 
-  public ImageDTO(int id, int movie_id, String imageUrl, Boolean mainImage) {
+  public ImageDTO(int id, int movie_id, String image_url, Boolean main_image) {
     this.id = id;
     this.movie_id = movie_id;
-    this.imageUrl = imageUrl;
-    this.mainImage = mainImage;
+    this.image_url = image_url;
+    this.main_image = main_image;
   }
-
 }
