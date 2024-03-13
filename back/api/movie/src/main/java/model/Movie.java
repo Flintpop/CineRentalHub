@@ -1,24 +1,21 @@
 package model;
 
 import database.MariaDB;
-import dto.MovieDTO;
+import dto.ImageDTO;
 import dto.MoviePostPutDTO;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.ParameterMode;
-import jakarta.persistence.PersistenceException;
-import jakarta.persistence.StoredProcedureQuery;
+import jakarta.persistence.*;
 import mariadbPojo.MoviesPojo;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Movie {
-  public static MovieDTO getMovieById(Integer id) {
+  public static dto.MovieDTO getMovieById(Integer id) {
     EntityManager em = MariaDB.getEntityManager();
     try {
       MoviesPojo movie = em.find(MoviesPojo.class, id);
       if (movie != null) {
-        return new MovieDTO(movie);
+        return new dto.MovieDTO(movie);
       }
     } finally {
       em.close();
@@ -27,15 +24,16 @@ public class Movie {
   }
 
   // Les autres méthodes peuvent être adaptées de manière similaire pour retourner ou accepter des DTO au lieu de MoviesPojo
-  public static List<MovieDTO> getListMovie() {
+  public static List<dto.MovieDTO> getListMovie() {
     EntityManager em = MariaDB.getEntityManager();
     try {
       List<MoviesPojo> movies = em.createQuery("SELECT m FROM MoviesPojo m", MoviesPojo.class).getResultList();
-      return movies.stream().map(MovieDTO::new).collect(Collectors.toList());
+      return movies.stream().map(dto.MovieDTO::new).collect(Collectors.toList());
     } finally {
       em.close();
     }
   }
+
   public static MoviePostPutDTO addMovie(MoviePostPutDTO movieDTO) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
@@ -68,7 +66,7 @@ public class Movie {
     }
   }
 
-  public static MovieDTO updateMovie(Integer movieId, MoviePostPutDTO movieDTO) throws Exception {
+  public static dto.MovieDTO updateMovie(Integer movieId, MoviePostPutDTO movieDTO) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
       em.getTransaction().begin();
@@ -92,12 +90,62 @@ public class Movie {
 
       query.execute();
       em.getTransaction().commit();
-      return new MovieDTO(em.find(MoviesPojo.class, movieId));
+      return new dto.MovieDTO(em.find(MoviesPojo.class, movieId));
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();
       }
       throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static ImageDTO getMainImage(Integer movieId) throws PersistenceException {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_main_image_by_movie_id")
+              .registerStoredProcedureParameter("id_movie", Integer.class, ParameterMode.IN)
+              .setParameter("id_movie", movieId);
+
+      @SuppressWarnings("unchecked")
+      List<Object[]> result = query.getResultList();
+      if (!result.isEmpty()) {
+        Object[] row = result.get(0);
+        // Hack car bug, pour le get de main image, le 4e paramètre est un Byte et non un boolean
+        Boolean isMain = (Byte) row[3] == 1;
+        return new ImageDTO((Integer) row[0], (Integer) row[1], (String) row[2], isMain);
+      }
+
+      throw new PersistenceException("No main image found for movie with id " + movieId);
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new PersistenceException(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static List<ImageDTO> getImagesByMovieId(Integer movieId) throws PersistenceException {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_images_by_movie_id")
+              .registerStoredProcedureParameter("id_movie", Integer.class, ParameterMode.IN)
+              .setParameter("id_movie", movieId);
+
+      @SuppressWarnings("unchecked")
+      List<Object[]> result = query.getResultList();
+      return result.stream().map(row -> new ImageDTO((Integer) row[0], (Integer) row[1], (String) row[2], (Boolean) row[3])).collect(Collectors.toList());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new PersistenceException(e.getCause().getCause().getMessage());
     } finally {
       em.close();
     }

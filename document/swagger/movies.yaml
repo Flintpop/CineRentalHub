@@ -118,7 +118,7 @@ paths:
       responses:
         '200':
           description: Main image successfully set
-  /movies/image/{movieId}:
+  /movies/images/{movieId}:
     parameters:
       - name: movieId
         in: path
@@ -151,7 +151,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Image'
-  /movies/image/{imageId}:
+  /movies/images/{imageId}:
     delete:
       summary: Delete an image from an id
       parameters:
