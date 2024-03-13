@@ -45,9 +45,9 @@ export default {
         console.log("Movies is empty")
         return;
       }
-      for (let i = 0; i < 1; i++) {
-        console.log("Appel d'url ? : " + "http://localhost:3000/movies/main_image/" + this.movies[0].id)
-        axios.get("http://localhost:3000/movies/main_image/" + this.movies[0].id)
+      for (let i = 0; i < this.movies.length; i++) {
+        console.log("Appel d'url ? : " + "http://localhost:3000/movies/main_image/" + this.movies[i].id)
+        axios.get("http://localhost:3000/movies/main_image/" + this.movies[i].id)
             .then(response => {
               this.movies[i].main_image_url = response.data.imageUrl;
             })
