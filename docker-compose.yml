@@ -39,15 +39,16 @@ services:
     networks:
       - ubo-network
 
-#  node:
-#    build:
-#      context:
-#        ./back/node
-#    ports:
-#      - "3000:3000"
+  node:
+    build:
+      context:
+        ./back/node
+    ports:
+      - "3000:3000"
+    networks:
+      - ubo-network
 
   movie-api:
-
     build:
       context:
         ./back/api/movie
