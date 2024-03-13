@@ -1,10 +1,14 @@
 package dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import mariadbPojo.MoviesPojo;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
+@Getter
+@Setter
 public class MovieDTO {
   private int id;
   private String title;
