@@ -4,10 +4,6 @@
       <router-link to="/homeConnected" class="navbar-brand">TUX</router-link>
       <div class="navbar-links">
         <router-link to="/homeConnected">Accueil</router-link>
-<!--        <router-link to="/about">À propos</router-link>-->
-        <router-link to="/GestionLieu">Gestion des Lieux</router-link>
-        <router-link to="/GestionEvenement">Gestion des Événements</router-link>
-        <router-link to="/GestionMembre">Gestion des Membres</router-link>
         <button @click="logout">Déconnexion</button>
 <!--        <router-link to="/">Déconnexion</router-link>-->
         <!-- Ajoutez d'autres liens de navigation ici -->

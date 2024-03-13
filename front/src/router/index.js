@@ -3,6 +3,7 @@ import Home from '../views/Home.vue';
 import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import About from "../views/About.vue";
+import manageUsers from "../views/ManageUsers.vue";
 
 const routes = [
     {
@@ -25,7 +26,12 @@ const routes = [
         path: '/about',
         name: 'about',
         component: About,
-    }
+    },
+    {
+        path: '/ManageUsers',
+        name: 'manageUsers',
+        component: manageUsers,
+    },
     // ...autres routes
 ];
 
