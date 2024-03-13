@@ -29,6 +29,7 @@ const proxyOptions = {
 
 // Utilisation du middleware de proxy pour différents chemins
 app.use('/movies', createProxyMiddleware(proxyOptions));
-app.use('/movies/image', createProxyMiddleware(proxyOptions));
+app.use('/movies/images', createProxyMiddleware(proxyOptions));
+app.use('/movies/main_image', createProxyMiddleware(proxyOptions));
 
 app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));

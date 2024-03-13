@@ -230,7 +230,9 @@ VALUES (6, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 
 -- jeux de données pour la table images
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (1, 'https://www.imdb.com/title/tt0111161/mediaviewer/rm10105600/', TRUE);
+VALUES (1, 'https://www.imdb.com/title/tt0111161/mediaviewer/rm10105600/', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (1, 'https://www.imdb.com/title/tt0111161/mediaviewer/rm10105600/', FALSE);
 INSERT INTO images (movie_id, image_url, main_image)
 VALUES (2, 'https://www.imdb.com/title/tt0068646/mediaviewer/rm10105600/', TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
@@ -241,7 +243,6 @@ INSERT INTO images (movie_id, image_url, main_image)
 VALUES (5, 'https://www.imdb.com/title/tt0110912/mediaviewer/rm10105600/', TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
 VALUES (6, 'https://www.imdb.com/title/tt0108052/mediaviewer/rm10105600/', TRUE);
-
 
 -- TRIGGER
 

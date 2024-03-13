@@ -1,30 +1,61 @@
 <template>
   <div class="movie-card-grid">
-    <div class="movie-card" v-for="film in films" :key="film.id">
-      <img :src="film.main_image_url" :alt="film.title" class="movie-image"/>
+    <div class="movie-card" v-for="movie in movies" :key="movie.id">
+      <img :src="movie.main_image_url" :alt="movie.title" class="movie-image"/>
+      <p> URL : {{ movie.main_image_url }}</p>
       <div class="movie-info">
-        <h3>{{ film.title }}</h3>
-        <p>{{ film.release_date | formatDate }}</p>
-        <p>{{ film.description }}</p>
-        <p>Rental Price: {{ film.daily_rental_price }} €</p>
-        <p>Purchase Price: {{ film.purchase_price }} €</p>
-        <button @click="showMoreInfo(film)" class="info-button">Plus d'informations</button>
+        <h3>{{ movie.title }}</h3>
+        <p>{{ movie.release_date }}</p>
+        <p>{{ movie.description }}</p>
+        <p>Rental Price: {{ movie.daily_rental_price }} €</p>
+        <p>Purchase Price: {{ movie.purchase_price }} €</p>
+        <button @click="showMoreInfo(movie)" class="info-button">Plus d'informations</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: 'MovieCardGrid',
   props: {
-    films: Array
+    movies: Array
+  },
+  async mounted() {
+    console.log("Hey");
+    console.log(this.movies);
+    await this.fetchMainImages();
+    console.log(this.movies);
   },
   methods: {
     showMoreInfo(film) {
       alert(`Plus d'infos sur : ${film.title}`);
       // Ici, vous pouvez rediriger l'utilisateur ou ouvrir un modal avec plus d'informations
     },
+    fetchMainImages() {
+      console.log("Fetching main images");
+      console.log("Here is movies variable : " + this.movies);
+      if (this.movies === undefined) {
+        console.log("Movies is undefined")
+        return;
+      }
+      if (this.movies.length === 0) {
+        console.log("Movies is empty")
+        return;
+      }
+      for (let i = 0; i < 1; i++) {
+        console.log("Appel d'url ? : " + "http://localhost:3000/movies/main_image/" + this.movies[0].id)
+        axios.get("http://localhost:3000/movies/main_image/" + this.movies[0].id)
+            .then(response => {
+              this.movies[i].main_image_url = response.data.imageUrl;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+      }
+    }
   },
   filters: {
     formatDate(value) {
