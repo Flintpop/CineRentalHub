@@ -73,23 +73,4 @@ public class MovieServlet extends HttpServlet {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     }
   }
-
-  @Override
-  protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer movieId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
-    if (movieId == null || movieId < 0) {
-      return; // La validation de l'ID a échoué.
-    }
-
-    try {
-      boolean deleted = Movie.deleteMovie(movieId);
-      if (deleted) {
-        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_NO_CONTENT, "");
-      } else {
-        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Film non trouvé.\"}");
-      }
-    } catch (Exception e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"Une erreur s'est produite.\"}");
-    }
-  }
 }

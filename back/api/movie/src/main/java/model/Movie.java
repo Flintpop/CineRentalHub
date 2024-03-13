@@ -2,7 +2,6 @@ package model;
 
 import database.MariaDB;
 import dto.MovieDTO;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
 import mariadbPojo.MoviesPojo;
 
@@ -42,7 +41,7 @@ public class Movie {
     return null;
   }
 
-  public static boolean deleteMovie(Integer movieId) {
+  public static boolean desactivateMovie(Integer movieId) {
     return false;
   }
 }
