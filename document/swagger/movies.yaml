@@ -58,7 +58,14 @@ paths:
       responses:
         '200':
           description: Movie successfully updated
-    delete:
+  /movies/deactivated/{movieId}:
+    parameters:
+      - name: movieId
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
       summary: Deactivate a movie by ID
       responses:
         '204':
@@ -111,7 +118,7 @@ paths:
       responses:
         '200':
           description: Main image successfully set
-  /movies/image/{movieId}:
+  /movies/images/{movieId}:
     parameters:
       - name: movieId
         in: path
@@ -144,7 +151,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Image'
-  /movies/image/{imageId}:
+  /movies/images/{imageId}:
     delete:
       summary: Delete an image from an id
       parameters:

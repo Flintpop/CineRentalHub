@@ -18,6 +18,8 @@ DROP PROCEDURE IF EXISTS add_rental;
 DROP PROCEDURE IF EXISTS add_purchase;
 DROP PROCEDURE IF EXISTS add_comment;
 DROP PROCEDURE IF EXISTS delete_comment;
+DROP PROCEDURE IF EXISTS get_main_image_by_movie_id;
+DROP PROCEDURE IF EXISTS get_images_by_movie_id;
 
 
 -- Drop Triggers
@@ -539,6 +541,50 @@ DELIMITER ;
 
 -- CALL set_main_image(1, 2);
 
+-- Récupérer l'image principale d'un film
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_main_image_by_movie_id;
+CREATE PROCEDURE get_main_image_by_movie_id(IN id_movie INT)
+BEGIN
+    -- Vérifie si le film existe
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT id FROM images WHERE movie_id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune image n\'est disponible pour ce film.';
+    ELSE
+        -- Essayez de sélectionner l'image principale; sinon, sélectionnez l'image avec le plus petit ID
+        SELECT * FROM images
+        WHERE movie_id = id_movie AND main_image = TRUE
+        UNION ALL
+        SELECT * FROM images
+        WHERE movie_id = id_movie
+        ORDER BY main_image DESC, id
+        LIMIT 1;
+    END IF;
+END //
+DELIMITER ;
+
+-- call getMainImageByMovieId(1);
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_images_by_movie_id;
+CREATE PROCEDURE get_images_by_movie_id(IN id_movie INT)
+BEGIN
+    -- Vérifie si le film existe
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT id FROM images WHERE movie_id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune image n\'est disponible pour ce film.';
+    ELSE
+        SELECT * FROM images WHERE movie_id = id_movie;
+    END IF;
+END //
+DELIMITER ;
+
+-- call getImagesByMovieId(1);
+# TODO: Continuer d'ajouter les procédures et les drops en haut
+
 
 -- AJouter une image à un film
 DELIMITER //
@@ -733,4 +779,5 @@ END //
 DELIMITER ;
 
 -- CALL delete_comment(1);
+
 
