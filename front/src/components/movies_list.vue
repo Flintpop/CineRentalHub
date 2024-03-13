@@ -39,18 +39,18 @@ export default {
       console.log("Fetching main images");
       console.log("Here is movies variable : " + this.movies);
       if (this.movies === undefined) {
-        console.log("Movies is undefined")
+        console.error("Movies is undefined")
         return;
       }
       if (this.movies.length === 0) {
-        console.log("Movies is empty")
+        console.error("Movies is empty")
         return;
       }
       for (let i = 0; i < this.movies.length; i++) {
-        console.log("Appel d'url ? : " + "http://localhost:3000/movies/main_image/" + this.movies[i].id)
+        console.log("Appel d'url : " + "http://localhost:3000/movies/main_image/" + this.movies[i].id)
         axios.get("http://localhost:3000/movies/main_image/" + this.movies[i].id)
             .then(response => {
-              this.movies[i].main_image_url = response.data.imageUrl;
+              this.movies[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
               console.log(error.response.data);

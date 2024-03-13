@@ -49,11 +49,11 @@ export default {
   },
   methods: {
     async submitForm() {
+      console.log("Body de la requête : ", this.movie);
+      const url = 'http://localhost:3000/movies/' + this.movie.id;
+      const method = 'put';
       try {
-        this.movie.release_date = moment(this.movie.release_date).format('YYYY-MM-DD');
-        console.log("Body de la requête : ", this.movie);
-        const url = 'http://localhost:3000/movies/' + this.movieId;
-        const method = 'put';
+        this.movie.release_date = moment(this.movie.release_date).format('MMM DD, YYYY');
 
         await axios({
           method: method,
@@ -64,9 +64,10 @@ export default {
         this.resetForm();
         this.$emit('movie-added');
       } catch (error) {
-        console.error(`Erreur lors de l'${this.movieId ? 'modification' : 'ajout'} du film :`);
-        console.error(error.response.data);
-        alert(`Erreur lors de l'${this.movieId ? 'modification' : 'ajout'} du film. Veuillez réessayer.`);
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.log("Body JSON envoyé dans la requête :", this.movie);
+        console.error(`Erreur lors de la modification du film :`);
       }
     },
     resetForm() {

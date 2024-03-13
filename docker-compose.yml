@@ -57,14 +57,14 @@ services:
     networks:
       - ubo-network
 
-  user-api:
-    build:
-      context:
-        ./back/api/user
-    ports:
-        - "8085:8080"
-    networks:
-          - ubo-network
+#  user-api:
+#    build:
+#      context:
+#        ./back/api/user
+#    ports:
+#        - "8085:8080"
+#    networks:
+#          - ubo-network
 
 
 networks:

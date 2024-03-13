@@ -78,19 +78,6 @@ export default {
           .catch(error => {
             console.log(error);
           });
-
-      // this.movies = [
-      // {
-      //   id: 1,
-      //   available: true,
-      //   title: "AVATAR",
-      //   release_date: "2009-12-16",
-      //   daily_rental_price: 2.99,
-      //   purchase_price: 9.99,
-      //   description: "Malgré sa paralysie, Jake Sully, un ancien marine immobilisé dans un fauteuil roulant, est resté un combattant au plus profond de son être. Il est recruté pour se rendre à des années-lumière de la Terre, sur Pandora, où de puissants groupes industriels exploitent un minerai rarissime destiné à résoudre la crise énergétique sur Terre. Parce que l'atmosphère de Pandora est toxique pour les humains, ceux-ci ont créé le Programme Avatar, qui permet à des \" pilotes \" humains de lier leur esprit à un avatar, un corps biologique commandé à distance, capable de survivre dans cette atmosphère létale. Ces avatars sont des hybrides créés génétiquement en croisant l'ADN humain avec celui des Na'vi, les autochtones de Pandora.",
-      //   link: "https://m.media-amazon.com/images/I/51EUk47IF8L._AC_SL1080_.jpg"
-      // },
-      // ];
     },
     handleEditMovie(movieId) {
       this.selectedMovieId = movieId;

@@ -53,7 +53,7 @@ export default {
   methods: {
     async submitForm() {
       try {
-        this.movie.release_date = moment(this.movie.release_date).format('YYYY-MM-DD');
+        this.movie.release_date = moment(this.movie.release_date).format('MMM DD, YYYY');
         console.log("Body de la requête : ", this.movie);
         const url = `http://localhost:3000/movies${this.movieId ? `/${this.movieId}` : ''}`;
         const method = this.movieId ? 'put' : 'post';
