@@ -609,7 +609,7 @@ BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
     ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n''existe pas.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
         INSERT INTO shopping_cart (user_id, movie_id, cart_type, rental_duration) VALUES (user_id, movie_id, cart_type, rental_duration);
     END IF;
@@ -626,7 +626,7 @@ DELIMITER //
 CREATE PROCEDURE remove_from_cart(IN cart_id INT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM shopping_cart WHERE id = cart_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'article n''existe pas dans le panier.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'article n\'existe pas dans le panier.';
     ELSE
         DELETE FROM shopping_cart WHERE id = cart_id;
     END IF;
@@ -665,7 +665,7 @@ DELIMITER //
 CREATE PROCEDURE add_purchase(IN user_id INT, IN movie_id INT, IN purchase_date DATE)
 BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n''existe pas.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
     ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
