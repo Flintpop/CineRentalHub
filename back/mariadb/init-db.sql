@@ -26,9 +26,9 @@ DROP TRIGGER IF EXISTS before_insert_shopping_cart;
 DROP TRIGGER IF EXISTS before_insert_update_movies;
 DROP TRIGGER IF EXISTS before_insert_update_images;
 DROP TRIGGER IF EXISTS before_insert_shopping_cart_rental_duration;
-DROP TRIGGER IF EXISTS before_disable_movies_;
+DROP TRIGGER IF EXISTS before_disable_movies;
 DROP TRIGGER IF EXISTS before_update_users;
-DROP TRIGGER IF EXISTS BeforeInsertMovie;
+DROP TRIGGER IF EXISTS before_insert_movies;
 DROP TRIGGER IF EXISTS before_insert_rentals;
 DROP TRIGGER IF EXISTS before_insert_purchases;
 DROP TRIGGER IF EXISTS check_rental_overlap;
@@ -304,7 +304,7 @@ DELIMITER ;
 
 -- supprime le film des paniers si il est désactivé
 DELIMITER //
-CREATE TRIGGER before_disable_movies_
+CREATE TRIGGER before_disable_movies
     BEFORE UPDATE ON movies
     FOR EACH ROW
 BEGIN
@@ -331,7 +331,7 @@ DELIMITER ;
 -- Vérification d’un titre de film unique:
 
 DELIMITER //
-CREATE TRIGGER BeforeInsertMovie
+CREATE TRIGGER before_insert_movies
     BEFORE INSERT ON movies
     FOR EACH ROW
 BEGIN
