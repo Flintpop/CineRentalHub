@@ -11,9 +11,13 @@
 
     <!-- Section Films -->
     <section class="films">
+      <section class="add-movie">
+        <MovieForm v-if="!this.selectedMovieId" @movie-added="fetchMovies"/>
+        <MovieEditForm v-if="this.selectedMovieId" :movie="selectedMovie" @movie-added="fetchMovies"/>
+      </section>
       <h2>Nos Films</h2>
       <div class="film-list">
-        <movies_list v-if="movies.length > 0" :movies="movies"></movies_list>
+        <movies_list :movies="movies" @edit-movie="handleEditMovie"></movies_list>
       </div>
     </section>
 
@@ -24,7 +28,6 @@
         films, louez vos favoris et partagez vos avis !</p>
     </section>
 
-    <!-- Section Contact -->
     <!-- Section Contact -->
     <section class="contact">
       <h2>Contactez-nous</h2>
@@ -41,14 +44,20 @@
 import Navbar from '../components/Navbar.vue';
 import Footer from "../components/Footer.vue";
 import movies_list from "../components/movies_list.vue";
+import MovieForm from '../components/MovieForm.vue';
 import axios from "axios";
+import EditMemberForm from "../components/EditMemberForm.vue";
+import MovieEditForm from "../components/MovieEditForm.vue";
 
 export default {
   name: 'Home',
   components: {
+    MovieEditForm,
+    EditMemberForm,
     Footer,
     Navbar,
-    movies_list
+    movies_list,
+    MovieForm
   },
 
   mounted() {
@@ -82,12 +91,25 @@ export default {
       //   link: "https://m.media-amazon.com/images/I/51EUk47IF8L._AC_SL1080_.jpg"
       // },
       // ];
-    }
+    },
+    handleEditMovie(movieId) {
+      this.selectedMovieId = movieId;
+      // Trouver le film par son ID
+      const movieToEdit = this.movies.find(movie => movie.id === movieId);
+      if (movieToEdit) {
+        this.selectedMovie = movieToEdit;
+      } else {
+        console.error("Film non trouvé");
+        this.selectedMovie = null;
+      }
+    },
   },
 
   data() {
     return {
       movies: [],
+      selectedMovieId: null, // Ajoutez ceci
+      selectedMovie: null
     };
   },
 };

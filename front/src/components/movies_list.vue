@@ -10,6 +10,7 @@
         <p>Rental Price: {{ movie.daily_rental_price }} €</p>
         <p>Purchase Price: {{ movie.purchase_price }} €</p>
         <button @click="showMoreInfo(movie)" class="info-button">Plus d'informations</button>
+        <button @click="editMovie(movie.id)" class="info-button">Modifier</button>
       </div>
     </div>
   </div>
@@ -52,22 +53,16 @@ export default {
               this.movies[i].main_image_url = response.data.imageUrl;
             })
             .catch(error => {
-              console.log(error);
+              console.log(error.response.data);
             });
       }
-    }
-  },
-  filters: {
-    formatDate(value) {
-      if (value) {
-        return new Date(value).toLocaleDateString();
-      }
+    },
+    editMovie(movieId) {
+      this.$emit('edit-movie', movieId);
     },
   },
 };
 </script>
-
-
 
 
 <style scoped>
@@ -114,6 +109,7 @@ export default {
 h3 {
   margin: 10px 0;
 }
+
 .info-button {
   padding: 10px 20px;
   margin-top: 10px;
