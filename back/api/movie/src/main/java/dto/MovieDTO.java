@@ -1,16 +1,20 @@
 package dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import mariadbPojo.MoviesPojo;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
+@Getter
+@Setter
 public class MovieDTO {
   private int id;
   private String title;
-  private Date releaseDate;
-  private BigDecimal dailyRentalPrice;
-  private BigDecimal purchasePrice;
+  private Date release_date;
+  private BigDecimal daily_rental_price;
+  private BigDecimal purchase_price;
   private String description;
   private String link;
 
@@ -18,9 +22,9 @@ public class MovieDTO {
   public MovieDTO(MoviesPojo movie) {
     this.id = movie.getId();
     this.title = movie.getTitle();
-    this.releaseDate = movie.getReleaseDate();
-    this.dailyRentalPrice = movie.getDailyRentalPrice();
-    this.purchasePrice = movie.getPurchasePrice();
+    this.release_date = movie.getReleaseDate();
+    this.daily_rental_price = movie.getDailyRentalPrice();
+    this.purchase_price = movie.getPurchasePrice();
     this.description = movie.getDescription();
     this.link = movie.getLink();
   }

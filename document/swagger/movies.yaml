@@ -58,7 +58,14 @@ paths:
       responses:
         '200':
           description: Movie successfully updated
-    delete:
+  /movies/deactivated/{movieId}:
+    parameters:
+      - name: movieId
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
       summary: Deactivate a movie by ID
       responses:
         '204':
