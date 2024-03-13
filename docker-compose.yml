@@ -30,12 +30,32 @@ services:
 #    networks:
 #      - ubo-network
 
+  front:
+    build:
+      context:
+        ./front
+    ports:
+      - "8080:8080"
+    networks:
+      - ubo-network
+
   node:
     build:
       context:
         ./back/node
     ports:
       - "3000:3000"
+    networks:
+      - ubo-network
+
+  movie-api:
+    build:
+      context:
+        ./back/api/movie
+    ports:
+      - "8082:8080"
+    networks:
+      - ubo-network
 
 networks:
   ubo-network:
