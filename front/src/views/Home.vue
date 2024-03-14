@@ -104,9 +104,8 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-/* Styles adaptés pour la nouvelle thématique */
+/* Styles existants adaptés pour la nouvelle thématique */
 .banner, .about, .contact {
   padding: 40px 20px;
   text-align: center;
@@ -121,5 +120,17 @@ footer {
   text-align: center;
   padding: 20px;
   margin-top: 40px;
+}
+
+/* Modifications pour le texte de CineRentalHub */
+.banner h1 {
+  font-size: 4rem; /* Ajustez la taille selon vos préférences */
+  background: -webkit-linear-gradient(#007bff, #6c757d); /* Gradient bleu à gris pour les navigateurs WebKit */
+  background: linear-gradient(#007bff, #6c757d); /* Gradient bleu à gris pour les autres navigateurs */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* Technique pour l'effet de gradient sur le texte */
+  margin: 0;
+  padding: 0;
+  padding-bottom: 100vh;
 }
 </style>
