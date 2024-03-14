@@ -119,10 +119,14 @@ public class Movie {
         Object[] row = result.get(0);
         // Hack car bug, pour le get de main image, le 4e paramètre est un Byte et non un boolean
         Boolean isMain = (Byte) row[3] == 1;
-        return new ImageDTO((Integer) row[0], (Integer) row[1], (String) row[2], isMain);
-      }
+        ImageDTO image = new ImageDTO((Integer) row[0], (Integer) row[1], (String) row[2], isMain);
 
-      throw new Exception("No main image found for movie with id " + movieId);
+        em.getTransaction().commit(); // Ajout du commit ici
+        return image;
+      } else {
+        em.getTransaction().rollback(); // Rollback en cas de non résultat
+        throw new Exception("No main image found for movie with id " + movieId);
+      }
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();

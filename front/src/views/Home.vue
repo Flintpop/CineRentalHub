@@ -7,19 +7,15 @@
     <section class="banner">
       <h1>CineRentalHub</h1>
       <p>Découvrez | Louez | Partagez</p>
+      <section class="films">
+        <h2>Nos Films</h2>
+        <div class="film-list">
+          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
+        </div>
+      </section>
     </section>
 
     <!-- Section Films -->
-    <section class="films">
-      <section class="add-movie">
-        <MovieForm v-if="!this.selectedMovieId" @movie-added="fetchMovies"/>
-        <MovieEditForm v-if="this.selectedMovieId" :movie="selectedMovie" @movie-added="fetchMovies"/>
-      </section>
-      <h2>Nos Films</h2>
-      <div class="film-list">
-        <movies_list :movies="movies" @edit-movie="handleEditMovie"></movies_list>
-      </div>
-    </section>
 
     <!-- Section À propos -->
     <section class="about">
@@ -43,7 +39,7 @@
 <script>
 import Navbar from '../components/Navbar.vue';
 import Footer from "../components/Footer.vue";
-import movies_list from "../components/movies_list.vue";
+import MoviesList from "../components/MoviesList.vue";
 import MovieForm from '../components/MovieForm.vue';
 import axios from "axios";
 import EditMemberForm from "../components/EditMemberForm.vue";
@@ -56,7 +52,7 @@ export default {
     EditMemberForm,
     Footer,
     Navbar,
-    movies_list,
+    MoviesList,
     MovieForm
   },
 
@@ -74,6 +70,9 @@ export default {
       await axios.get("http://localhost:3000/movies")
           .then(async response => {
             this.movies = response.data;
+
+            this.clicked_added_movie = false;
+            this.clicked_modification_movie = false;
           })
           .catch(error => {
             console.log(error);
@@ -85,6 +84,8 @@ export default {
       const movieToEdit = this.movies.find(movie => movie.id === movieId);
       if (movieToEdit) {
         this.selectedMovie = movieToEdit;
+        this.clicked_modification_movie = true;
+        this.clicked_added_movie = false;
       } else {
         console.error("Film non trouvé");
         this.selectedMovie = null;
@@ -96,7 +97,9 @@ export default {
     return {
       movies: [],
       selectedMovieId: null, // Ajoutez ceci
-      selectedMovie: null
+      selectedMovie: null,
+      clicked_added_movie: false,
+      clicked_modification_movie: false
     };
   },
 };
