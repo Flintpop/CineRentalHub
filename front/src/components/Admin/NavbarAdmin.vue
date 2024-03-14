@@ -1,15 +1,12 @@
 <template>
-  <nav class="navbar">
+  <nav class="NavbarAdmin">
     <div class="container">
-      <router-link to="/" class="navbar-brand">CineRentalHub </router-link>
+      <router-link to="/HomeAdmin" class="navbar-brand">CineRentalHub</router-link>
       <div class="navbar-links">
-        <router-link to="/">Accueil</router-link>
-        <router-link to="/MyMovies">Mes films</router-link>
-        <router-link to="/MyHistory">Mon historique</router-link>
-        <router-link to="/MyAccount">Mon profil</router-link>
-        <router-link to="/MyCart">Mon panier</router-link>
-        <router-link to="/login">Déconnexion</router-link>
-
+        <router-link to="/HomeAdmin">Accueil</router-link>
+        <router-link to="/ManageMovies">Gérer les films</router-link>
+        <router-link to="/ManageUsers">Gérer les utilisateurs</router-link>
+        <router-link to="/">Déconnexion</router-link>
         <!-- Ajoutez d'autres liens de navigation ici -->
       </div>
     </div>
@@ -18,12 +15,12 @@
 
 <script>
 export default {
-  name: 'NavbarUser',
+  name: 'NavbarAdmin',
 };
 </script>
 
 <style scoped>
-.navbar {
+.NavbarAdmin {
   background-color: #007bff;
   padding: 1rem 0;
   color: #ffffff;

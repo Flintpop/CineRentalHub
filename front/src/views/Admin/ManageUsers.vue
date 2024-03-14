@@ -1,4 +1,5 @@
 <template>
+  <NavbarAdmin/>
   <div class="gestionMembres">
     <h1>Gestion des Utilisateurs</h1>
     <div class="add-member-button">
@@ -23,18 +24,18 @@
 </template>
 
 <script>
-import NavbarConnected from '../components/NavbarConnected.vue';
-import CreateMemberForm from "../components/CreateUserForm.vue";
-import EditMemberForm from "../components/EditMemberForm.vue";
-import Footer from '../components/Footer.vue';
+import CreateMemberForm from "../../components/Admin/CreateUserForm.vue";
+import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
+import Footer from '../../components/Core/Footer.vue';
 import axios from 'axios';
+import NavbarAdmin from "../../components/Admin/NavbarAdmin.vue";
 
 
 export default {
   name: 'GestionMembres',
   components: {
+    NavbarAdmin,
     EditMemberForm,
-    NavbarConnected,
     CreateMemberForm,
     Footer,
   },

@@ -1,14 +1,16 @@
 <template>
   <nav class="navbar">
     <div class="container">
-      <router-link to="/homeConnected" class="navbar-brand">TUX</router-link>
+      <router-link to="/HomeUser" class="navbar-brand">CineRentalHub </router-link>
       <div class="navbar-links">
-        <router-link to="/homeConnected">Accueil</router-link>
-        <button @click="logout">Déconnexion</button>
-<!--        <router-link to="/">Déconnexion</router-link>-->
+        <router-link to="/HomeUser">Accueil</router-link>
+        <router-link to="/MyMovies">Mes films</router-link>
+        <router-link to="/MyHistory">Mon historique</router-link>
+        <router-link to="/MyAccount">Mon profil</router-link>
+        <router-link to="/MyCart">Mon panier</router-link>
+        <router-link to="/">Déconnexion</router-link>
+
         <!-- Ajoutez d'autres liens de navigation ici -->
-
-
       </div>
     </div>
   </nav>
@@ -16,13 +18,7 @@
 
 <script>
 export default {
-  name: 'Navbar',
-  methods: {
-    logout() {
-      localStorage.removeItem('membreId');
-      this.$router.push('/');
-    }
-  }
+  name: 'NavbarUser',
 };
 </script>
 

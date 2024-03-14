@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import NavbarUser from "../components/NavbarUser.vue";
+import NavbarUser from "../components/User/NavbarUser.vue";
 
 export default {
   name: 'MyCart',

@@ -1,15 +1,22 @@
 <template>
   <div class="home">
     <!-- Navbar -->
-    <NavbarUser/>
+    <Navbar/>
+
+    <!-- Section banner -->
+    <section class="banner">
+      <h1>CineRentalHub</h1>
+      <p>Découvrez | Louez | Partagez</p>
+    </section>
 
     <!-- Section Films -->
     <section class="films">
-        <h2>Nos Films</h2>
-        <div class="film-list">
-          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
-        </div>
-      </section>
+      <h2>Nos Films</h2>
+      <div class="film-list">
+        <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
+      </div>
+    </section>
+
 
 
     <!-- Section À propos -->
@@ -32,13 +39,13 @@
 </template>
 
 <script>
-import NavbarUser from '../components/NavbarUser.vue';
-import Footer from "../components/Footer.vue";
-import MoviesList from "../components/MoviesList.vue";
-import MovieForm from '../components/MovieForm.vue';
+import Navbar from '../../components/NoConnected/Navbar.vue';
+import Footer from "../../components/Core/Footer.vue";
+import MoviesList from "../../components/Core/MoviesList.vue";
+import MovieForm from '../../components/Admin/MovieForm.vue';
 import axios from "axios";
-import EditMemberForm from "../components/EditMemberForm.vue";
-import MovieEditForm from "../components/MovieEditForm.vue";
+import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
+import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 
 export default {
   name: 'Home',
@@ -46,7 +53,7 @@ export default {
     MovieEditForm,
     EditMemberForm,
     Footer,
-    NavbarUser,
+    Navbar,
     MoviesList,
     MovieForm
   },
@@ -99,6 +106,9 @@ export default {
   },
 };
 </script>
+
+
+
 <style scoped>
 /* Styles existants adaptés pour la nouvelle thématique */
 .banner, .about, .contact {
@@ -106,7 +116,7 @@ export default {
   text-align: center;
 }
 
-.films, .about, .contact {
+.films, .contact {
   padding: 20px;
 }
 
@@ -126,6 +136,5 @@ footer {
   -webkit-text-fill-color: transparent; /* Technique pour l'effet de gradient sur le texte */
   margin: 0;
   padding: 0;
-  padding-bottom: 100vh;
 }
 </style>
