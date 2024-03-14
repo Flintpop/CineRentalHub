@@ -21,7 +21,7 @@
       <textarea id="description" v-model="movie.description" required></textarea>
     </div>
     <div class="form-group">
-      <label for="link">Lien de l'image</label>
+      <label for="link">Lien ddu film</label>
       <input type="text" id="link" v-model="movie.link">
     </div>
     <button type="submit" class="submit-button">Ajouter le film</button>
@@ -41,12 +41,12 @@ export default {
   data() {
     return {
       movie: {
-        title: 'Titre du film',
-        release_date: '2023-01-01',
-        daily_rental_price: 10.00,
-        purchase_price: 20.00,
-        description: 'Description du film',
-        link: 'https://example.com/image.jpg'
+        title: '',
+        release_date: '',
+        daily_rental_price: '',
+        purchase_price: '',
+        description: '',
+        link: ''
       }
     };
   },

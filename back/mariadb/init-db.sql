@@ -373,7 +373,7 @@ CREATE TRIGGER before_update_movies
     FOR EACH ROW
 BEGIN
     DECLARE msg VARCHAR(255);
-    IF EXISTS (SELECT title FROM movies WHERE title = NEW.title) THEN
+    IF OLD.title <> NEW.title AND EXISTS (SELECT title FROM movies WHERE title = NEW.title) THEN
         SET msg = CONCAT('Un film avec le titre ', NEW.title, ' existe déjà.');
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;

@@ -2,75 +2,154 @@
   <NavbarAdmin/>
   <div class="main-content">
     <h1>Gestion des films</h1>
+    <button @click="showAddMovieForm = true">Ajouter un film</button>
+    <!-- Modale d'ajout de film -->
+    <MovieForm v-if="showAddMovieForm" @close="showAddMovieForm = false" @submit="addMovie"></MovieForm>
 
+    <!-- Liste des films -->
     <div class="movie-card" v-for="movie in movies" :key="movie.id">
-      <div class="movie-image-wrapper">
-        <img :src="movie.main_image_url" alt="Image du film" class="movie-image">
+      <div class="movie-content">
+        <div class="movie-image-wrapper">
+          <img :src="movie.main_image_url" alt="Image du film" class="movie-image">
+        </div>
+        <div class="movie-info">
+          <h2>{{ movie.title }}</h2>
+          <p>{{ movie.description }}</p>
+          <p>Date de sortie : {{ movie.release_date }}</p>
+          <p>Prix de location quotidien : {{ movie.daily_rental_price }}€</p>
+          <p>Prix d'achat : {{ movie.purchase_price }}€</p>
+          <p>Disponible : {{ movie.available}}</p>
+          <p>Lien de la video : {{ movie.link }}</p>
+        </div>
+        <div class="movie-actions">
+          <button @click="selectMovie(movie)">Modifier</button>
+          <!-- Bouton pour désactiver le film -->
+          <button v-if="movie.available" @click="disableMovie(movie.id)" class="disable-button">Désactiver le film</button>
+          <!-- Bouton pour activer le film -->
+          <button v-else @click="enableMovie(movie.id)" class="enable-button">Activer le film</button>
+          <button @click="showImage(movie.main_image_url)">Afficher les images</button>
+          <button @click="showComments(movie.id)">Afficher les commentaires</button>
+        </div>
       </div>
-      <div class="movie-info">
-        <h2>{{ movie.title }}</h2>
-        <p>{{ movie.description }}</p>
-        <p>Date de sortie : {{ movie.release_date }}</p>
-        <p>Prix de location quotidien : {{ movie.dayly_rental_price }}</p>
-        <p>Prix d'achat : {{ movie.purchase_price }}</p>
-        <p>Disponible : {{ movie.available }}</p>
-        <p><a :href="movie.link">Lien de la vidéo</a></p>
-      </div>
-      <div class="movie-actions">
-        <button @click="editMovie(movie)">Modifier</button>
-        <button @click="deleteMovie(movie.id)">Supprimer</button>
+      <!-- Modale de modification de film -->
+      <div class="movie-edit-form">
+        <MovieEditForm v-if="showEditMovieForm && selectedMovie === movie" :movie="selectedMovie"
+                       @close="clearSelectedMovie" @submit="editMovie"></MovieEditForm>
       </div>
     </div>
+
+
   </div>
   <Footer/>
 </template>
 
+
 <script>
 import NavbarAdmin from "../../components/Admin/NavbarAdmin.vue";
 import Footer from "../../components/Core/Footer.vue";
+import MovieForm from "../../components/Admin/MovieForm.vue";
+import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
+import axios from "axios";
+import moment from "moment/moment.js";
 
 export default {
-  components: {Footer, NavbarAdmin},
+  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm},
+  mounted() {
+    // Simuler la récupération de données
+    this.fetchMovies();
+  },
   data() {
     return {
       showAddMovieForm: false,
-      movies: [
-        {
-          id: 1,
-          available: true,
-          title: "Le Parrain",
-          release_date: "1972-03-24",
-          dayly_rental_price: 2.99,
-          purchase_price: 9.99,
-          description: "Le patriarche d'une famille mafieuse de New York, âgé et malade, est soutenu par son fils cadet. Celui-ci doit prendre la relève du père et régner sur le crime organisé.",
-          link: "https://www.youtube.com/watch?v=bmtuIhesQWA",
-          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQyO8trmFbGTJIY6MaIFqzfPB6hW8UFCAYxTqtdKWGz7EJ6Jt-d"
-        },
-        {
-          id: 2,
-          available: true,
-          title: "Le Parrain 2",
-          release_date: "1974-12-18",
-          dayly_rental_price: 2.99,
-          purchase_price: 9.99,
-          description: "Michael Corleone tente de se réhabiliter socialement et de légaliser les activités de sa famille. Mais ses anciens ennemis lui déclarent à nouveau la guerre.",
-          link: "https://www.youtube.com/watch?v=9O1Iy9od7-A",
-          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSm7mhU1VNBbj92y8jqRnTmGEPslNFw-T5nMBswgfis03J2OMRa"
-        }
-
-      ]
+      showEditMovieForm: false,
+      movies: []
     };
   },
   methods: {
-    addMovie() {
+    async fetchMovies() {
+      // Simulation de la récupération de données depuis la base de données
+      await axios.get("http://localhost:3000/movies")
+          .then(async response => {
+            this.movies = response.data;
+
+
+            // Pour chaque film, récupérer l'image principale
+            for (let i = 0; i < this.movies.length; i++) {
+              console.log("Appel d'url : " + "http://localhost:3000/movies/main_image/" + this.movies[i].id)
+              axios.get("http://localhost:3000/movies/main_image/" + this.movies[i].id)
+                  .then(response => {
+                    this.movies[i].main_image_url = response.data.image_url;
+                  })
+                  .catch(error => {
+                    console.log(error.response.data);
+                  });
+
+            this.movies[i].release_date = moment(this.movies[i].release_date).format('YYYY-MM-DD');
+
+            }
+
+          })
+          .catch(error => {
+            console.log(error);
+          });
+    },
+    addMovie(movieData) {
       // Logique pour ajouter un film
     },
-    editMovie(movie) {
-      // Logique pour modifier un film
+    selectMovie(movie) {
+      this.selectedMovie = movie;
+      this.showEditMovieForm = true;
     },
-    deleteMovie(movieId) {
-      // Logique pour supprimer un film
-    }
+    clearSelectedMovie() {
+      this.selectedMovie = null;
+      this.showEditMovieForm = false;
+    },
+    async disableMovie(movieId) {
+      const url = `http://localhost:3000/movies/deactivated/${movieId}`;
+      try {
+        await axios.patch(url);
+        alert(`Film désactivé avec succès !`);
+        this.fetchMovies(); // Rafraîchir la liste des films après la désactivation
+      } catch (error) {
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.error(`Erreur lors de la désactivation du film :`, error);
+      }
+    },
+    async enableMovie(movieId) {
+      const url = `http://localhost:3000/movies/activated/${movieId}`;
+
+      try {
+        await axios.patch(url);
+        alert(`Film activé avec succès !`);
+        this.fetchMovies(); // Rafraîchir la liste des films après l'activation
+      } catch (error) {
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.error(`Erreur lors de l'activation du film :`, error);
+      }
+    },
+    async deleteMovie(movieId) {
+      const url = `http://localhost:3000/movies/${movieId}`;
+
+      try {
+        await axios.delete(url);
+        alert(`Film supprimé avec succès !`);
+        this.fetchMovies(); // Rafraîchir la liste des films après la suppression
+      } catch (error) {
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.error(`Erreur lors de la suppression du film :`, error);
+      }
+    },
+    showImage(imageUrl) {
+      // Logique pour afficher l'image
+    },
+    showComments(movieId) {
+      // Logique pour afficher les commentaires
+    },
+
+
   }
 };
 </script>
@@ -82,16 +161,20 @@ h1 {
 }
 
 .movie-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
-  height: 250px;
-
+  background-color: #f9f9f9;
 }
+
+.movie-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 250px;
+}
+
 .movie-image-wrapper {
   height: 100%;
 }
@@ -119,13 +202,15 @@ button {
 button:hover {
   background-color: #2980b9;
 }
+
 .movie-image {
   height: 100%;
   object-fit: cover;
   margin-right: 20px;
 }
-.main-content {
-  width: 80%;
-  margin: 0 auto;
+
+.movie-edit-form {
+  margin-top: 20px;
 }
+
 </style>
