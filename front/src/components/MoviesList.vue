@@ -1,8 +1,8 @@
 <template>
   <div class="movie-card-grid">
-    <router-link v-for="movie in movies" :key="movie.id" :to="'MovieDetails'" class="movie-card">
+    <div v-for="movie in movies" :key="movie.id" class="movie-card" @click="goToMovieDetails(movie.id)">
       <img :src="movie.main_image_url" :alt="movie.title" class="movie-image"/>
-    </router-link>
+    </div>
   </div>
 </template>
 
@@ -30,8 +30,7 @@ export default {
       await Promise.all(this.movies.map((movie, i) => {
         return axios.get(`http://localhost:3000/movies/main_image/${movie.id}`)
             .then(response => {
-              // this.$set(this.movies, i, {...movie, main_image_url: response.data.image_url});
-              console.log("URL de l'image principale du film", response.data.image_url);
+              // console.log("URL de l'image principale du film", response.data.image_url);
               this.movies[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
@@ -41,6 +40,10 @@ export default {
       }));
       console.log(this.movies); // Log après mise à jour des images
     },
+    goToMovieDetails(movieId) {
+      // Utilisez Vue Router pour naviguer programmatically
+      this.$router.push({ name: 'MovieDetailsPage', params: { movieId: movieId } });
+    }
   }
 };
 </script>
@@ -66,6 +69,7 @@ export default {
   transition: transform 0.3s ease, filter 0.3s ease; /* Mise à jour pour inclure la transition du filtre */
   transform: scale(1); /* Assure que la propriété transform est animable */
   filter: brightness(65%); /* Assombrir légèrement par défaut */
+  cursor: pointer; /* Ajoutez un curseur pointer pour indiquer la cliquabilité */
 }
 
 .movie-card:hover {

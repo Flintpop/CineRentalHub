@@ -4,6 +4,7 @@ import Login from '../views/Login.vue';
 import Register from '../views/Register.vue';
 import About from "../views/About.vue";
 import manageUsers from "../views/ManageUsers.vue";
+import MovieDetailsPage from "../views/MovieDetailsPage.vue";
 
 const routes = [
     {
@@ -32,7 +33,11 @@ const routes = [
         name: 'manageUsers',
         component: manageUsers,
     },
-    // ...autres routes
+    {
+        path: '/MovieDetailsPage/:movieId',
+        name: 'MovieDetailsPage',
+        component: MovieDetailsPage
+    }
 ];
 
 const router = createRouter({
