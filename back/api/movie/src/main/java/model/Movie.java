@@ -141,12 +141,16 @@ public class Movie {
   public static List<ImageDTO> getImagesByMovieId(Integer movieId) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
+      em.getTransaction().begin();
+
       StoredProcedureQuery query = em.createStoredProcedureQuery("get_images_by_movie_id")
               .registerStoredProcedureParameter("id_movie", Integer.class, ParameterMode.IN)
               .setParameter("id_movie", movieId);
 
       @SuppressWarnings("unchecked")
       List<Object[]> result = query.getResultList();
+      em.getTransaction().commit();
+
       return result.stream().map(row -> new ImageDTO((Integer) row[0], (Integer) row[1], (String) row[2], (Boolean) row[3])).collect(Collectors.toList());
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
@@ -166,6 +170,94 @@ public class Movie {
       StoredProcedureQuery query = em.createStoredProcedureQuery("disable_movie")
               .registerStoredProcedureParameter("_movie_id", Integer.class, ParameterMode.IN)
               .setParameter("_movie_id", movieId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static void activateMovie(Integer movieId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("enable_movie")
+              .registerStoredProcedureParameter("_movie_id", Integer.class, ParameterMode.IN)
+              .setParameter("_movie_id", movieId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static void addImage(Integer movieId, String link) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("add_image_to_movie")
+              .registerStoredProcedureParameter("_movie_id", Integer.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("_image_url", String.class, ParameterMode.IN)
+              .setParameter("_movie_id", movieId)
+              .setParameter("_image_url", link);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static void deleteImage(Integer imageId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("delete_image_by_id")
+              .registerStoredProcedureParameter("_image_id", Integer.class, ParameterMode.IN)
+              .setParameter("_image_id", imageId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  public static void setMainImage(Integer id_movie, Integer id_image) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("set_main_image")
+              .registerStoredProcedureParameter("id_movie", Integer.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("id_image", Integer.class, ParameterMode.IN)
+              .setParameter("id_movie", id_movie)
+              .setParameter("id_image", id_image);
 
       query.execute();
       em.getTransaction().commit();

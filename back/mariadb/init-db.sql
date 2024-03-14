@@ -524,6 +524,19 @@ DELIMITER ;
 
 -- CALL disable_movie(1);
 
+-- désactiver un film par son ID
+DELIMITER //
+DROP PROCEDURE IF EXISTS enable_movie;
+CREATE PROCEDURE enable_movie(IN _movie_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = _movie_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSE
+        UPDATE movies SET available = TRUE WHERE id = _movie_id;
+        DELETE FROM shopping_cart WHERE movie_id = _movie_id;
+    END IF;
+END //
+DELIMITER ;
 
 -- Définir l'image principale d'un film et désactiver les autres images
 DELIMITER //
