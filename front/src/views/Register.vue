@@ -5,6 +5,14 @@
     <h1>Inscription</h1>
     <form @submit.prevent="login">
       <div class="form-group">
+        <label for="lastName">Nom:</label>
+        <input type="text" id="lastName" v-model="user.lastName" required>
+      </div>
+      <div class="form-group">
+        <label for="firstName">Prénom:</label>
+        <input type="text" id="firstName" v-model="user.firstName" required>
+      </div>
+      <div class="form-group">
         <label for="email">E-mail:</label>
         <input type="email" id="email" v-model="user.email" required>
       </div>
@@ -21,7 +29,6 @@
   </div>
   <Footer />
 </template>
-
 <script>
 import Navbar from "../components/Navbar.vue";
 import Footer from "../components/Footer.vue";
@@ -35,8 +42,12 @@ export default {
   data() {
     return {
       user: {
+        firstName: '',
+        lastName: '',
         email: '',
-        motDePasse: '',
+        password: '',
+        confirmPassword: '',
+        role:'user'
       },
     };
   },

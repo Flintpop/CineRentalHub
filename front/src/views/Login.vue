@@ -15,8 +15,11 @@
       <!--        bouton avec redirection vers la page HommeConnected en type bouton et non routerlink-->
       <button type="submit">Se connecter</button>
 
+
     </form>
+
   </div>
+  <router-link to="/HomeUser" class="router-link">HomeUser</router-link>
   <Footer/>
 </template>
 
@@ -80,6 +83,7 @@ export default {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  text-align: left; /* Centrer le texte */
 }
 
 .form-group {
@@ -92,13 +96,18 @@ export default {
 }
 
 .form-group input {
+  box-sizing: border-box; /* Ajouter cette ligne */
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 button {
+  display: block; /* Ajouter cette ligne */
+  margin: auto; /* Ajouter cette ligne */
   padding: 10px 20px;
   background-color: #3498db;
   text-align: center;
@@ -106,6 +115,7 @@ button {
   border-radius: 4px;
   color: white;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .router-link {
@@ -116,9 +126,14 @@ button {
   border-radius: 4px;
   color: white;
   cursor: pointer;
+  margin-top: 10px; /* Ajouter de l'espacement au-dessus du lien */
 }
 
 button:hover {
   background-color: #2980b9;
+}
+h1 {
+  color: #007bff;
+  text-align: center;
 }
 </style>
