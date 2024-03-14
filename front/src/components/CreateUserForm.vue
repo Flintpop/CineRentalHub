@@ -57,7 +57,7 @@ export default {
         this.$emit('memberCreated');
         // Vous pouvez également rediriger l'utilisateur vers une autre page ici
       } catch (error) {
-        console.error('Erreur lors de l\'inscription', error);
+        console.error('Erreur lors de l\'inscription', error.response.data.error);
       }
     }
   }
