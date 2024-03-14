@@ -1,14 +1,14 @@
 package dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import mariadbPojo.UsersPojo;
 
-import java.math.BigDecimal;
-import java.sql.Date;
-
+@Getter
+@Setter
 public class UserPasswordDTO {
   private int id;
   private String password;
-
 
 
   // Constructeur qui accepte un UserPojo
@@ -16,6 +16,4 @@ public class UserPasswordDTO {
     this.id = user.getId();
     this.password = user.getPassword();
   }
-
-  // Getters et Setters
 }

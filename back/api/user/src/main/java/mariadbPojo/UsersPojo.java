@@ -1,9 +1,13 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "users", schema = "cine_rental_hub")
 public class UsersPojo {
@@ -21,11 +25,11 @@ public class UsersPojo {
   @Column(name = "email", nullable = false, length = 255)
   private String email;
   @Basic
-  @Column(name = "activated", nullable = false)
-  private boolean activated;
-  @Basic
   @Column(name = "password", nullable = false, length = 255)
   private String password;
+  @Basic
+  @Column(name = "activated", nullable = false)
+  private byte activated;
   @Basic
   @Column(name = "role", nullable = false)
   private Object role;
@@ -37,59 +41,6 @@ public class UsersPojo {
   private Collection<RentalsPojo> rentalsById;
   @OneToMany(mappedBy = "usersByUserId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public String getFirstName() {
-    return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public boolean isActivated() {
-    return activated;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public Object getRole() {
-    return role;
-  }
-
-  public void setRole(Object role) {
-    this.role = role;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -116,37 +67,5 @@ public class UsersPojo {
     result = 31 * result + (password != null ? password.hashCode() : 0);
     result = 31 * result + (role != null ? role.hashCode() : 0);
     return result;
-  }
-
-  public Collection<CommentsPojo> getCommentsById() {
-    return commentsById;
-  }
-
-  public void setCommentsById(Collection<CommentsPojo> commentsById) {
-    this.commentsById = commentsById;
-  }
-
-  public Collection<PurchasesPojo> getPurchasesById() {
-    return purchasesById;
-  }
-
-  public void setPurchasesById(Collection<PurchasesPojo> purchasesById) {
-    this.purchasesById = purchasesById;
-  }
-
-  public Collection<RentalsPojo> getRentalsById() {
-    return rentalsById;
-  }
-
-  public void setRentalsById(Collection<RentalsPojo> rentalsById) {
-    this.rentalsById = rentalsById;
-  }
-
-  public Collection<ShoppingCartPojo> getShoppingCartsById() {
-    return shoppingCartsById;
-  }
-
-  public void setShoppingCartsById(Collection<ShoppingCartPojo> shoppingCartsById) {
-    this.shoppingCartsById = shoppingCartsById;
   }
 }

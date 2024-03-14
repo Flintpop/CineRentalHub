@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import dto.UserDTO;
 import dto.UserLowDTO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -23,7 +22,4 @@ public class UsersServlet extends HttpServlet {
     ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(users));
   }
 
-
-
-  // Ajoutez ici des méthodes doPost, doPut, doDelete pour la création, mise à jour, suppression des utilisateurs
 }

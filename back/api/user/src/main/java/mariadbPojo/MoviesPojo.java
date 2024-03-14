@@ -1,11 +1,15 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.Collection;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "movies", schema = "cine_rental_hub")
 public class MoviesPojo {
@@ -45,70 +49,6 @@ public class MoviesPojo {
   @OneToMany(mappedBy = "moviesByMovieId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
 
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public byte getAvailable() {
-    return available;
-  }
-
-  public void setAvailable(byte available) {
-    this.available = available;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public Date getReleaseDate() {
-    return releaseDate;
-  }
-
-  public void setReleaseDate(Date releaseDate) {
-    this.releaseDate = releaseDate;
-  }
-
-  public BigDecimal getDailyRentalPrice() {
-    return dailyRentalPrice;
-  }
-
-  public void setDailyRentalPrice(BigDecimal dailyRentalPrice) {
-    this.dailyRentalPrice = dailyRentalPrice;
-  }
-
-  public BigDecimal getPurchasePrice() {
-    return purchasePrice;
-  }
-
-  public void setPurchasePrice(BigDecimal purchasePrice) {
-    this.purchasePrice = purchasePrice;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public String getLink() {
-    return link;
-  }
-
-  public void setLink(String link) {
-    this.link = link;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -140,46 +80,6 @@ public class MoviesPojo {
     result = 31 * result + (description != null ? description.hashCode() : 0);
     result = 31 * result + (link != null ? link.hashCode() : 0);
     return result;
-  }
-
-  public Collection<CommentsPojo> getCommentsById() {
-    return commentsById;
-  }
-
-  public void setCommentsById(Collection<CommentsPojo> commentsById) {
-    this.commentsById = commentsById;
-  }
-
-  public Collection<ImagesPojo> getImagesById() {
-    return imagesById;
-  }
-
-  public void setImagesById(Collection<ImagesPojo> imagesById) {
-    this.imagesById = imagesById;
-  }
-
-  public Collection<PurchasesPojo> getPurchasesById() {
-    return purchasesById;
-  }
-
-  public void setPurchasesById(Collection<PurchasesPojo> purchasesById) {
-    this.purchasesById = purchasesById;
-  }
-
-  public Collection<RentalsPojo> getRentalsById() {
-    return rentalsById;
-  }
-
-  public void setRentalsById(Collection<RentalsPojo> rentalsById) {
-    this.rentalsById = rentalsById;
-  }
-
-  public Collection<ShoppingCartPojo> getShoppingCartsById() {
-    return shoppingCartsById;
-  }
-
-  public void setShoppingCartsById(Collection<ShoppingCartPojo> shoppingCartsById) {
-    this.shoppingCartsById = shoppingCartsById;
   }
 
 }

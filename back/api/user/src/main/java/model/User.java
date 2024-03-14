@@ -1,11 +1,11 @@
 package model;
 
 import database.MariaDB;
-import dto.UserDTO;
 import dto.UserLowDTO;
+import dto.UserDTO;
+import dto.UserPostDTO;
 import jakarta.persistence.*;
 import mariadbPojo.UsersPojo;
-import org.hibernate.exception.GenericJDBCException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,19 +21,21 @@ public class User {
     }
   }
 
-  public static List<UserDTO> getUser() {
+  public static UserDTO getUser(Integer userId) {
     EntityManager em = MariaDB.getEntityManager();
     try {
-      List<UsersPojo> userPojos = em.createQuery("SELECT u FROM UsersPojo u", UsersPojo.class).getResultList();
-      return userPojos.stream().map(UserDTO::new).collect(Collectors.toList());
+      UsersPojo usersPojo = em.find(UsersPojo.class, userId);
+      if (usersPojo == null) {
+        throw new EntityNotFoundException("L'utilisateur avec l'ID " + userId + " n'existe pas.");
+      }
+      return new UserDTO(usersPojo);
     } finally {
       em.close();
     }
   }
 
-  public static UsersPojo createUser(UserDTO userDto) throws Exception {
+  public static UserPostDTO createUser(UserPostDTO userDto) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
-    UsersPojo user = null;
 
     try {
       em.getTransaction().begin();
@@ -55,7 +57,7 @@ public class User {
       query.execute();
 
       em.getTransaction().commit();
-      return user;
+      return userDto;
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();
@@ -66,5 +68,4 @@ public class User {
     }
   }
 
-  // Ajoutez ici d'autres méthodes pour créer, mettre à jour, supprimer des utilisateurs, etc.
 }
