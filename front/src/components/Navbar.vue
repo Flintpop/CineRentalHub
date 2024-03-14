@@ -1,13 +1,12 @@
 <template>
   <nav class="navbar">
     <div class="container">
-      <router-link to="/" class="navbar-brand">TUX</router-link>
+      <router-link to="/" class="navbar-brand">CineRentalHub </router-link>
       <div class="navbar-links">
         <router-link to="/">Accueil</router-link>
         <router-link to="/about">À propos</router-link>
         <router-link to="/login">Connexion</router-link>
-        <router-link to="/manageUsers">Gestion des utilisateurs</router-link>
-<!--        <router-link to="/register">Inscription</router-link>-->
+        <router-link to="/register">Inscription</router-link>
 
         <!-- Ajoutez d'autres liens de navigation ici -->
       </div>
