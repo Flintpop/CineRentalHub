@@ -30,6 +30,7 @@ DROP TRIGGER IF EXISTS before_insert_shopping_cart_rental_duration;
 DROP TRIGGER IF EXISTS before_disable_movies;
 DROP TRIGGER IF EXISTS before_update_users;
 DROP TRIGGER IF EXISTS before_insert_movies;
+DROP TRIGGER IF EXISTS before_update_movies;
 DROP TRIGGER IF EXISTS before_insert_rentals;
 DROP TRIGGER IF EXISTS before_insert_purchases;
 DROP TRIGGER IF EXISTS check_rental_overlap;
@@ -253,8 +254,9 @@ CREATE TRIGGER before_insert_shopping_cart
     ON shopping_cart
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF (NEW.cart_type = 'rental' AND (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible pour la location.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est plus disponible.';
     END IF;
     IF (NEW.cart_type = 'purchase' AND (SELECT purchase_price FROM movies WHERE id = NEW.movie_id) = -1) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible pour l\'achat.';
@@ -270,11 +272,14 @@ CREATE TRIGGER before_insert_update_movies
     ON movies
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.daily_rental_price < 0 AND NEW.daily_rental_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix de location est invalide.';
+        SET msg = 'Vous avez sasi ' + NEW.daily_rental_price + ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NEW.purchase_price < 0 AND NEW.purchase_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix d\'achat est invalide.';
+        SET msg = 'Vous avez sasi ' + NEW.purchase_price + ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -302,8 +307,10 @@ CREATE TRIGGER before_insert_shopping_cart_rental_duration
     ON shopping_cart
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.cart_type = 'rental' AND NEW.rental_duration <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La durée en jours de location doit être supérieure à 0.';
+        SET msg = 'La durée de location doit être supérieure à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -332,15 +339,17 @@ CREATE TRIGGER before_update_users
     ON users
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.email <> OLD.email AND EXISTS (SELECT id FROM users WHERE email = NEW.email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'email est déjà utilisé par un autre utilisateur.';
+        SET msg = CONCAT('L\'email ', NEW.email, ' est déjà utilisé.');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
 DELIMITER ;
 
 
--- Vérification d’un titre de film unique:
+-- Vérification d’un titre de film unique à l’ajout :
 
 DELIMITER //
 CREATE TRIGGER before_insert_movies
@@ -356,6 +365,22 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- Vérification d’un titre de film unique à la modification:
+DELIMITER //
+CREATE TRIGGER before_update_movies
+    BEFORE UPDATE
+    ON movies
+    FOR EACH ROW
+BEGIN
+    DECLARE msg VARCHAR(255);
+    IF EXISTS (SELECT title FROM movies WHERE title = NEW.title) THEN
+        SET msg = CONCAT('Un film avec le titre ', NEW.title, ' existe déjà.');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
+    END IF;
+END;
+//
+DELIMITER ;
+
 
 
 -- Vérifie que le film est disponible à la location et que l'utilisateur est activé
@@ -412,15 +437,15 @@ CREATE TRIGGER check_rental_overlap
     ON rentals
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF EXISTS (SELECT *
                FROM rentals
                WHERE user_id = NEW.user_id
                  AND movie_id = NEW.movie_id
                  AND (NEW.rental_date BETWEEN rental_date AND return_date
                    OR NEW.return_date BETWEEN rental_date AND return_date)) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT =
-                    'Le même utilisateur ne peut pas louer le même film sur des périodes qui se chevauchent.';
+        SET msg = 'Vous avez déjà essayé de louer ce film pour une période qui se chevauche avec une location existante.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -452,9 +477,10 @@ CREATE TRIGGER check_return_date
     ON rentals
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.return_date <= NEW.rental_date THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La date de retour doit être postérieure à la date de début de la location.';
+        SET msg = 'La date de retour ( ' + NEW.return_date + ' ) doit être après la date de location ( ' + NEW.rental_date + ' ).';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -485,11 +511,14 @@ CREATE PROCEDURE update_movie(IN movie_id INT, IN title VARCHAR(255), IN release
                               IN daily_rental_price DECIMAL(10, 2), IN purchase_price DECIMAL(10, 2),
                               IN link VARCHAR(2000))
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF daily_rental_price < 0 AND daily_rental_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix de location est invalide.';
+        SET msg = 'Vous avez saisi ' + daily_rental_price + ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF purchase_price < 0 AND purchase_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix d\'achat est invalide.';
+        SET msg = 'Vous avez saisi ' + purchase_price + ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
@@ -635,8 +664,10 @@ DELIMITER //
 CREATE PROCEDURE create_user(IN last_name VARCHAR(255), IN first_name VARCHAR(255), IN new_email VARCHAR(255),
                              IN password CHAR(255), IN role ENUM ('user', 'admin'))
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF EXISTS (SELECT email FROM users WHERE email = new_email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'email est déjà utilisé.';
+        SET msg = CONCAT('L\'email ', new_email, ' est déjà utilisé.');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     ELSE
         INSERT INTO users (last_name, first_name, email, password, role, activated)
         VALUES (last_name, first_name, new_email, password, role, TRUE);

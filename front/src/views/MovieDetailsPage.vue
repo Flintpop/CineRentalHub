@@ -23,8 +23,8 @@
 
 <script>
 import axios from 'axios';
-import Carousel from '../components/Carousel.vue';
-import Navbar from "../components/Navbar.vue"; // Assurez-vous d'importer le composant Carousel
+import Carousel from '../components/Core/Carousel.vue';
+import Navbar from "../components/NoConnected/Navbar.vue"; // Assurez-vous d'importer le composant Carousel
 
 export default {
   name: 'MovieDetailPage',

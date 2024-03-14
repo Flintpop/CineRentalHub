@@ -1,16 +1,16 @@
 <template>
-  <div class="MyHistory">
+  <div class="MyAccount">
     <NavbarUser/>
-    <h1>Mon Historique</h1>
+    <h1>Mon Compte</h1>
     <!-- Ici, vous pouvez ajouter le code pour afficher les articles dans le panier -->
   </div>
 </template>
 
 <script>
-import NavbarUser from "../components/NavbarUser.vue";
+import NavbarUser from "../../components/User/NavbarUser.vue";
 
 export default {
-  name: 'MyHistory',
+  name: 'MyAccount',
   components: {NavbarUser},
   data() {
     return {

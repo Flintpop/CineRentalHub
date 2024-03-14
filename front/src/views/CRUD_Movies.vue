@@ -42,13 +42,13 @@
 </template>
 
 <script>
-import Navbar from '../components/Navbar.vue';
-import Footer from "../components/Footer.vue";
+import Navbar from '../components/NoConnected/Navbar.vue';
+import Footer from "../components/Core/Footer.vue";
 import movies_list from "../components/movies_list.vue";
-import MovieForm from '../components/MovieForm.vue';
+import MovieForm from '../components/Admin/MovieForm.vue';
 import axios from "axios";
-import EditMemberForm from "../components/EditMemberForm.vue";
-import MovieEditForm from "../components/MovieEditForm.vue";
+import EditMemberForm from "../components/Admin/EditMemberForm.vue";
+import MovieEditForm from "../components/Admin/MovieEditForm.vue";
 
 export default {
   name: 'Home',

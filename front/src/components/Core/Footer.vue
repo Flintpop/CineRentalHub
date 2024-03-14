@@ -2,7 +2,7 @@
   <footer class="footer">
     <div class="container">
       <p>© 2024 TUX. Tous droits réservés.</p>
-      <p> THOMAS Antoine | LE GOFF Tanguy | AMIL Abdelaziz</p>
+      <p> THOMAS Antoine | LE GOFF Tanguy </p>
       <div class="footer-links">
         <router-link to="/about">À propos</router-link>
         <router-link to="/contact">Contact</router-link>
