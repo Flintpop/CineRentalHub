@@ -3,19 +3,21 @@
     <!-- Navbar -->
     <Navbar/>
 
-    <!-- Bannière principale -->
+    <!-- Section banner -->
     <section class="banner">
       <h1>CineRentalHub</h1>
       <p>Découvrez | Louez | Partagez</p>
-      <section class="films">
-        <h2>Nos Films</h2>
-        <div class="film-list">
-          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
-        </div>
-      </section>
     </section>
 
     <!-- Section Films -->
+    <section class="films">
+      <h2>Nos Films</h2>
+      <div class="film-list">
+        <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
+      </div>
+    </section>
+
+
 
     <!-- Section À propos -->
     <section class="about">
@@ -104,6 +106,9 @@ export default {
   },
 };
 </script>
+
+
+
 <style scoped>
 /* Styles existants adaptés pour la nouvelle thématique */
 .banner, .about, .contact {
@@ -111,7 +116,7 @@ export default {
   text-align: center;
 }
 
-.films, .about, .contact {
+.films, .contact {
   padding: 20px;
 }
 
@@ -131,6 +136,5 @@ footer {
   -webkit-text-fill-color: transparent; /* Technique pour l'effet de gradient sur le texte */
   margin: 0;
   padding: 0;
-  padding-bottom: 100vh;
 }
 </style>
