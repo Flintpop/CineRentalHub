@@ -54,7 +54,7 @@ export default {
       const movieId = this.$route.params.movieId;
       console.log("L'id du movie " + movieId);
       try {
-        const response = await axios.get(``);
+        const response = await axios.get(`http://localhost:3000/movies/${movieId}`);
         this.movie = response.data;
         console.log("Requête : \n " + +"\nMovie : \n" + JSON.stringify(response, null, 2));
       } catch (error) {
@@ -64,7 +64,7 @@ export default {
     async fetchMovieImages() {
       const movieId = this.$route.params.movieId;
       try {
-        const response = await axios.get(``);
+        const response = await axios.get(`http://localhost:3000/movies/images/${movieId}`);
         this.images = response.data; // Supposons que l'API renvoie un objet avec une propriété 'images' qui est un tableau d'URLs
       } catch (error) {
         console.error(error);
@@ -74,26 +74,26 @@ export default {
       if (!this.isUserLoggedIn()) {
         return; // Ne fait rien si l'utilisateur n'est pas connecté
       }
-      const movieId = this.$route.params.movieId;
-      try {
-        const response = await axios.get(``);
-        this.isPurchased = response.data.isPurchased;
-      } catch (error) {
-        console.error(error);
-      }
+      // const movieId = this.$route.params.movieId;
+      // try {
+      //   const response = await axios.get(``);
+      //   this.isPurchased = response.data.isPurchased;
+      // } catch (error) {
+      //   console.error(error);
+      // }
     },
 
     async checkRentalStatus() {
       if (!this.isUserLoggedIn()) {
         return; // Ne fait rien si l'utilisateur n'est pas connecté
       }
-      const movieId = this.$route.params.movieId;
-      try {
-        const response = await axios.get(`http://localhost:3000/movies/${movieId}/isRented`);
-        this.isRented = response.data.isRented;
-      } catch (error) {
-        console.error(error);
-      }
+      // const movieId = this.$route.params.movieId;
+      // try {
+      //   const response = await axios.get(`http://localhost:3000/movies/${movieId}/isRented`);
+      //   this.isRented = response.data.isRented;
+      // } catch (error) {
+      //   console.error(error);
+      // }
     },
 
     isUserLoggedIn() {
