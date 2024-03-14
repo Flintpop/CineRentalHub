@@ -55,32 +55,12 @@ public class User {
       query.execute();
 
       em.getTransaction().commit();
-
-      // Tentez de récupérer l'utilisateur après la création pour obtenir l'instance complète
-      try {
-        user = em.createQuery("SELECT u FROM UsersPojo u WHERE u.email = :email", UsersPojo.class)
-          .setParameter("email", userDto.getEmail())
-          .getSingleResult();
-      } catch (NoResultException e) {
-        throw new Exception("L'utilisateur n'a pas été trouvé après la création.");
-      }
-
       return user;
-
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();
       }
-
-      Throwable cause = e.getCause();
-      if (cause instanceof GenericJDBCException) {
-        // Récupérer et renvoyer le message d'erreur SQL personnalisé
-        throw new Exception("Erreur base de données : " + cause.getMessage());
-      } else {
-        // Renvoyer l'exception non spécifique
-        throw new Exception("Erreur lors de la création de l'utilisateur.");
-      }
-
+      throw new Exception(e.getCause().getCause().getMessage());
     } finally {
       em.close();
     }

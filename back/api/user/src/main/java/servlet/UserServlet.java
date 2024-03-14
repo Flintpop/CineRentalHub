@@ -23,19 +23,12 @@ public class UserServlet extends HttpServlet {
 
     try {
       UserDTO userDto = gson.fromJson(jsonBody, UserDTO.class);
-      // Validez ici les données de userDto si nécessaire.
-
       UsersPojo userCreated = User.createUser(userDto);
-
-      if (userCreated != null) {
-        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(new UserDTO(userCreated)));
-      } else {
-        ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"Erreur lors de la création de l'utilisateur.\"}");
-      }
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(userCreated));
     } catch (JsonSyntaxException e) {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      throw new RuntimeException(e);
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
     }
   }
 
