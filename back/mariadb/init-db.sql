@@ -28,6 +28,7 @@ DROP TRIGGER IF EXISTS before_insert_shopping_cart_rental_duration;
 DROP TRIGGER IF EXISTS before_disable_movies;
 DROP TRIGGER IF EXISTS before_update_users;
 DROP TRIGGER IF EXISTS before_insert_movies;
+DROP TRIGGER IF EXISTS before_update_movies;
 DROP TRIGGER IF EXISTS before_insert_rentals;
 DROP TRIGGER IF EXISTS before_insert_purchases;
 DROP TRIGGER IF EXISTS check_rental_overlap;
