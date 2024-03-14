@@ -13,6 +13,11 @@
     <p>Date de sortie : {{ this.movie.release_date }}</p>
     <p>Prix d'achat : {{ this.movie.purchase_price }} </p>
     <p>Prix de location par jour : {{ this.movie.daily_rental_price }} </p>
+    <button v-if="!isPurchased" @click="purchaseMovie">Acheter</button>
+    <button v-else-if="isPurchased" disabled>Déjà acheté</button>
+
+    <!-- Bouton Louer s'affiche si l'utilisateur est connecté, le film n'est pas déjà loué ou acheté -->
+    <button v-if="!isPurchased && !isRented" @click="rentMovie">Louer</button>
   </div>
 </template>
 
@@ -31,21 +36,27 @@ export default {
     return {
       movie: {},
       images: [],
+      isPurchased: false,
+      isRented: false,
+
     };
   },
   async created() {
     await this.fetchMovieDetails();
     await this.fetchMovieImages();
+    await this.checkPurchaseStatus();
+    await this.checkRentalStatus();
   },
   methods: {
+    // TODO: Changer les appels pour qu'ils correspondent à l'API pour savoir s'il a déjà acheté ou loué le film
     async fetchMovieDetails() {
       // Remplacez 'movieId' par l'ID réel du film obtenu dynamiquement
       const movieId = this.$route.params.movieId;
       console.log("L'id du movie " + movieId);
       try {
-        const response = await axios.get(`http://localhost:3000/movies/${movieId}`);
+        const response = await axios.get(``);
         this.movie = response.data;
-        console.log("Requête : \n "+  +"\nMovie : \n" + JSON.stringify(response, null ,2));
+        console.log("Requête : \n " + +"\nMovie : \n" + JSON.stringify(response, null, 2));
       } catch (error) {
         console.error(error.response);
       }
@@ -53,11 +64,41 @@ export default {
     async fetchMovieImages() {
       const movieId = this.$route.params.movieId;
       try {
-        const response = await axios.get(`http://localhost:3000/movies/images/${movieId}`);
+        const response = await axios.get(``);
         this.images = response.data; // Supposons que l'API renvoie un objet avec une propriété 'images' qui est un tableau d'URLs
       } catch (error) {
         console.error(error);
       }
+    },
+    async checkPurchaseStatus() {
+      if (!this.isUserLoggedIn()) {
+        return; // Ne fait rien si l'utilisateur n'est pas connecté
+      }
+      const movieId = this.$route.params.movieId;
+      try {
+        const response = await axios.get(``);
+        this.isPurchased = response.data.isPurchased;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async checkRentalStatus() {
+      if (!this.isUserLoggedIn()) {
+        return; // Ne fait rien si l'utilisateur n'est pas connecté
+      }
+      const movieId = this.$route.params.movieId;
+      try {
+        const response = await axios.get(`http://localhost:3000/movies/${movieId}/isRented`);
+        this.isRented = response.data.isRented;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    isUserLoggedIn() {
+      // Exemple de vérification de l'état de connexion basé sur un token JWT stocké localement
+      return !!localStorage.getItem('jwtToken');
     },
   },
 };
