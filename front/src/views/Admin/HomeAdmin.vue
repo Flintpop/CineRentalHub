@@ -1,10 +1,12 @@
 <template>
+
   <div class="homeAdmin">
+
     <!-- Navbar -->
     <NavbarAdmin/>
-
-    <!-- Section Films -->
-    <section class="films">
+    <div class="main-content">
+      <!-- Section Films -->
+      <section class="films">
         <h2>Nos Films</h2>
         <div class="film-list">
           <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
@@ -12,20 +14,22 @@
       </section>
 
 
-    <!-- Section À propos -->
-    <section class="about">
-      <h2>À propos de CineRentalHub</h2>
-      <p>Nous sommes votre destination ultime pour la location de films en ligne. Parcourez une vaste sélection de
-        films, louez vos favoris et partagez vos avis !</p>
-    </section>
+      <!-- Section À propos -->
+      <section class="about">
+        <h2>À propos de CineRentalHub</h2>
+        <p>Nous sommes votre destination ultime pour la location de films en ligne. Parcourez une vaste sélection de
+          films, louez vos favoris et partagez vos avis !</p>
+      </section>
 
-    <!-- Section Contact -->
-    <section class="contact">
-      <h2>Contactez-nous</h2>
-      <p>Des questions ou des suggestions ? Nous sommes à votre écoute ! Contactez-nous.</p>
-      <p>Email: contact@CineRentalHub.com</p>
-    </section>
+      <!-- Section Contact -->
+      <section class="contact">
+        <h2>Contactez-nous</h2>
+        <p>Des questions ou des suggestions ? Nous sommes à votre écoute ! Contactez-nous.</p>
+        <p>Email: contact@CineRentalHub.com</p>
+      </section>
 
+
+    </div>
     <!-- Pied de page -->
     <Footer/>
   </div>
@@ -100,11 +104,7 @@ export default {
 };
 </script>
 <style scoped>
-/* Styles existants adaptés pour la nouvelle thématique */
-.banner, .about, .contact {
-  padding: 40px 20px;
-  text-align: center;
-}
+
 
 .films, .about, .contact {
   padding: 20px;
@@ -128,4 +128,5 @@ footer {
   padding: 0;
   padding-bottom: 100vh;
 }
+
 </style>

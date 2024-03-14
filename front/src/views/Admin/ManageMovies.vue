@@ -1,52 +1,63 @@
 <template>
   <NavbarAdmin/>
-  <div>
+  <div class="main-content">
     <h1>Gestion des films</h1>
 
-    <button @click="showAddMovieForm = true">Ajouter un film</button>
-
-    <div v-if="showAddMovieForm">
-      <h2>Ajouter un film</h2>
-      <form @submit.prevent="addMovie">
-        <label for="title">Titre:</label>
-        <input type="text" id="title" v-model="newMovie.title" required>
-
-        <label for="director">Réalisateur:</label>
-        <input type="text" id="director" v-model="newMovie.director" required>
-
-        <label for="year">Année:</label>
-        <input type="number" id="year" v-model="newMovie.year" required>
-
-        <button type="submit">Ajouter</button>
-      </form>
-    </div>
-
-    <div v-for="movie in movies" :key="movie.id">
-      <h2>{{ movie.title }}</h2>
-      <p>Réalisateur: {{ movie.director }}</p>
-      <p>Année: {{ movie.year }}</p>
-
-      <button @click="editMovie(movie)">Modifier</button>
-      <button @click="deleteMovie(movie.id)">Supprimer</button>
+    <div class="movie-card" v-for="movie in movies" :key="movie.id">
+      <div class="movie-image-wrapper">
+        <img :src="movie.main_image_url" alt="Image du film" class="movie-image">
+      </div>
+      <div class="movie-info">
+        <h2>{{ movie.title }}</h2>
+        <p>{{ movie.description }}</p>
+        <p>Date de sortie : {{ movie.release_date }}</p>
+        <p>Prix de location quotidien : {{ movie.dayly_rental_price }}</p>
+        <p>Prix d'achat : {{ movie.purchase_price }}</p>
+        <p>Disponible : {{ movie.available }}</p>
+        <p><a :href="movie.link">Lien de la vidéo</a></p>
+      </div>
+      <div class="movie-actions">
+        <button @click="editMovie(movie)">Modifier</button>
+        <button @click="deleteMovie(movie.id)">Supprimer</button>
+      </div>
     </div>
   </div>
+  <Footer/>
 </template>
 
 <script>
 import NavbarAdmin from "../../components/Admin/NavbarAdmin.vue";
+import Footer from "../../components/Core/Footer.vue";
 
 export default {
-  components: {NavbarAdmin},
+  components: {Footer, NavbarAdmin},
   data() {
     return {
       showAddMovieForm: false,
-      newMovie: {
-        title: '',
-        director: '',
-        year: null
-      },
       movies: [
-        // Liste des films
+        {
+          id: 1,
+          available: true,
+          title: "Le Parrain",
+          release_date: "1972-03-24",
+          dayly_rental_price: 2.99,
+          purchase_price: 9.99,
+          description: "Le patriarche d'une famille mafieuse de New York, âgé et malade, est soutenu par son fils cadet. Celui-ci doit prendre la relève du père et régner sur le crime organisé.",
+          link: "https://www.youtube.com/watch?v=bmtuIhesQWA",
+          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQyO8trmFbGTJIY6MaIFqzfPB6hW8UFCAYxTqtdKWGz7EJ6Jt-d"
+        },
+        {
+          id: 2,
+          available: true,
+          title: "Le Parrain 2",
+          release_date: "1974-12-18",
+          dayly_rental_price: 2.99,
+          purchase_price: 9.99,
+          description: "Michael Corleone tente de se réhabiliter socialement et de légaliser les activités de sa famille. Mais ses anciens ennemis lui déclarent à nouveau la guerre.",
+          link: "https://www.youtube.com/watch?v=9O1Iy9od7-A",
+          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSm7mhU1VNBbj92y8jqRnTmGEPslNFw-T5nMBswgfis03J2OMRa"
+        }
+
       ]
     };
   },
@@ -70,9 +81,32 @@ h1 {
   color: #007bff;
 }
 
+.movie-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  height: 250px;
+
+}
+.movie-image-wrapper {
+  height: 100%;
+}
+
+.movie-info {
+  flex: 1;
+}
+
+.movie-actions {
+  display: flex;
+  flex-direction: column;
+}
+
 button {
-  display: block;
-  margin: 10px auto;
+  margin: 10px 0;
   padding: 10px 20px;
   background-color: #3498db;
   text-align: center;
@@ -85,23 +119,13 @@ button {
 button:hover {
   background-color: #2980b9;
 }
-
-form {
-  margin: 20px auto;
+.movie-image {
+  height: 100%;
+  object-fit: cover;
+  margin-right: 20px;
+}
+.main-content {
   width: 80%;
-  max-width: 500px;
-}
-
-form label {
-  display: block;
-  margin-top: 10px;
-}
-
-form input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  margin: 0 auto;
 }
 </style>

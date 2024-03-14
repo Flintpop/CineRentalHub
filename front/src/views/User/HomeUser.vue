@@ -1,7 +1,9 @@
 <template>
-  <div class="home">
+  <div class="home ">
     <!-- Navbar -->
     <NavbarUser/>
+    <div class="main-content">
+
 
     <!-- Section Films -->
     <section class="films">
@@ -25,6 +27,8 @@
       <p>Des questions ou des suggestions ? Nous sommes à votre écoute ! Contactez-nous.</p>
       <p>Email: contact@CineRentalHub.com</p>
     </section>
+
+    </div>
 
     <!-- Pied de page -->
     <Footer/>
