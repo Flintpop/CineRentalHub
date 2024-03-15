@@ -32,7 +32,10 @@
             <span v-if="showImageManagement === movie.id">Cacher les images</span>
             <span v-else>Afficher les images</span>
           </button>
-          <button @click="showComments(movie.id)">Afficher les commentaires</button>
+          <button @click="toggleComments(movie.id)">
+            <span v-if="showCommentManagement === movie.id">Cacher les commentaires</span>
+            <span v-else>Afficher les commentaires</span>
+          </button>
         </div>
       </div>
       <!-- Modale de modification de film -->
@@ -42,6 +45,7 @@
       </div>
 
       <MovieImages v-if="showImageManagement === movie.id" :movie-id="movie.id"></MovieImages>
+      <ManageComment v-if="showCommentManagement === movie.id" :movie-id="movie.id"></ManageComment>
       <!--      <MovieImages v-if="showImageManagement && visibleImages === movie.id" :movie-id="movie.id"></MovieImages>-->
     </div>
 
@@ -59,9 +63,10 @@ import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import axios from "axios";
 import MovieImages from "../../components/Admin/MovieImages.vue";
 import moment from 'moment';
+import ManageComment from "../../components/Admin/ManageComment.vue";
 
 export default {
-  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm, MovieImages},
+  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm, MovieImages, ManageComment},
   mounted() {
     // Simuler la récupération de données
     this.fetchMovies();
@@ -71,6 +76,7 @@ export default {
       showAddMovieForm: false,
       showEditMovieForm: false,
       showImageManagement: null,
+      showCommentManagement: null,
       movies: [],
       images: [],
     };
@@ -119,6 +125,13 @@ export default {
       } else {
         this.showEditMovieForm = false;
         this.showImageManagement = movieId; // Afficher les images
+      }
+    },
+    toggleComments(movieId) {
+      if (this.showCommentManagement === movieId) {
+        this.showCommentManagement = null; // Cacher les commentaires
+      } else {
+        this.showCommentManagement = movieId; // Afficher les commentaires
       }
     },
     addMovie(movieData) {
