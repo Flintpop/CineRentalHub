@@ -823,6 +823,76 @@ DELIMITER ;
 -- CALL remove_from_cart(1);
 
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS delete_user_cart;
+CREATE PROCEDURE `delete_user_cart` (IN `userId` INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des entrées dans le panier
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = userId) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
+    ELSE
+        -- Supprimer les entrées du panier pour cet utilisateur
+        DELETE FROM shopping_cart WHERE user_id = userId;
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_user_cart;
+CREATE PROCEDURE `get_user_cart` (IN `userId` INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des entrées dans le panier
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = userId) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
+    ELSE
+        -- Sélectionner et retourner les entrées du panier pour cet utilisateur
+        SELECT * FROM shopping_cart WHERE user_id = userId;
+    END IF;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS validate_user_cart;
+CREATE PROCEDURE `validate_user_cart` (IN `userId` INT)
+BEGIN
+    DECLARE cartItemCount INT DEFAULT 0;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cartId INT;
+    DECLARE cartType ENUM('purchase', 'rental');
+    DECLARE movieId INT;
+    DECLARE rentalDuration INT;
+    DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = userId;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Compter les éléments dans le panier de l'utilisateur
+    SELECT COUNT(*) INTO cartItemCount FROM shopping_cart WHERE user_id = userId;
+    IF cartItemCount = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le panier est vide.';
+    END IF;
+
+    -- Parcourir les éléments du panier
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO cartId, cartType, movieId, rentalDuration;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Traitement en fonction du type d'élément dans le panier
+        IF cartType = 'purchase' THEN
+            INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (userId, movieId, CURDATE());
+        ELSEIF cartType = 'rental' THEN
+            INSERT INTO rentals (user_id, movie_id, rental_date, return_date) VALUES (userId, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
+        END IF;
+    END LOOP;
+    CLOSE cur;
+
+    -- Vider le panier de l'utilisateur en appelant la procédure précédemment créée
+    CALL delete_user_cart(userId);
+END //
+DELIMITER ;
+
 -- Gestion des Locations (Rentals)
 
 
