@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Cart;
 
 import java.io.IOException;
 
@@ -25,8 +26,8 @@ public class CartDeleteServlet extends HttpServlet {
     }
 
     try {
-//      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson("error));
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\" \"Not implemented yet\"}");
+      Cart.deleteEntireCart(cartId);
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"message\":\" \"Successfully deleted\"}");
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
     }

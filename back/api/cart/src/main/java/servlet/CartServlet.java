@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Cart;
 
 import java.io.IOException;
 
@@ -17,16 +18,16 @@ public class CartServlet extends HttpServlet {
 
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer cartId;
+    Integer userId;
     try {
-      cartId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+      userId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
     } catch (IdMissingException | IdValidationException | NumberFormatException e) {
       return; // L'erreur a déjà été envoyée
     }
 
     try {
-//      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson("error));
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\" \"Not implemented yet\"}");
+      Cart cart = Cart.getCartByUserId(userId);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(cart));
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
     }
@@ -35,6 +36,14 @@ public class CartServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String jsonBody = ServletUtils.readRequestBody(request);
+
+    try {
+      Cart cart = gson.fromJson(jsonBody, Cart.class);
+      cart = Cart.createCart(cart);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(cart));
+    } catch (Exception e) {
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+    }
   }
 
   @Override
@@ -45,7 +54,12 @@ public class CartServlet extends HttpServlet {
     } catch (IdMissingException | IdValidationException | NumberFormatException e) {
       return; // L'erreur a déjà été envoyée
     }
-//    throw new ExecutionControl.NotImplementedException("Not implemented");
-    ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\" \"Not implemented yet\"}");
+
+    try {
+      Cart.deleteEntireCart(cartId);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson("{\"message:\" Cart deleted\"}"));
+    } catch (Exception e) {
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+    }
   }
 }
