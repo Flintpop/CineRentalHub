@@ -1,9 +1,13 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "rentals", schema = "cine_rental_hub")
 public class RentalsPojo {
@@ -13,40 +17,16 @@ public class RentalsPojo {
   private int id;
   @Basic
   @Column(name = "rental_date", nullable = false)
-  private Timestamp rentalDate;
+  private LocalDateTime rentalDate;
   @Basic
   @Column(name = "return_date", nullable = false)
-  private Timestamp returnDate;
+  private LocalDateTime returnDate;
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UsersPojo usersByUserId;
   @ManyToOne
   @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false)
   private MoviesPojo moviesByMovieId;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public Timestamp getRentalDate() {
-    return rentalDate;
-  }
-
-  public void setRentalDate(Timestamp rentalDate) {
-    this.rentalDate = rentalDate;
-  }
-
-  public Timestamp getReturnDate() {
-    return returnDate;
-  }
-
-  public void setReturnDate(Timestamp returnDate) {
-    this.returnDate = returnDate;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -70,19 +50,4 @@ public class RentalsPojo {
     return result;
   }
 
-  public UsersPojo getUsersByUserId() {
-    return usersByUserId;
-  }
-
-  public void setUsersByUserId(UsersPojo usersByUserId) {
-    this.usersByUserId = usersByUserId;
-  }
-
-  public MoviesPojo getMoviesByMovieId() {
-    return moviesByMovieId;
-  }
-
-  public void setMoviesByMovieId(MoviesPojo moviesByMovieId) {
-    this.moviesByMovieId = moviesByMovieId;
-  }
 }

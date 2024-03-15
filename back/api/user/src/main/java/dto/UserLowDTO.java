@@ -1,9 +1,12 @@
 package dto;
 
+import lombok.Getter;
+import lombok.Setter;
 import mariadbPojo.UsersPojo;
 
+@Getter
+@Setter
 public class UserLowDTO {
-  private int id;
   private String last_name;
   private String first_name;
   private String email;
@@ -13,7 +16,6 @@ public class UserLowDTO {
 
   // Constructeur qui accepte un UserPojo
   public UserLowDTO(UsersPojo user) {
-    this.id = user.getId();
     this.last_name = user.getLastName();
     this.first_name = user.getFirstName();
     this.email = user.getEmail();

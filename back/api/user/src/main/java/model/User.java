@@ -50,7 +50,7 @@ public class User {
       query.setParameter(1, userDto.getLast_name());
       query.setParameter(2, userDto.getFirst_name());
       query.setParameter(3, userDto.getEmail());
-      query.setParameter(4, userDto.getPassword()); // Assurez-vous que le mot de passe est haché si nécessaire
+      query.setParameter(4, userDto.getPassword());
       query.setParameter(5, userDto.getRole());
 
 
@@ -62,7 +62,56 @@ public class User {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();
       }
-      throw new Exception(e.getCause().getCause().getMessage());
+      ModelUtils.generateException(e);
+      return null;
+    } finally {
+      em.close();
+    }
+  }
+
+  public static UserLowDTO updateUser(Integer userId, UserLowDTO userDto) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+
+      /*
+      Équivalent json pour modifier un utilisateur :
+
+      {
+        "last_name": "Doe",
+        "first_name": "John",
+        "email": "hey@jdskl",
+        "activated": 1,
+        "role": "admin"
+      }
+       */
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("update_user")
+              .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_last_name", String.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_first_name", String.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_email", String.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_activated", Byte.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_role", String.class, ParameterMode.IN)
+              .setParameter("user_id", userId)
+              .setParameter("new_last_name", userDto.getLast_name())
+              .setParameter("new_first_name", userDto.getFirst_name())
+              .setParameter("new_email", userDto.getEmail())
+              .setParameter("new_activated", userDto.getActivated())
+              .setParameter("new_role", userDto.getRole());
+
+      query.execute();
+
+      em.getTransaction().commit();
+      return userDto;
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+
+      ModelUtils.generateException(e);
+      return null;
     } finally {
       em.close();
     }

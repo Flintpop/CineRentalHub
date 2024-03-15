@@ -2,6 +2,7 @@ package servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import dto.UserLowDTO;
 import dto.UserPostDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
@@ -13,6 +14,7 @@ import dto.UserDTO;
 import model.User;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @WebServlet(name = "UserServlet", urlPatterns = "/user/*")
 public class UserServlet extends HttpServlet {
@@ -48,9 +50,31 @@ public class UserServlet extends HttpServlet {
     } catch (JsonSyntaxException e) {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "" +
+              "\ntraceback:" + Arrays.toString(e.getStackTrace()) + "\"}");
     }
   }
 
+  @Override
+  protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Integer userId;
+    try {
+      userId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+    } catch (IdMissingException | IdValidationException | NumberFormatException e) {
+      return; // L'erreur a déjà été envoyée
+    }
 
+    String jsonBody = ServletUtils.readRequestBody(request);
+
+    try {
+      UserLowDTO userDto = gson.fromJson(jsonBody, UserLowDTO.class);
+      UserLowDTO userUpdated = User.updateUser(userId, userDto);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(userUpdated));
+    } catch (JsonSyntaxException e) {
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
+    } catch (Exception e) {
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "" +
+              "\n\"traceback:\" \"" + Arrays.toString(e.getStackTrace()) + "\"\"}");
+    }
+  }
 }
