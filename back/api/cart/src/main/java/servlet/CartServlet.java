@@ -29,7 +29,7 @@ public class CartServlet extends HttpServlet {
       Cart cart = Cart.getCartByUserId(userId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(cart));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -42,7 +42,7 @@ public class CartServlet extends HttpServlet {
       cart = Cart.createCart(cart);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(cart));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -59,7 +59,7 @@ public class CartServlet extends HttpServlet {
       Cart.deleteEntireCart(cartId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson("{\"message:\" Cart deleted\"}"));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }
