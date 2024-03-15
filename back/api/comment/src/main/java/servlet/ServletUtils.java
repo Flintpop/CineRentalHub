@@ -5,14 +5,16 @@ import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 
 public class ServletUtils {
-  public static String readRequestBody(HttpServletRequest request) throws IOException {
+  public static <T> T readRequestBodyAndGetObject(HttpServletRequest request, Class<T> clazz) throws IOException, JsonSyntaxException {
     StringBuilder jsonBody = new StringBuilder();
     try (BufferedReader reader = request.getReader()) {
       String line;
@@ -20,7 +22,26 @@ public class ServletUtils {
         jsonBody.append(line);
       }
     }
-    return jsonBody.toString();
+    return convertObjectToJson(jsonBody.toString(), clazz);
+  }
+  
+  private static <T> T convertObjectToJson(String json, Class<T> clazz) {
+    Gson gson = new Gson();
+    
+    T object = gson.fromJson(json, clazz);
+    
+    for (Field field : clazz.getDeclaredFields()) {
+      field.setAccessible(true);
+      try {
+        Object value = field.get(object);
+        if (value == null || (value instanceof String && ((String) value).isEmpty())) {
+          throw new JsonSyntaxException("Le champ '" + field.getName() + "' est vide.");
+        }
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Erreur lors de l'accès au champ '" + field.getName() + "'.", e);
+      }
+    }
+    return object;
   }
 
   /**
