@@ -4,7 +4,7 @@
     <h1>Gestion des films</h1>
     <button @click="showAddMovieForm = true">Ajouter un film</button>
     <!-- Modale d'ajout de film -->
-    <MovieForm v-if="showAddMovieForm" @close="showAddMovieForm = false" @submit="addMovie"></MovieForm>
+    <MovieCreateForm v-if="showAddMovieForm" @close="showAddMovieForm = false" @submit="addMovie"></MovieCreateForm>
 
     <!-- Liste des films -->
     <div class="movie-card" v-for="movie in movies" :key="movie.id">
@@ -46,7 +46,6 @@
 
       <MovieImages v-if="showImageManagement === movie.id" :movie-id="movie.id"></MovieImages>
       <ManageComment v-if="showCommentManagement === movie.id" :movie-id="movie.id"></ManageComment>
-      <!--      <MovieImages v-if="showImageManagement && visibleImages === movie.id" :movie-id="movie.id"></MovieImages>-->
     </div>
 
 
@@ -58,7 +57,7 @@
 <script>
 import NavbarAdmin from "../../components/Admin/NavbarAdmin.vue";
 import Footer from "../../components/Core/Footer.vue";
-import MovieForm from "../../components/Admin/MovieForm.vue";
+import MovieCreateForm from "../../components/Admin/MovieCreateForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import axios from "axios";
 import MovieImages from "../../components/Admin/MovieImages.vue";
@@ -66,7 +65,7 @@ import moment from 'moment';
 import ManageComment from "../../components/Admin/ManageComment.vue";
 
 export default {
-  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm, MovieImages, ManageComment},
+  components: {Footer, NavbarAdmin, MovieCreateForm, MovieEditForm, MovieImages, ManageComment},
   mounted() {
     // Simuler la récupération de données
     this.fetchMovies();
@@ -77,8 +76,11 @@ export default {
       showEditMovieForm: false,
       showImageManagement: null,
       showCommentManagement: null,
+      selectedMovie: null,
+
       movies: [],
       images: [],
+
     };
   },
   methods: {
@@ -135,7 +137,13 @@ export default {
       }
     },
     addMovie(movieData) {
-      // Logique pour ajouter un film
+      axios.post(`http://localhost:3000/movies`, movieData)
+          .then(() => {
+            console.log('Film ajouté avec succès');
+            this.fetchMovies(); // Recharger les films pour afficher les modifications
+            this.showAddMovieForm = false; // Fermer le formulaire après l'ajout du film
+          })
+          .catch(error => console.error('Erreur lors de l\'ajout du film:', error));
     },
     selectMovie(movie) {
       this.showImageManagement = null;
