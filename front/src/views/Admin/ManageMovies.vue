@@ -117,6 +117,7 @@ export default {
       if (this.showImageManagement === movieId) {
         this.showImageManagement = null; // Cacher les images
       } else {
+        this.showEditMovieForm = false;
         this.showImageManagement = movieId; // Afficher les images
       }
     },
@@ -124,6 +125,7 @@ export default {
       // Logique pour ajouter un film
     },
     selectMovie(movie) {
+      this.showImageManagement = null;
       this.selectedMovie = movie;
       this.showEditMovieForm = true;
     },
@@ -155,22 +157,6 @@ export default {
         console.log("Message d'erreur de la réponse :", error.response.data);
         console.error(`Erreur lors de l'activation du film :`, error);
       }
-    },
-    async deleteMovie(movieId) {
-      const url = `http://localhost:3000/movies/${movieId}`;
-
-      try {
-        await axios.delete(url);
-        alert(`Film supprimé avec succès !`);
-        this.fetchMovies(); // Rafraîchir la liste des films après la suppression
-      } catch (error) {
-        console.log("Status d'erreur de la réponse :", error.response.status);
-        console.log("Message d'erreur de la réponse :", error.response.data);
-        console.error(`Erreur lors de la suppression du film :`, error);
-      }
-    },
-    showImage(movieId) {
-      this.showImageManagement = movieId;
     },
     showComments(movieId) {
       // Logique pour afficher les commentaires
