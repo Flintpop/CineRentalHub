@@ -9,6 +9,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 public class ServletUtils {
+  /**
+   * Lit le corps de la requête HTTP, et renvoie son contenu sous forme de chaîne de caractères.
+   * @param request La requête HTTP.
+   * @return Le corps de la requête HTTP.
+   * @throws IOException Si une erreur d'entrée/sortie survient.
+   */
   public static String readRequestBody(HttpServletRequest request) throws IOException {
     StringBuilder jsonBody = new StringBuilder();
     try (BufferedReader reader = request.getReader()) {
