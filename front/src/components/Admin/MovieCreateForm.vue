@@ -64,13 +64,13 @@ export default {
   data() {
     return {
       movie: {
-        available: '',
-        title: '',
-        release_date: '',
-        daily_rental_price: null,
-        purchase_price: null,
-        description: '',
-        link: '',
+        available: 'true',
+        title: 'avatar',
+        release_date: '2021-01-01',
+        daily_rental_price: 2,
+        purchase_price: 2,
+        description: 'avatar',
+        link: 'avatar',
       }
     };
   },
