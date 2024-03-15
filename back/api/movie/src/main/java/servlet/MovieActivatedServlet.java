@@ -1,6 +1,5 @@
 package servlet;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
@@ -15,8 +14,6 @@ import java.io.IOException;
 
 @WebServlet(name = "MovieActivatedServlet", urlPatterns = "/movies/activated/*")
 public class MovieActivatedServlet extends HttpServlet {
-
-  private final Gson gson = new Gson();
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

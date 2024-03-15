@@ -45,8 +45,7 @@ public class ImagesServlet extends HttpServlet {
     }
 
     try {
-      String jsonBody = ServletUtils.readRequestBody(request);
-      ImagePostDTO image = gson.fromJson(jsonBody, ImagePostDTO.class);
+      ImagePostDTO image = ServletUtils.readRequestBodyAndGetObject(request, ImagePostDTO.class);
       Movie.addImage(movieId, image.getImage_url());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(image));
     } catch (Exception e) {

@@ -30,7 +30,7 @@ public class MainImageServlet extends HttpServlet {
       ImageDTO mainImage = Movie.getMainImage(movieId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(mainImage));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -44,8 +44,7 @@ public class MainImageServlet extends HttpServlet {
     }
 
     try {
-      String jsonBody = ServletUtils.readRequestBody(request);
-      PutMainImageDTO image = gson.fromJson(jsonBody, PutMainImageDTO.class);
+      PutMainImageDTO image = ServletUtils.readRequestBodyAndGetObject(request, PutMainImageDTO.class);
       Movie.setMainImage(movieId, image.getImage_id());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(image));
     } catch (Exception e) {

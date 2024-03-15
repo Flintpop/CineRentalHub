@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dto.MovieDTO;
 import dto.MoviePostPutDTO;
 import exceptions.IdMissingException;
@@ -46,9 +45,8 @@ public class MovieServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonBody = ServletUtils.readRequestBody(request);
     try {
-      MoviePostPutDTO movieEntity = gson.fromJson(jsonBody, MoviePostPutDTO.class);
+      MoviePostPutDTO movieEntity = ServletUtils.readRequestBodyAndGetObject(request, MoviePostPutDTO.class);
       // Ici, implémentez la validation du film si nécessaire
       MoviePostPutDTO createdMovie = Movie.addMovie(movieEntity);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(createdMovie));
@@ -66,9 +64,8 @@ public class MovieServlet extends HttpServlet {
       return; // Erreur déjà envoyée
     }
 
-    String jsonBody = ServletUtils.readRequestBody(request);
     try {
-      MoviePostPutDTO movieToUpdate = gson.fromJson(jsonBody, MoviePostPutDTO.class);
+      MoviePostPutDTO movieToUpdate = ServletUtils.readRequestBodyAndGetObject(request, MoviePostPutDTO.class);
       MovieDTO updatedMovie = Movie.updateMovie(movieId, movieToUpdate);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(updatedMovie));
     } catch (Exception e) {
