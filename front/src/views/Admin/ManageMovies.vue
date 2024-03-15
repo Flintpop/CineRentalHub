@@ -27,7 +27,7 @@
           <button v-if="movie.available" @click="disableMovie(movie.id)" class="disable-button">Désactiver le film</button>
           <!-- Bouton pour activer le film -->
           <button v-else @click="enableMovie(movie.id)" class="enable-button">Activer le film</button>
-          <button @click="showImage(movie.main_image_url)">Afficher les images</button>
+          <button @click="showImage(movie.id)">Afficher les images</button>
           <button @click="showComments(movie.id)">Afficher les commentaires</button>
         </div>
       </div>
@@ -36,6 +36,9 @@
         <MovieEditForm v-if="showEditMovieForm && selectedMovie === movie" :movie="selectedMovie"
                        @close="clearSelectedMovie" @submit="editMovie"></MovieEditForm>
       </div>
+
+      <MovieImages v-if="showImageManagement === movie.id" :movie-id="movie.id"></MovieImages>
+<!--      <MovieImages v-if="showImageManagement && visibleImages === movie.id" :movie-id="movie.id"></MovieImages>-->
     </div>
 
 
@@ -50,10 +53,11 @@ import Footer from "../../components/Core/Footer.vue";
 import MovieForm from "../../components/Admin/MovieForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import axios from "axios";
-import moment from "moment/moment.js";
+import MovieImages from "../../components/Admin/MovieImages.vue";
+import moment from 'moment';
 
 export default {
-  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm},
+  components: {Footer, NavbarAdmin, MovieForm, MovieEditForm, MovieImages},
   mounted() {
     // Simuler la récupération de données
     this.fetchMovies();
@@ -62,7 +66,9 @@ export default {
     return {
       showAddMovieForm: false,
       showEditMovieForm: false,
-      movies: []
+      showImageManagement: null,
+      movies: [],
+      images: [],
     };
   },
   methods: {
@@ -85,6 +91,8 @@ export default {
                   });
 
             this.movies[i].release_date = moment(this.movies[i].release_date).format('YYYY-MM-DD');
+              this.movies[i].images = await this.fetchMovieImages(this.movies[i].id);
+
 
             }
 
@@ -92,6 +100,14 @@ export default {
           .catch(error => {
             console.log(error);
           });
+    },
+    async fetchMovieImages(movieId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/movies/images/${movieId}`);
+        return response.data; // Supposons que l'API renvoie un tableau d'URLs d'images
+      } catch (error) {
+        console.error(error);
+      }
     },
     addMovie(movieData) {
       // Logique pour ajouter un film
@@ -142,8 +158,8 @@ export default {
         console.error(`Erreur lors de la suppression du film :`, error);
       }
     },
-    showImage(imageUrl) {
-      // Logique pour afficher l'image
+    showImage(movieId) {
+      this.showImageManagement = movieId;
     },
     showComments(movieId) {
       // Logique pour afficher les commentaires

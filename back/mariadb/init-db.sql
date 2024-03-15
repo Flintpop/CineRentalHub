@@ -160,9 +160,18 @@ INSERT INTO movies (available, title, release_date, daily_rental_price, purchase
 VALUES (TRUE, 'Schindler\'s List', '1994-02-04', 2.99, 9.99,
         'In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution',
         'https://www.youtube.com/watch?v=gG22XNhtnoY');
+INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
+VALUES (TRUE, 'Avatar', '2009-12-18', 3.99, 14.99,
+        'A paraplegic Marine dispatched to the moon Pandora on a unique mission becomes torn between following his orders and protecting the world he feels is his home.',
+        'https://www.youtube.com/watch?v=5PSNL1qE6VY');
+INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
+VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
+        'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.',
+        'https://www.youtube.com/watch?v=8hYlB38asDY');
 
 -- jeux de données pour la table users
-INSERT INTO users (last_name, first_name, email, activated, password, role)
+INSERT
+INTO users (last_name, first_name, email, activated, password, role)
 VALUES ('Doe', 'John', 'john.doe@example.com', TRUE, SHA2('password123', 512), 'user');
 INSERT INTO users (last_name, first_name, email, activated, password, role)
 VALUES ('Smith', 'Jane', 'jane.smith@example.com', TRUE, SHA2('password456', 512), 'admin');
@@ -231,19 +240,47 @@ VALUES (6, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 
 -- jeux de données pour la table images
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (1, 'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg', FALSE);
+VALUES (1,
+        'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg',
+        FALSE);
 INSERT INTO images (movie_id, image_url, main_image)
 VALUES (1, 'https://m.media-amazon.com/images/I/815qtzaP9iL._AC_UF1000,1000_QL80_.jpg', FALSE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (2, 'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg', TRUE);
+VALUES (2,
+        'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg',
+        TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
 VALUES (3, 'https://fr.web.img2.acsta.net/medias/nmedia/18/63/97/89/18949761.jpg', TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (4, 'https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_.jpg', TRUE);
+VALUES (4,
+        'https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_.jpg',
+        TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (5, 'https://www.ecranlarge.com/media/cache/1600x1200/uploads/image/001/121/7p8x4u3o3p1jzmbqny3zaloby3m-861.jpg', TRUE);
+VALUES (5, 'https://www.ecranlarge.com/media/cache/1600x1200/uploads/image/001/121/7p8x4u3o3p1jzmbqny3zaloby3m-861.jpg',
+        TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
 VALUES (6, 'https://m.media-amazon.com/images/I/817sLmprCSL._AC_UF1000,1000_QL80_.jpg', TRUE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (1, 'https://cdn.theasc.com/Shawshank-Featured.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (1, 'https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p15987_k_h8_ad.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (2, 'https://www.artmajeur.com/medias/hd/p/a/paul-stowe/artwork/15733837_godfather-31cm-x-44cm.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (2, 'https://wordpress.wbur.org/wp-content/uploads/2020/12/1207_godfather-part-3-1-1000x669.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (3,
+        'https://thumb.canalplus.pro/http/unsafe/1200x630/filters:quality(80)/img-hapi.canalplus.pro:80/ServiceImage/ImageID/52831084',
+        FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (3, 'https://www.critikat.com/wp-content/uploads/fly-images/37370/arton2307-1450x800-c.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://variety.com/wp-content/uploads/2017/01/lord-of-the-rings-return-of-the-king.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://assets.mubicdn.net/images/film/2112/image-w1280.jpg?1546470042', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://www.pluggedin.com/wp-content/uploads/2019/12/lotr-the-return-of-the-king.jpg', FALSE);
+
 
 -- TRIGGER
 
@@ -274,11 +311,13 @@ CREATE TRIGGER before_insert_update_movies
 BEGIN
     DECLARE msg VARCHAR(255);
     IF NEW.daily_rental_price < 0 AND NEW.daily_rental_price <> -1 THEN
-        SET msg = 'Vous avez sasi ' + NEW.daily_rental_price + ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SET msg = 'Vous avez sasi ' + NEW.daily_rental_price +
+                  ' comme prix de location. Le prix de location doit être supérieur à 0.';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NEW.purchase_price < 0 AND NEW.purchase_price <> -1 THEN
-        SET msg = 'Vous avez sasi ' + NEW.purchase_price + ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SET msg = 'Vous avez sasi ' + NEW.purchase_price +
+                  ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
@@ -382,7 +421,6 @@ END;
 DELIMITER ;
 
 
-
 -- Vérifie que le film est disponible à la location et que l'utilisateur est activé
 DELIMITER //
 CREATE TRIGGER before_insert_rentals
@@ -444,7 +482,8 @@ BEGIN
                  AND movie_id = NEW.movie_id
                  AND (NEW.rental_date BETWEEN rental_date AND return_date
                    OR NEW.return_date BETWEEN rental_date AND return_date)) THEN
-        SET msg = 'Vous avez déjà essayé de louer ce film pour une période qui se chevauche avec une location existante.';
+        SET msg =
+                'Vous avez déjà essayé de louer ce film pour une période qui se chevauche avec une location existante.';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
@@ -479,7 +518,8 @@ CREATE TRIGGER check_return_date
 BEGIN
     DECLARE msg VARCHAR(255);
     IF NEW.return_date <= NEW.rental_date THEN
-        SET msg = 'La date de retour ( ' + NEW.return_date + ' ) doit être après la date de location ( ' + NEW.rental_date + ' ).';
+        SET msg = 'La date de retour ( ' + NEW.return_date + ' ) doit être après la date de location ( ' +
+                  NEW.rental_date + ' ).';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
@@ -513,11 +553,13 @@ CREATE PROCEDURE update_movie(IN movie_id INT, IN title VARCHAR(255), IN release
 BEGIN
     DECLARE msg VARCHAR(255);
     IF daily_rental_price < 0 AND daily_rental_price <> -1 THEN
-        SET msg = 'Vous avez saisi ' + daily_rental_price + ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SET msg = 'Vous avez saisi ' + daily_rental_price +
+                  ' comme prix de location. Le prix de location doit être supérieur à 0.';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF purchase_price < 0 AND purchase_price <> -1 THEN
-        SET msg = 'Vous avez saisi ' + purchase_price + ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SET msg = 'Vous avez saisi ' + purchase_price +
+                  ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
@@ -596,10 +638,13 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune image n\'est disponible pour ce film.';
     ELSE
         -- Essayez de sélectionner l'image principale; sinon, sélectionnez l'image avec le plus petit ID
-        SELECT * FROM images
-        WHERE movie_id = id_movie AND main_image = TRUE
+        SELECT *
+        FROM images
+        WHERE movie_id = id_movie
+          AND main_image = TRUE
         UNION ALL
-        SELECT * FROM images
+        SELECT *
+        FROM images
         WHERE movie_id = id_movie
         ORDER BY main_image DESC, id
         LIMIT 1;
