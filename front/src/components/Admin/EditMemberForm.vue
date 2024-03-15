@@ -80,12 +80,18 @@ export default {
 
 <style scoped>
 .Edit-member-form-container {
-  max-width: 500px;
+  max-width: 800px; /* Elargir la carte */
   margin: auto;
   padding: 20px;
   background: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+form {
+  display: grid; /* Utiliser le système de grille */
+  grid-template-columns: 1fr 1fr; /* Créer deux colonnes de taille égale */
+  gap: 20px; /* Ajouter un espace entre les colonnes */
 }
 
 .form-field {
@@ -111,6 +117,7 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  grid-column: span 2; /* Faire en sorte que le bouton s'étende sur les deux colonnes */
 }
 
 .close-form-button {

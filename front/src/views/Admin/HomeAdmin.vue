@@ -56,9 +56,6 @@ export default {
   },
 
   mounted() {
-    if (localStorage.getItem('userId')) {
-      this.$router.push('/homeConnected');
-    }
     // Simuler la récupération de données
     this.fetchMovies();
   },

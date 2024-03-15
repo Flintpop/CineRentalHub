@@ -5,7 +5,7 @@
       <p> THOMAS Antoine | LE GOFF Tanguy </p>
       <div class="footer-links">
         <router-link to="/about">À propos</router-link>
-        <router-link to="/contact">Contact</router-link>
+        <router-link to="/">Contact</router-link>
         <!-- Ajoutez d'autres liens utiles ici -->
       </div>
     </div>

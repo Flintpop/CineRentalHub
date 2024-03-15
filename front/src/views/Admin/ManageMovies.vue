@@ -2,75 +2,188 @@
   <NavbarAdmin/>
   <div class="main-content">
     <h1>Gestion des films</h1>
+    <button @click="showAddMovieForm = true">Ajouter un film</button>
+    <!-- Modale d'ajout de film -->
+    <MovieCreateForm v-if="showAddMovieForm" @close="showAddMovieForm = false" @submit="addMovie"></MovieCreateForm>
 
+    <!-- Liste des films -->
     <div class="movie-card" v-for="movie in movies" :key="movie.id">
-      <div class="movie-image-wrapper">
-        <img :src="movie.main_image_url" alt="Image du film" class="movie-image">
+      <div class="movie-content">
+        <div class="movie-image-wrapper">
+          <img :src="movie.main_image_url" alt="Image du film" class="movie-image">
+        </div>
+        <div class="movie-info">
+          <h2>{{ movie.title }}</h2>
+          <p>{{ movie.description }}</p>
+          <p>Date de sortie : {{ movie.release_date }}</p>
+          <p>Prix de location quotidien : {{ movie.daily_rental_price }}€</p>
+          <p>Prix d'achat : {{ movie.purchase_price }}€</p>
+          <p>Disponible : {{ movie.available }}</p>
+          <p>Lien de la video : {{ movie.link }}</p>
+        </div>
+        <div class="movie-actions">
+          <button @click="selectMovie(movie)">Modifier</button>
+          <!-- Bouton pour désactiver le film -->
+          <button v-if="movie.available" @click="disableMovie(movie.id)" class="disable-button">Désactiver le film
+          </button>
+          <!-- Bouton pour activer le film -->
+          <button v-else @click="enableMovie(movie.id)" class="enable-button">Activer le film</button>
+          <button @click="toggleImages(movie.id)">
+            <span v-if="showImageManagement === movie.id">Cacher les images</span>
+            <span v-else>Afficher les images</span>
+          </button>
+          <button @click="toggleComments(movie.id)">
+            <span v-if="showCommentManagement === movie.id">Cacher les commentaires</span>
+            <span v-else>Afficher les commentaires</span>
+          </button>
+        </div>
       </div>
-      <div class="movie-info">
-        <h2>{{ movie.title }}</h2>
-        <p>{{ movie.description }}</p>
-        <p>Date de sortie : {{ movie.release_date }}</p>
-        <p>Prix de location quotidien : {{ movie.dayly_rental_price }}</p>
-        <p>Prix d'achat : {{ movie.purchase_price }}</p>
-        <p>Disponible : {{ movie.available }}</p>
-        <p><a :href="movie.link">Lien de la vidéo</a></p>
+      <!-- Modale de modification de film -->
+      <div class="movie-edit-form">
+        <MovieEditForm v-if="showEditMovieForm && selectedMovie === movie" :movie="selectedMovie"
+                       @close="clearSelectedMovie" @submit="editMovie"></MovieEditForm>
       </div>
-      <div class="movie-actions">
-        <button @click="editMovie(movie)">Modifier</button>
-        <button @click="deleteMovie(movie.id)">Supprimer</button>
-      </div>
+
+      <MovieImages v-if="showImageManagement === movie.id" :movie-id="movie.id"></MovieImages>
+      <ManageComment v-if="showCommentManagement === movie.id" :movie-id="movie.id"></ManageComment>
     </div>
+
+
   </div>
   <Footer/>
 </template>
 
+
 <script>
 import NavbarAdmin from "../../components/Admin/NavbarAdmin.vue";
 import Footer from "../../components/Core/Footer.vue";
+import MovieCreateForm from "../../components/Admin/MovieCreateForm.vue";
+import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
+import axios from "axios";
+import MovieImages from "../../components/Admin/MovieImages.vue";
+import moment from 'moment';
+import ManageComment from "../../components/Admin/ManageComment.vue";
 
 export default {
-  components: {Footer, NavbarAdmin},
+  components: {Footer, NavbarAdmin, MovieCreateForm, MovieEditForm, MovieImages, ManageComment},
+  mounted() {
+    // Simuler la récupération de données
+    this.fetchMovies();
+  },
   data() {
     return {
       showAddMovieForm: false,
-      movies: [
-        {
-          id: 1,
-          available: true,
-          title: "Le Parrain",
-          release_date: "1972-03-24",
-          dayly_rental_price: 2.99,
-          purchase_price: 9.99,
-          description: "Le patriarche d'une famille mafieuse de New York, âgé et malade, est soutenu par son fils cadet. Celui-ci doit prendre la relève du père et régner sur le crime organisé.",
-          link: "https://www.youtube.com/watch?v=bmtuIhesQWA",
-          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQyO8trmFbGTJIY6MaIFqzfPB6hW8UFCAYxTqtdKWGz7EJ6Jt-d"
-        },
-        {
-          id: 2,
-          available: true,
-          title: "Le Parrain 2",
-          release_date: "1974-12-18",
-          dayly_rental_price: 2.99,
-          purchase_price: 9.99,
-          description: "Michael Corleone tente de se réhabiliter socialement et de légaliser les activités de sa famille. Mais ses anciens ennemis lui déclarent à nouveau la guerre.",
-          link: "https://www.youtube.com/watch?v=9O1Iy9od7-A",
-          main_image_url: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSm7mhU1VNBbj92y8jqRnTmGEPslNFw-T5nMBswgfis03J2OMRa"
-        }
+      showEditMovieForm: false,
+      showImageManagement: null,
+      showCommentManagement: null,
+      selectedMovie: null,
 
-      ]
+      movies: [],
+      images: [],
+
     };
   },
   methods: {
-    addMovie() {
-      // Logique pour ajouter un film
+    async fetchMovies() {
+      // Simulation de la récupération de données depuis la base de données
+      await axios.get("http://localhost:3000/movies")
+          .then(async response => {
+            this.movies = response.data;
+
+
+            // Pour chaque film, récupérer l'image principale
+            for (let i = 0; i < this.movies.length; i++) {
+              console.log("Appel d'url : " + "http://localhost:3000/movies/main_image/" + this.movies[i].id)
+              axios.get("http://localhost:3000/movies/main_image/" + this.movies[i].id)
+                  .then(response => {
+                    this.movies[i].main_image_url = response.data.image_url;
+                  })
+                  .catch(error => {
+                    console.log(error.response.data);
+                  });
+
+              this.movies[i].release_date = moment(this.movies[i].release_date).format('YYYY-MM-DD');
+              this.movies[i].images = await this.fetchMovieImages(this.movies[i].id);
+
+
+            }
+
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
-    editMovie(movie) {
-      // Logique pour modifier un film
+    async fetchMovieImages(movieId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/movies/images/${movieId}`);
+        return response.data; // Supposons que l'API renvoie un tableau d'URLs d'images
+      } catch (error) {
+        console.error(error);
+      }
     },
-    deleteMovie(movieId) {
-      // Logique pour supprimer un film
-    }
+    toggleImages(movieId) {
+      if (this.showImageManagement === movieId) {
+        this.showImageManagement = null; // Cacher les images
+      } else {
+        this.showEditMovieForm = false;
+        this.showImageManagement = movieId; // Afficher les images
+      }
+    },
+    toggleComments(movieId) {
+      if (this.showCommentManagement === movieId) {
+        this.showCommentManagement = null; // Cacher les commentaires
+      } else {
+        this.showCommentManagement = movieId; // Afficher les commentaires
+      }
+    },
+    addMovie(movieData) {
+      axios.post(`http://localhost:3000/movies`, movieData)
+          .then(() => {
+            console.log('Film ajouté avec succès');
+            this.fetchMovies(); // Recharger les films pour afficher les modifications
+            this.showAddMovieForm = false; // Fermer le formulaire après l'ajout du film
+          })
+          .catch(error => console.error('Erreur lors de l\'ajout du film:', error));
+    },
+    selectMovie(movie) {
+      this.showImageManagement = null;
+      this.selectedMovie = movie;
+      this.showEditMovieForm = true;
+    },
+    clearSelectedMovie() {
+      this.selectedMovie = null;
+      this.showEditMovieForm = false;
+    },
+    async disableMovie(movieId) {
+      const url = `http://localhost:3000/movies/deactivated/${movieId}`;
+      try {
+        await axios.patch(url);
+        alert(`Film désactivé avec succès !`);
+        this.fetchMovies(); // Rafraîchir la liste des films après la désactivation
+      } catch (error) {
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.error(`Erreur lors de la désactivation du film :`, error);
+      }
+    },
+    async enableMovie(movieId) {
+      const url = `http://localhost:3000/movies/activated/${movieId}`;
+
+      try {
+        await axios.patch(url);
+        alert(`Film activé avec succès !`);
+        this.fetchMovies(); // Rafraîchir la liste des films après l'activation
+      } catch (error) {
+        console.log("Status d'erreur de la réponse :", error.response.status);
+        console.log("Message d'erreur de la réponse :", error.response.data);
+        console.error(`Erreur lors de l'activation du film :`, error);
+      }
+    },
+    showComments(movieId) {
+      // Logique pour afficher les commentaires
+    },
+
+
   }
 };
 </script>
@@ -82,16 +195,20 @@ h1 {
 }
 
 .movie-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 20px;
   margin-bottom: 20px;
-  height: 250px;
-
+  background-color: #f9f9f9;
 }
+
+.movie-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 250px;
+}
+
 .movie-image-wrapper {
   height: 100%;
 }
@@ -119,13 +236,15 @@ button {
 button:hover {
   background-color: #2980b9;
 }
+
 .movie-image {
   height: 100%;
   object-fit: cover;
   margin-right: 20px;
 }
-.main-content {
-  width: 80%;
-  margin: 0 auto;
+
+.movie-edit-form {
+  margin-top: 20px;
 }
+
 </style>

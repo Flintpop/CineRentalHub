@@ -42,6 +42,8 @@ const userProxyOptions = {
 // Utilisation du middleware de proxy pour l'API de films
 app.use('/movies', createProxyMiddleware(movieProxyOptions));
 app.use('/movies/image', createProxyMiddleware(movieProxyOptions));
+app.use('/movies/desactivate', createProxyMiddleware(movieProxyOptions));
+app.use('/movies/activate', createProxyMiddleware(movieProxyOptions));
 app.use('/movies/main_image', createProxyMiddleware(movieProxyOptions));
 
 // Utilisation du middleware de proxy pour l'API utilisateur
