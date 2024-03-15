@@ -1,20 +1,147 @@
 package model;
 
+import database.MariaDB;
+import dto.CommentDTO;
+import dto.CommentPostDTO;
+import jakarta.persistence.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Comment {
 
-  public static Comment getCommentsByFilmId(Integer userId) {
-    return null;
+
+  /**
+   * Retourne la liste des commentaires d'un film
+   *
+   * @param movieId ID du film
+   * @return Liste des commentaires
+   */
+  public static List<CommentDTO> getCommentsByMovieId(Integer movieId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_comments_by_movie_id")
+        .registerStoredProcedureParameter("id_movie", Integer.class, ParameterMode.IN)
+        .setParameter("id_movie", movieId);
+
+      @SuppressWarnings ("unchecked")
+      List<Object[]> result = query.getResultList();
+      em.getTransaction().commit();
+      // retour:
+      // id, comment_text, comment_date, user_id, last_name, first_name
+      return result.stream().map(
+        row -> new CommentDTO((Integer) row[0], movieId, (Integer) row[1], (String) row[2], (String) row[3])).collect(
+        Collectors.toList());
+    }catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
   }
 
-  public static Comment addComment(Comment commentEntity) {
-    return null;
+  /**
+   * Ajoute un commentaire
+   *
+   * @param commentEntity Commentaire à ajouter
+   * @return Commentaire ajouté
+   *
+   */
+
+  // utilise la procédure stockée add_comment
+  // CREATE PROCEDURE add_comment (IN movie_id INT, IN user_id INT, IN comment_text TEXT, IN comment_date DATETIME)
+  public static CommentPostDTO addComment(CommentPostDTO commentEntity) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("add_comment")
+        .registerStoredProcedureParameter("movie_id", Integer.class, ParameterMode.IN)
+        .registerStoredProcedureParameter("user_id", Integer.class, ParameterMode.IN)
+        .registerStoredProcedureParameter("comment_text", String.class, ParameterMode.IN)
+        .registerStoredProcedureParameter("comment_date", java.sql.Timestamp.class, ParameterMode.IN)
+        .setParameter("movie_id", commentEntity.getMovie_id())
+        .setParameter("user_id", commentEntity.getUser_id())
+        .setParameter("comment_text", commentEntity.getComment_text())
+        .setParameter("comment_date", commentEntity.getComment_date());
+
+      query.execute();
+      em.getTransaction().commit();
+      return new CommentPostDTO(commentEntity.getMovie_id(), commentEntity.getUser_id(), commentEntity.getComment_text(),
+        commentEntity.getComment_date());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
   }
 
+  /**
+   * Supprime un commentaire par ID
+   *
+   * @param commentId ID du commentaire
+   */
+
+  // utilise la procédure stockée delete_comment
   public static void deleteCommentById(Integer commentId) {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("delete_comment_by_id")
+        .registerStoredProcedureParameter("comment_id", Integer.class, ParameterMode.IN)
+        .setParameter("comment_id", commentId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+    } finally {
+      em.close();
+    }
 
   }
 
-  public static void updateCommentById(Integer commentId, String s) {
+  /**
+   * Met à jour un commentaire par ID
+   *
+   * @param commentId ID du commentaire
+   * @param commentDTO Commentaire à mettre à jour
+   * @return Commentaire mis à jour
+   */
+  public static CommentPostDTO updateCommentById(Integer commentId, CommentDTO commentDTO) {
+    EntityManager em = MariaDB.getEntityManager();
+try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("update_comment_by_id")
+        .registerStoredProcedureParameter("comment_id", Integer.class, ParameterMode.IN)
+        .registerStoredProcedureParameter("comment_text", String.class, ParameterMode.IN)
+
+        .setParameter("comment_id", commentId)
+        .setParameter("comment_text", commentDTO.getComment_text());
+
+      query.execute();
+      em.getTransaction().commit();
+      return new CommentPostDTO(commentDTO.getMovie_id(), commentDTO.getUser_id(), commentDTO.getComment_text(),
+        commentDTO.getComment_date());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      return null;
+    } finally {
+      em.close();
+    }
 
   }
 }
