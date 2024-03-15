@@ -73,8 +73,26 @@ public class UserServlet extends HttpServlet {
     } catch (JsonSyntaxException e) {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "" +
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+              "{\"error\":\"" + e.getMessage() +
               "\n\"traceback:\" \"" + Arrays.toString(e.getStackTrace()) + "\"\"}");
+    }
+  }
+
+  @Override
+  protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Integer userId;
+    try {
+      userId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+    } catch (IdMissingException | IdValidationException | NumberFormatException e) {
+      return; // L'erreur a déjà été envoyée
+    }
+
+    try {
+      User.disableUser(userId);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Utilisateur désactivé.\"}");
+    } catch (Exception e) {
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
     }
   }
 }

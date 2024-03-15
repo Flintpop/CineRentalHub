@@ -3,6 +3,7 @@ package model;
 import database.MariaDB;
 import dto.UserLowDTO;
 import dto.UserDTO;
+import dto.UserPasswordDTO;
 import dto.UserPostDTO;
 import jakarta.persistence.*;
 import mariadbPojo.UsersPojo;
@@ -117,4 +118,102 @@ public class User {
     }
   }
 
+  // Disable user
+  public static void disableUser(Integer userId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("disable_user")
+              .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
+              .setParameter("user_id", userId);
+
+      query.execute();
+
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  // Enable user
+  public static void enableUser(Integer userId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("enable_user")
+              .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
+              .setParameter("user_id", userId);
+
+      query.execute();
+
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  // Update user password
+  public static void updateUserPassword(Integer userId, String newPassword) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("update_user_password")
+              .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("new_password", String.class, ParameterMode.IN)
+              .setParameter("user_id", userId)
+              .setParameter("new_password", newPassword);
+
+      query.execute();
+
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  public static UserPasswordDTO getUserPassword(Integer userId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      UsersPojo user = em.find(UsersPojo.class, userId);
+      if (user == null) {
+        throw new EntityNotFoundException("L'utilisateur avec l'ID " + userId + " n'existe pas.");
+      }
+
+      return new UserPasswordDTO(user);
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+
+      ModelUtils.generateException(e);
+      return null;
+    } finally {
+      em.close();
+    }
+  }
 }
