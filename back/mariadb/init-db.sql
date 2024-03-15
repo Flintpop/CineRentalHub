@@ -759,6 +759,35 @@ DELIMITER ;
 
 -- CALL disable_user(1);
 
+-- Activer un utilisateur
+DELIMITER //
+DROP PROCEDURE IF EXISTS enable_user;
+CREATE PROCEDURE enable_user(IN user_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
+    ELSE
+        UPDATE users SET activated = TRUE WHERE id = user_id;
+    END IF;
+END //
+DELIMITER ;
+
+-- CALL enable_user(1);
+
+-- Mettre à jour le mot de passe d'un utilisateur
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS update_user_password;
+CREATE PROCEDURE update_user_password(IN user_id INT, IN new_password CHAR(255))
+BEGIN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
+    ELSE
+        UPDATE users SET password = new_password WHERE id = user_id;
+    END IF;
+END //
+DELIMITER ;
+
 
 -- Ajouter un article au panier
 DELIMITER //
