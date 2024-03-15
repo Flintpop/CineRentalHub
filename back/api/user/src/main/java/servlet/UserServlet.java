@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dto.UserLowDTO;
 import dto.UserPostDTO;
 import exceptions.IdMissingException;
@@ -14,7 +13,6 @@ import dto.UserDTO;
 import model.User;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @WebServlet(name = "UserServlet", urlPatterns = "/user/*")
 public class UserServlet extends HttpServlet {
@@ -40,18 +38,13 @@ public class UserServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonBody = ServletUtils.readRequestBody(request);
-
     try {
-      UserPostDTO userDto = gson.fromJson(jsonBody, UserPostDTO.class);
+      UserPostDTO userDto = ServletUtils.readRequestBodyAndGetObject(request, UserPostDTO.class);
       userDto.hashPassword();
       UserPostDTO userCreated = User.createUser(userDto);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(userCreated));
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "" +
-              "\ntraceback:" + Arrays.toString(e.getStackTrace()) + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -64,18 +57,12 @@ public class UserServlet extends HttpServlet {
       return; // L'erreur a déjà été envoyée
     }
 
-    String jsonBody = ServletUtils.readRequestBody(request);
-
     try {
-      UserLowDTO userDto = gson.fromJson(jsonBody, UserLowDTO.class);
+      UserLowDTO userDto = ServletUtils.readRequestBodyAndGetObject(request, UserLowDTO.class);
       UserLowDTO userUpdated = User.updateUser(userId, userDto);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(userUpdated));
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-              "{\"error\":\"" + e.getMessage() +
-              "\n\"traceback:\" \"" + Arrays.toString(e.getStackTrace()) + "\"\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 

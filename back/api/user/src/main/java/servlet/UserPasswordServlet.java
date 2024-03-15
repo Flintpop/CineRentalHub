@@ -45,15 +45,13 @@ public class UserPasswordServlet extends HttpServlet {
     }
 
     try {
-      String jsonBody = ServletUtils.readRequestBody(request);
-      UserPasswordDTO userPassword = gson.fromJson(jsonBody, UserPasswordDTO.class);
+      UserPasswordDTO userPassword = ServletUtils.readRequestBodyAndGetObject(request, UserPasswordDTO.class);
+//      UserPasswordDTO userPassword = gson.fromJson(jsonBody, UserPasswordDTO.class);
       userPassword.hashPassword();
       User.updateUserPassword(userId, userPassword.getPassword());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Mot de passe modifié.\"}");
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }
