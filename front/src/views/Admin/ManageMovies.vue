@@ -18,16 +18,20 @@
           <p>Date de sortie : {{ movie.release_date }}</p>
           <p>Prix de location quotidien : {{ movie.daily_rental_price }}€</p>
           <p>Prix d'achat : {{ movie.purchase_price }}€</p>
-          <p>Disponible : {{ movie.available}}</p>
+          <p>Disponible : {{ movie.available }}</p>
           <p>Lien de la video : {{ movie.link }}</p>
         </div>
         <div class="movie-actions">
           <button @click="selectMovie(movie)">Modifier</button>
           <!-- Bouton pour désactiver le film -->
-          <button v-if="movie.available" @click="disableMovie(movie.id)" class="disable-button">Désactiver le film</button>
+          <button v-if="movie.available" @click="disableMovie(movie.id)" class="disable-button">Désactiver le film
+          </button>
           <!-- Bouton pour activer le film -->
           <button v-else @click="enableMovie(movie.id)" class="enable-button">Activer le film</button>
-          <button @click="showImage(movie.id)">Afficher les images</button>
+          <button @click="toggleImages(movie.id)">
+            <span v-if="showImageManagement === movie.id">Cacher les images</span>
+            <span v-else>Afficher les images</span>
+          </button>
           <button @click="showComments(movie.id)">Afficher les commentaires</button>
         </div>
       </div>
@@ -38,7 +42,7 @@
       </div>
 
       <MovieImages v-if="showImageManagement === movie.id" :movie-id="movie.id"></MovieImages>
-<!--      <MovieImages v-if="showImageManagement && visibleImages === movie.id" :movie-id="movie.id"></MovieImages>-->
+      <!--      <MovieImages v-if="showImageManagement && visibleImages === movie.id" :movie-id="movie.id"></MovieImages>-->
     </div>
 
 
@@ -90,7 +94,7 @@ export default {
                     console.log(error.response.data);
                   });
 
-            this.movies[i].release_date = moment(this.movies[i].release_date).format('YYYY-MM-DD');
+              this.movies[i].release_date = moment(this.movies[i].release_date).format('YYYY-MM-DD');
               this.movies[i].images = await this.fetchMovieImages(this.movies[i].id);
 
 
@@ -107,6 +111,13 @@ export default {
         return response.data; // Supposons que l'API renvoie un tableau d'URLs d'images
       } catch (error) {
         console.error(error);
+      }
+    },
+    toggleImages(movieId) {
+      if (this.showImageManagement === movieId) {
+        this.showImageManagement = null; // Cacher les images
+      } else {
+        this.showImageManagement = movieId; // Afficher les images
       }
     },
     addMovie(movieData) {
