@@ -2,9 +2,15 @@
   <NavbarAdmin/>
   <div class="main-content">
     <h1>Gestion des films</h1>
+    <div v-if="errorMessage" class="error-modal">
+      <span class="close" @click="closeError">&times;</span>
+      <div class="error-content">{{ errorMessage }}</div>
+    </div>
     <button @click="showAddMovieForm = true">Ajouter un film</button>
     <!-- Modale d'ajout de film -->
     <MovieCreateForm v-if="showAddMovieForm" @close="showAddMovieForm = false" @submit="addMovie"></MovieCreateForm>
+
+
 
     <!-- Liste des films -->
     <div class="movie-card" v-for="movie in movies" :key="movie.id">
@@ -77,6 +83,8 @@ export default {
       showImageManagement: null,
       showCommentManagement: null,
       selectedMovie: null,
+      errorMessage: null, // Ajoutez cette ligne
+
 
       movies: [],
       images: [],
@@ -121,6 +129,9 @@ export default {
         console.error(error);
       }
     },
+    closeError() {
+      this.errorMessage = null;
+    },
     toggleImages(movieId) {
       if (this.showImageManagement === movieId) {
         this.showImageManagement = null; // Cacher les images
@@ -142,8 +153,18 @@ export default {
             console.log('Film ajouté avec succès');
             this.fetchMovies(); // Recharger les films pour afficher les modifications
             this.showAddMovieForm = false; // Fermer le formulaire après l'ajout du film
+            this.errorMessage = null; // Effacer le message d'erreur précédent
           })
-          .catch(error => console.error('Erreur lors de l\'ajout du film:', error));
+          .catch((error) => {
+            if (error.response && error.response.data) {
+              // Stocker le message d'erreur dans errorMessage
+              this.errorMessage = '' + error.response.data.error;
+              console.error('Erreur lors de l\'ajout du film :', error.response.data.error);
+            } else {
+              // Stocker un message d'erreur générique si aucune information spécifique n'est disponible
+              this.errorMessage = 'Erreur lors de l\'ajout du film: ' + error;
+            }
+          });
     },
     selectMovie(movie) {
       this.showImageManagement = null;
@@ -159,7 +180,7 @@ export default {
       try {
         await axios.patch(url);
         alert(`Film désactivé avec succès !`);
-        this.fetchMovies(); // Rafraîchir la liste des films après la désactivation
+        await this.fetchMovies(); // Rafraîchir la liste des films après la désactivation
       } catch (error) {
         console.log("Status d'erreur de la réponse :", error.response.status);
         console.log("Message d'erreur de la réponse :", error.response.data);
@@ -172,7 +193,7 @@ export default {
       try {
         await axios.patch(url);
         alert(`Film activé avec succès !`);
-        this.fetchMovies(); // Rafraîchir la liste des films après l'activation
+        await this.fetchMovies(); // Rafraîchir la liste des films après l'activation
       } catch (error) {
         console.log("Status d'erreur de la réponse :", error.response.status);
         console.log("Message d'erreur de la réponse :", error.response.data);
@@ -245,6 +266,50 @@ button:hover {
 
 .movie-edit-form {
   margin-top: 20px;
+}
+.error-message {
+  color: red;
+  border: 1px solid red;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+}
+.error-modal {
+  position: fixed; /* Utilisez fixed pour positionner la modal par rapport à la fenêtre du navigateur */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* Fond légèrement transparent */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-content {
+  background-color: #fff; /* Fond blanc pour le contenu de l'erreur */
+  margin: 15px;
+  padding: 20px;
+  border-left: 5px solid red; /* Bordure gauche rouge pour l'accent */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre pour un effet de profondeur */
+  max-width: 500px; /* Largeur maximale pour le contenu de l'erreur */
+  width: 100%; /* S'adapte à la largeur de l'écran jusqu'à 500px */
+  text-align: left; /* Alignement du texte à gauche */
+}
+
+.close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: #000;
+  cursor: pointer;
+  font-size: 25px;
+}
+.close:hover,
+.close:focus {
+  color: red; /* Changement de couleur au survol */
+  text-decoration: none;
+  cursor: pointer;
 }
 
 </style>
