@@ -911,3 +911,18 @@ BEGIN
     END IF;
 END //
 
+DELIMITER ;
+
+-- CALL get_comments_by_movie_id(1);
+
+-- modifier un commentaire
+DELIMITER //
+CREATE PROCEDURE update_comment_by_id(IN comment_id INT, IN comment_text TEXT, IN comment_date DATETIME, IN user_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = comment_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        UPDATE comments SET comment_text = comment_text WHERE id = comment_id;
+    END IF;
+END //
+
