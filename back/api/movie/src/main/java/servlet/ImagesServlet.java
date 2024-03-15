@@ -31,7 +31,7 @@ public class ImagesServlet extends HttpServlet {
       List<ImageDTO> mainImage = Movie.getImagesByMovieId(movieId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(mainImage));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -50,7 +50,7 @@ public class ImagesServlet extends HttpServlet {
       Movie.addImage(movieId, image.getImage_url());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(image));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -67,7 +67,7 @@ public class ImagesServlet extends HttpServlet {
       Movie.deleteImage(imageId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Image supprimée.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }

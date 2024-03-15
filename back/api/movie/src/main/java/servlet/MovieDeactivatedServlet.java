@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.ServletException;
@@ -45,10 +44,8 @@ public class MovieDeactivatedServlet extends HttpServlet {
       Movie.deactivateMovie(movieId);
 
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Film désactivé.\"}");
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }

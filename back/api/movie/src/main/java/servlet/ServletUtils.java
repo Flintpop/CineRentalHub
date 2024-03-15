@@ -1,5 +1,6 @@
 package servlet;
 
+import com.google.gson.JsonSyntaxException;
 import dto.MovieDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
@@ -8,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class ServletUtils {
   public static String readRequestBody(HttpServletRequest request) throws IOException {
@@ -95,21 +98,36 @@ public class ServletUtils {
     response.getWriter().flush();
   }
 
-
-  public static MovieDTO extractIdAndGetMovie(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer id;
-    try {
-      id = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
-    } catch (IdMissingException | IdValidationException | NumberFormatException e) {
-      return null;
+  public static void sendErrorJsonResponseWithTraceback(HttpServletResponse response, int statusCode, Exception e) throws IOException {
+    if (e.getCause() instanceof java.text.ParseException pe) {
+      String jsonResponse = """
+                {
+                  "error": "Format de date incorrect.",
+                  "expected_format": "MMM DD, YYYY",
+                  "example": "Jan 01, 2021",
+                  "received_value": %s
+                }
+                """.formatted(pe.getMessage().split(": ")[1]);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonResponse);
+    } else if (e instanceof JsonSyntaxException json) {
+      String jsonReponse = """
+              {
+                "error": "Format JSON invalide, données incorrect.",
+                "message": %s
+              }
+              """.formatted(json.getMessage());
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonReponse);
+    } else {
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      String exceptionAsString = sw.toString();
+      String jsonResponse = """
+              {
+                "error": "%s",
+                "traceback": "%s"
+              }
+              """.formatted(e.getMessage(), exceptionAsString);
+      sendErrorJsonResponse(response, statusCode, jsonResponse);
     }
-
-    MovieDTO moviePojo = model.Movie.getMovieById(id);
-    if (moviePojo == null) {
-      sendJsonResponse(response, HttpServletResponse.SC_NOT_FOUND, "{\"error\":\"Movie non trouvé.\"}");
-      return null;
-    }
-
-    return moviePojo;
-  }
+}
 }

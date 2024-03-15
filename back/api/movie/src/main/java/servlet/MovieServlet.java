@@ -52,10 +52,8 @@ public class MovieServlet extends HttpServlet {
       // Ici, implémentez la validation du film si nécessaire
       MoviePostPutDTO createdMovie = Movie.addMovie(movieEntity);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(createdMovie));
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -73,10 +71,8 @@ public class MovieServlet extends HttpServlet {
       MoviePostPutDTO movieToUpdate = gson.fromJson(jsonBody, MoviePostPutDTO.class);
       MovieDTO updatedMovie = Movie.updateMovie(movieId, movieToUpdate);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(updatedMovie));
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }

@@ -34,9 +34,30 @@ public class Movie {
     }
   }
 
+  /**
+   * Ajoute un film à la base de données.
+   *
+   * @param movieDTO Le film à ajouter.
+   * @return Le film ajouté.
+   * @throws Exception Si une erreur survient lors de l'ajout du film.
+   */
   public static MoviePostPutDTO addMovie(MoviePostPutDTO movieDTO) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
+      /*
+      JSON de la requête HTTP POST:
+
+      {
+        "title": "Le titre du film",
+        "release_date": "2021-01-01",
+        "description": "La description du film",
+        "daily_rental_price": 10.99,
+        "purchase_price": 19.99,
+        "link": "https://www.youtube.com/watch?v=123456"
+      }
+
+
+       */
       em.getTransaction().begin();
 
       StoredProcedureQuery query = em.createStoredProcedureQuery("add_movie")
