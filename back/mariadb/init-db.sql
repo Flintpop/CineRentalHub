@@ -626,11 +626,11 @@ END //
 DELIMITER ;
 
 -- call getImagesByMovieId(1);
-# TODO: Continuer d'ajouter les procédures et les drops en haut
 
 
 -- AJouter une image à un film
 DELIMITER //
+DROP PROCEDURE IF EXISTS add_image_to_movie;
 CREATE PROCEDURE add_image_to_movie(IN _movie_id INT, IN _image_url VARCHAR(2000))
 BEGIN
     IF NOT EXISTS (SELECT id FROM movies WHERE id = _movie_id) THEN
