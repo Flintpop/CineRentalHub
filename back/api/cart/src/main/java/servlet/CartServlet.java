@@ -35,10 +35,8 @@ public class CartServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String jsonBody = ServletUtils.readRequestBody(request);
-
     try {
-      Cart cart = gson.fromJson(jsonBody, Cart.class);
+      Cart cart = ServletUtils.readRequestBodyAndGetObject(request, Cart.class);
       cart = Cart.createCart(cart);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(cart));
     } catch (Exception e) {

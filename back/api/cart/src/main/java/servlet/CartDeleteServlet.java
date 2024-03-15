@@ -27,7 +27,7 @@ public class CartDeleteServlet extends HttpServlet {
 
     try {
       Cart.deleteEntireCart(cartId);
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"message\":\" \"Successfully deleted\"}");
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"message\":\" \"Suppression réussie\"}");
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
