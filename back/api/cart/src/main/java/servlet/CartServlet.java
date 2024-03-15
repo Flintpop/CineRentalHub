@@ -1,6 +1,8 @@
 package servlet;
 
 import com.google.gson.Gson;
+import dto.CartDTO;
+import dto.CartPostDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,8 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Cart;
 
 import java.io.IOException;
+import java.util.List;
 
-//@WebServlet
+
 @WebServlet(name = "CartServlet", urlPatterns = "/cart/*")
 public class CartServlet extends HttpServlet {
   private final Gson gson = new Gson();
@@ -26,7 +29,7 @@ public class CartServlet extends HttpServlet {
     }
 
     try {
-      Cart cart = Cart.getCartByUserId(userId);
+      List<CartDTO> cart = Cart.getCartByUserId(userId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(cart));
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
@@ -36,8 +39,8 @@ public class CartServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     try {
-      Cart cart = ServletUtils.readRequestBodyAndGetObject(request, Cart.class);
-      cart = Cart.createCart(cart);
+      CartPostDTO cart = ServletUtils.readRequestBodyAndGetObject(request, CartPostDTO.class);
+      Cart.createCart(cart);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(cart));
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);

@@ -12,8 +12,8 @@ import model.Cart;
 import java.io.IOException;
 
 //@WebServlet
-@WebServlet(name = "CartServlet", urlPatterns = "/cart/delete/*")
-public class CartValidateCart extends HttpServlet {
+@WebServlet(name = "CartValidateServlet", urlPatterns = "/cart/validate/*")
+public class CartValidate extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (req.getMethod().equalsIgnoreCase("PATCH")) {

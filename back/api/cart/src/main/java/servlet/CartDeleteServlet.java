@@ -12,22 +12,22 @@ import model.Cart;
 import java.io.IOException;
 
 //@WebServlet
-@WebServlet(name = "CartServlet", urlPatterns = "/cart/delete/*")
+@WebServlet(name = "CartDeleteServlet", urlPatterns = "/cart/delete/*")
 public class CartDeleteServlet extends HttpServlet {
   private final Gson gson = new Gson();
 
   @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer cartId;
+    Integer userId;
     try {
-      cartId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+      userId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
     } catch (IdMissingException | IdValidationException | NumberFormatException e) {
       return; // L'erreur a déjà été envoyée
     }
 
     try {
-      Cart.deleteEntireCart(cartId);
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"message\":\" \"Suppression réussie\"}");
+      Cart.deleteEntireCart(userId);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\": \"Suppression réussie\"}");
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }

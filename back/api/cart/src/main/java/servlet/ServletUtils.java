@@ -24,12 +24,12 @@ public class ServletUtils {
     }
     return convertObjectToJson(jsonBody.toString(), clazz);
   }
-  
+
   private static <T> T convertObjectToJson(String json, Class<T> clazz) {
     Gson gson = new Gson();
-    
+
     T object = gson.fromJson(json, clazz);
-    
+
     for (Field field : clazz.getDeclaredFields()) {
       field.setAccessible(true);
       try {
@@ -47,13 +47,14 @@ public class ServletUtils {
   /**
    * Extrait et valide l'ID de la requête HTTP. Envoie une réponse JSON avec le code d'état HTTP approprié
    * si l'ID est manquant ou invalide, et en fonction d'idAlwaysDemanded.
-   * @param pathInfo Le chemin de la requête HTTP.
-   * @param response La réponse HTTP.
+   *
+   * @param pathInfo         Le chemin de la requête HTTP.
+   * @param response         La réponse HTTP.
    * @param idAlwaysDemanded Si true, envoie une réponse JSON avec le code d'état HTTP approprié si l'ID est manquant.
    * @return L'ID extrait de la requête HTTP.
-   * @throws IOException Si une erreur d'entrée/sortie survient.
+   * @throws IOException           Si une erreur d'entrée/sortie survient.
    * @throws NumberFormatException Si l'ID n'est pas un chiffre.
-   * @throws IdMissingException Si l'ID est manquant.
+   * @throws IdMissingException    Si l'ID est manquant.
    * @throws IdValidationException Si l'ID est invalide.
    */
   public static Integer extractAndValidateId(String pathInfo, HttpServletResponse response, boolean idAlwaysDemanded)
@@ -100,8 +101,9 @@ public class ServletUtils {
   /**
    * En plus d'envoyer classiquement un json, supprime l'indication de la connexion si présente dans
    * le message d'erreur.
-   * @param response La réponse HTTP.
-   * @param statusCode Le code d'état HTTP.
+   *
+   * @param response     La réponse HTTP.
+   * @param statusCode   Le code d'état HTTP.
    * @param errorMessage Le message d'erreur, en brut.
    * @throws IOException Si une erreur d'entrée/sortie survient.
    */
@@ -119,15 +121,16 @@ public class ServletUtils {
   }
 
   public static void sendErrorJsonResponseWithTraceback(HttpServletResponse response, int statusCode, Exception e) throws IOException {
+    int statusCodeToSend = statusCode;
     if (e.getCause() instanceof java.text.ParseException pe) {
       String jsonResponse = """
-                {
-                  "error": "Format de date incorrect.",
-                  "expected_format": "MMM DD, YYYY",
-                  "example": "Jan 01, 2021",
-                  "received_value": %s
-                }
-                """.formatted(pe.getMessage().split(": ")[1]);
+              {
+                "error": "Format de date incorrect.",
+                "expected_format": "MMM DD, YYYY",
+                "example": "Jan 01, 2021",
+                "received_value": %s
+              }
+              """.formatted(pe.getMessage().split(": ")[1]);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonResponse);
     } else if (e instanceof JsonSyntaxException json) {
       String jsonReponse = """
@@ -138,6 +141,9 @@ public class ServletUtils {
               """.formatted(json.getMessage());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonReponse);
     } else {
+      if (isEntityNotFound(e)) {
+        statusCodeToSend = HttpServletResponse.SC_NOT_FOUND;
+      }
       StringWriter sw = new StringWriter();
       e.printStackTrace(new PrintWriter(sw));
       String exceptionAsString = sw.toString();
@@ -147,7 +153,20 @@ public class ServletUtils {
                 "traceback": "%s"
               }
               """.formatted(e.getMessage(), exceptionAsString);
-      sendErrorJsonResponse(response, statusCode, jsonResponse);
+      sendErrorJsonResponse(response, statusCodeToSend, jsonResponse);
     }
-}
+  }
+
+  private static boolean isEntityNotFound(Exception e) {
+    String[] filters = {"Entity not found", "Aucun", "Not found", "No entity", "No result", "No entity found",
+            "Aucune entité", "Aucun résultat", "Entité non trouvée", "Résultat non trouvé"
+    };
+
+    for (String filter : filters) {
+      if (e.getMessage().toLowerCase().contains(filter.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

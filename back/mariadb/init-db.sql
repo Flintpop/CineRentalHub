@@ -825,28 +825,28 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS delete_user_cart;
-CREATE PROCEDURE `delete_user_cart` (IN `userId` INT)
+CREATE PROCEDURE `delete_user_cart` (IN `id_user` INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
-    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = userId) = 0 THEN
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
     ELSE
         -- Supprimer les entrées du panier pour cet utilisateur
-        DELETE FROM shopping_cart WHERE user_id = userId;
+        DELETE FROM shopping_cart WHERE user_id = id_user;
     END IF;
 END //
 DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS get_user_cart;
-CREATE PROCEDURE `get_user_cart` (IN `userId` INT)
+CREATE PROCEDURE get_user_cart (IN id_user INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
-    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = userId) = 0 THEN
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
     ELSE
         -- Sélectionner et retourner les entrées du panier pour cet utilisateur
-        SELECT * FROM shopping_cart WHERE user_id = userId;
+        SELECT * FROM shopping_cart WHERE user_id = id_user;
     END IF;
 END //
 DELIMITER ;
@@ -854,7 +854,7 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS validate_user_cart;
-CREATE PROCEDURE `validate_user_cart` (IN `userId` INT)
+CREATE PROCEDURE `validate_user_cart` (IN `id_user` INT)
 BEGIN
     DECLARE cartItemCount INT DEFAULT 0;
     DECLARE done INT DEFAULT FALSE;
@@ -862,11 +862,11 @@ BEGIN
     DECLARE cartType ENUM('purchase', 'rental');
     DECLARE movieId INT;
     DECLARE rentalDuration INT;
-    DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = userId;
+    DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = id_user;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
     -- Compter les éléments dans le panier de l'utilisateur
-    SELECT COUNT(*) INTO cartItemCount FROM shopping_cart WHERE user_id = userId;
+    SELECT COUNT(*) INTO cartItemCount FROM shopping_cart WHERE user_id = id_user;
     IF cartItemCount = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le panier est vide.';
     END IF;
@@ -881,15 +881,15 @@ BEGIN
 
         -- Traitement en fonction du type d'élément dans le panier
         IF cartType = 'purchase' THEN
-            INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (userId, movieId, CURDATE());
+            INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, movieId, CURDATE());
         ELSEIF cartType = 'rental' THEN
-            INSERT INTO rentals (user_id, movie_id, rental_date, return_date) VALUES (userId, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
+            INSERT INTO rentals (user_id, movie_id, rental_date, return_date) VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
         END IF;
     END LOOP;
     CLOSE cur;
 
     -- Vider le panier de l'utilisateur en appelant la procédure précédemment créée
-    CALL delete_user_cart(userId);
+    CALL delete_user_cart(id_user);
 END //
 DELIMITER ;
 
@@ -898,15 +898,16 @@ DELIMITER ;
 
 -- Enregistrer une nouvelle location
 DELIMITER //
-CREATE PROCEDURE add_rental(IN user_id INT, IN movie_id INT, IN rental_date DATETIME, IN return_date DATETIME)
+DROP PROCEDURE IF EXISTS add_rental;
+CREATE PROCEDURE add_rental(IN id_user INT, IN id_movie INT, IN date_rental DATETIME, IN date_return DATETIME)
 BEGIN
-    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = id_user) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
-    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
+    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
         INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-        VALUES (user_id, movie_id, rental_date, return_date);
+        VALUES (id_user, id_movie, date_rental, date_return);
     END IF;
 END //
 DELIMITER ;
@@ -919,14 +920,15 @@ DELIMITER ;
 
 -- Enregistrer un nouvel achat
 DELIMITER //
-CREATE PROCEDURE add_purchase(IN user_id INT, IN movie_id INT, IN purchase_date DATE)
+DROP PROCEDURE IF EXISTS add_purchase;
+CREATE PROCEDURE add_purchase(IN id_user INT, IN id_movie INT, IN date_purchase DATE)
 BEGIN
-    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = id_user) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
-    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
+    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
-        INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (user_id, movie_id, purchase_date);
+        INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, id_movie, date_purchase);
     END IF;
 END //
 DELIMITER ;
