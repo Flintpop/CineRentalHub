@@ -900,3 +900,14 @@ DELIMITER ;
 -- CALL delete_comment(1);
 
 
+-- Récupère les commentaires d'un film
+DELIMITER //
+CREATE PROCEDURE get_comments_by_movie_id(IN id_movie INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSE
+        SELECT * FROM comments WHERE movie_id = id_movie;
+    END IF;
+END //
+
