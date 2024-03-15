@@ -45,7 +45,7 @@ public class UserActivateServlet extends HttpServlet {
       model.User.enableUser(userId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Utilisateur activé.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }

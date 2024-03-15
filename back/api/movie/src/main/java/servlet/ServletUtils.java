@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.JsonSyntaxException;
-import dto.MovieDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
