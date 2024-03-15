@@ -44,8 +44,7 @@ public class MainImageServlet extends HttpServlet {
     }
 
     try {
-      String jsonBody = ServletUtils.readRequestBody(request);
-      PutMainImageDTO image = gson.fromJson(jsonBody, PutMainImageDTO.class);
+      PutMainImageDTO image = ServletUtils.readRequestBodyAndGetObject(request, PutMainImageDTO.class);
       Movie.setMainImage(movieId, image.getImage_id());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(image));
     } catch (Exception e) {
