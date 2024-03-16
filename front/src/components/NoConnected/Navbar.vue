@@ -7,7 +7,9 @@
         <router-link to="/about">À propos</router-link>
         <router-link to="/login">Connexion</router-link>
         <router-link to="/register">Inscription</router-link>
-
+        <router-link to="/MyCart" class="navbar-cart">
+          <i class="fas fa-shopping-cart"></i> Panier
+        </router-link>
         <!-- Ajoutez d'autres liens de navigation ici -->
       </div>
     </div>

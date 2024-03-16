@@ -1,8 +1,17 @@
 <template>
+  <NavbarUser/>
   <div class="mycart">
-    <NavbarUser/>
     <h1>Mon Panier</h1>
-    <!-- Ici, vous pouvez ajouter le code pour afficher les articles dans le panier -->
+    <div class="cart-items">
+      <div v-for="(item, index) in cartItems" :key="index" class="cart-item">
+        <img :src="item.image" alt="" class="item-image">
+        <div class="item-details">
+          <h2>{{ item.name }}</h2>
+          <p>Quantité: {{ item.quantity }}</p>
+          <p>Prix: {{ item.price }} €</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -14,17 +23,48 @@ export default {
   components: {NavbarUser},
   data() {
     return {
-      // Ici, vous pouvez ajouter les données nécessaires pour votre panier
+      cartItems: [
+        { name: 'Film A', quantity: 2, price: 10, image: 'path/to/imageA.jpg' },
+        { name: 'Film B', quantity: 1, price: 15, image: 'path/to/imageB.jpg' }
+      ]
     };
   },
   methods: {
-    // Ici, vous pouvez ajouter les méthodes nécessaires pour votre panier
+    // Méthodes pour gérer le panier ici
   },
 };
 </script>
 
 <style scoped>
 .mycart {
-  /* Ici, vous pouvez ajouter le style pour votre panier */
+  max-width: 80vw;
+  margin: auto;
+  padding: 20px;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.item-image {
+  width: 200px;
+  height: 200px;
+  margin-right: 20px;
+}
+
+.item-details h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.item-details p {
+  margin: 5px 0;
 }
 </style>
