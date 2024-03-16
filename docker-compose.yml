@@ -13,14 +13,14 @@ services:
     networks:
       - ubo-network
 
-#  mongo:
-#    build:
-#      context:
-#        ./back/mongodb
-#    ports:
-#      - "27017:27017"
-#    networks:
-#      - ubo-network
+  mongo:
+    build:
+      context:
+        ./back/mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - ubo-network
 
   front:
     build:
