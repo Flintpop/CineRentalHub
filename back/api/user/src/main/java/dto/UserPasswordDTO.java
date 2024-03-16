@@ -24,9 +24,21 @@ public class UserPasswordDTO {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-512");
       byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-      this.password = Base64.getEncoder().encodeToString(hash);
+      this.password = bytesToHex(hash);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Problème lors du hachage du mot de passe", e);
     }
+  }
+
+  private static String bytesToHex(byte[] hash) {
+    StringBuilder hexString = new StringBuilder(2 * hash.length);
+    for (int i = 0; i < hash.length; i++) {
+      String hex = Integer.toHexString(0xff & hash[i]);
+      if (hex.length() == 1) {
+        hexString.append('0');
+      }
+      hexString.append(hex);
+    }
+    return hexString.toString();
   }
 }
