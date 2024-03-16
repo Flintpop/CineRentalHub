@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>user</artifactId>
+    <artifactId>comment</artifactId>
     <version>1.0</version>
-    <name>user</name>
+    <name>comment</name>
     <packaging>war</packaging>
 
     <properties>
