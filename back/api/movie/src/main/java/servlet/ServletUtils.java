@@ -1,6 +1,7 @@
 package servlet;
 
 import com.google.gson.JsonSyntaxException;
+import exceptions.ApiException;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -141,7 +142,9 @@ public class ServletUtils {
               """.formatted(json.getMessage());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonReponse);
     } else {
-      if (isEntityNotFound(e)) {
+      if (e instanceof ApiException apiException) {
+        statusCodeToSend = apiException.getStatusCode();
+      } else if (isEntityNotFound(e)) {
         statusCodeToSend = HttpServletResponse.SC_NOT_FOUND;
       }
       StringWriter sw = new StringWriter();
