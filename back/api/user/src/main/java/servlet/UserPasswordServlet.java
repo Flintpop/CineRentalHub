@@ -1,7 +1,6 @@
 package servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dto.UserPasswordDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
