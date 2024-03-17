@@ -989,12 +989,13 @@ DELIMITER ;
 
 -- modifier un commentaire
 DELIMITER //
-CREATE PROCEDURE update_comment_by_id(IN comment_id INT, IN comment_text TEXT, IN comment_date DATETIME, IN user_id INT)
+DROP PROCEDURE IF EXISTS update_comment_by_id;
+CREATE PROCEDURE update_comment_by_id(IN comment_id INT, IN text_comment TEXT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM comments WHERE id = comment_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
     ELSE
-        UPDATE comments SET comment_text = comment_text WHERE id = comment_id;
+        UPDATE comments SET comment_text = text_comment WHERE id = comment_id;
     END IF;
 END //
 
