@@ -170,11 +170,31 @@ VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
 
 -- jeux de données pour la table users
 INSERT INTO users (last_name, first_name, email, password, role)
-VALUES ('User', 'Deleted', 'deleted@email.com', SHA2('deleted', 512), 'user'),
+VALUES ('User', 'Anonyme', 'anonyme@exemple.com', SHA2('anonyme', 512), 'user'),
     ('Doe', 'John', 'john.doe@exemple.com', SHA2('password123', 512), 'user'),
     ('Smith', 'Jane', 'jane.smith@example.com', SHA2('password456', 512), 'admin'),
     ('Brown', 'Bob', 'bob.brown@example.com', SHA2('password789', 512), 'user'),
-    ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin');
+    ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin'),
+    ('Garcia', 'Maria', 'Maria.Garcia@gmail.com', SHA2('password123', 512), 'user'),
+    ('Smith', 'John', 'John.Smith@gmail.com', SHA2('password124', 512), 'user'),
+    ('Brown', 'Sarah', 'Sarah.Brown@gmail.com', SHA2('password125', 512), 'user'),
+    ('Johnson', 'Mike', 'Mike.Johnson@gmail.com', SHA2('password126', 512), 'user'),
+    ('Lee', 'Karen', 'Karen.Lee@gmail.com', SHA2('password127', 512), 'user'),
+    ('Patel', 'Raj', 'Raj.Patel@gmail.com', SHA2('password128', 512), 'user'),
+    ('Davis', 'Jessica', 'Jessica.Davis@gmail.com', SHA2('password129', 512), 'user'),
+    ('Martinez', 'Carlos', 'Carlos.Martinez@gmail.com', SHA2('password130', 512), 'user'),
+    ('Nguyen', 'Linda', 'Linda.Nguyen@gmail.com', SHA2('password131', 512), 'user'),
+    ('Clark', 'James', 'James.Clark@gmail.com', SHA2('password132', 512), 'user'),
+    ('Wilson', 'Emma', 'Emma.Wilson@gmail.com', SHA2('password233', 512), 'user'),
+    ('Moore', 'Jack', 'Jack.Moore@gmail.com', SHA2('password234', 512), 'user'),
+    ('Taylor', 'Olivia', 'Olivia.Taylor@gmail.com', SHA2('password235', 512), 'user'),
+    ('Anderson', 'George', 'George.Anderson@gmail.com', SHA2('password236', 512), 'user'),
+    ('Thomas', 'Mia', 'Mia.Thomas@gmail.com', SHA2('password237', 512), 'user'),
+    ('Jackson', 'Ethan', 'Ethan.Jackson@gmail.com', SHA2('password238', 512), 'user'),
+    ('White', 'Sophia', 'Sophia.White@gmail.com', SHA2('password239', 512), 'user'),
+    ('Harris', 'Noah', 'Noah.Harris@gmail.com', SHA2('password240', 512), 'user'),
+    ('Martin', 'Amelia', 'Amelia.Martin@gmail.com', SHA2('password241', 512), 'user'),
+    ('Garcia', 'Lucas', 'Lucas.Garcia@gmail.com', SHA2('password242', 512), 'user');
 
 
 -- jeux de données pour la table shopping_cart
@@ -829,7 +849,7 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS delete_user_cart;
-CREATE PROCEDURE `delete_user_cart` (IN `id_user` INT)
+CREATE PROCEDURE `delete_user_cart`(IN `id_user` INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
     IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
@@ -843,7 +863,7 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS get_user_cart;
-CREATE PROCEDURE get_user_cart (IN id_user INT)
+CREATE PROCEDURE get_user_cart(IN id_user INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
     IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
@@ -858,12 +878,12 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS validate_user_cart;
-CREATE PROCEDURE `validate_user_cart` (IN `id_user` INT)
+CREATE PROCEDURE `validate_user_cart`(IN `id_user` INT)
 BEGIN
     DECLARE cartItemCount INT DEFAULT 0;
     DECLARE done INT DEFAULT FALSE;
     DECLARE cartId INT;
-    DECLARE cartType ENUM('purchase', 'rental');
+    DECLARE cartType ENUM ('purchase', 'rental');
     DECLARE movieId INT;
     DECLARE rentalDuration INT;
     DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = id_user;
@@ -877,7 +897,8 @@ BEGIN
 
     -- Parcourir les éléments du panier
     OPEN cur;
-    read_loop: LOOP
+    read_loop:
+    LOOP
         FETCH cur INTO cartId, cartType, movieId, rentalDuration;
         IF done THEN
             LEAVE read_loop;
@@ -887,7 +908,8 @@ BEGIN
         IF cartType = 'purchase' THEN
             INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, movieId, CURDATE());
         ELSEIF cartType = 'rental' THEN
-            INSERT INTO rentals (user_id, movie_id, rental_date, return_date) VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
+            INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
+            VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
         END IF;
     END LOOP;
     CLOSE cur;
