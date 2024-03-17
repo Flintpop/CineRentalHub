@@ -170,15 +170,48 @@ VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
         'https://www.youtube.com/watch?v=8hYlB38asDY');
 
 -- jeux de données pour la table users
-INSERT
-INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Doe', 'John', 'john.doe@example.com', TRUE, SHA2('password123', 512), 'user');
+
 INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Smith', 'Jane', 'jane.smith@example.com', TRUE, SHA2('password456', 512), 'admin');
+VALUES ('Garcia', 'Maria', 'Maria.Garcia@gmail.com', TRUE, SHA2('password123', 512), 'user');
 INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Brown', 'Bob', 'bob.brown@example.com', TRUE, SHA2('password789', 512), 'user');
+VALUES ('Smith', 'John', 'John.Smith@gmail.com', TRUE, SHA2('password124', 512), 'user');
 INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Johnson', 'Alice', 'alice.johnson@example.com', TRUE, SHA2('password321', 512), 'admin');
+VALUES ('Brown', 'Sarah', 'Sarah.Brown@gmail.com', TRUE, SHA2('password125', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Johnson', 'Mike', 'Mike.Johnson@gmail.com', TRUE, SHA2('password126', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Lee', 'Karen', 'Karen.Lee@gmail.com', TRUE, SHA2('password127', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Patel', 'Raj', 'Raj.Patel@gmail.com', TRUE, SHA2('password128', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Davis', 'Jessica', 'Jessica.Davis@gmail.com', TRUE, SHA2('password129', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Martinez', 'Carlos', 'Carlos.Martinez@gmail.com', TRUE, SHA2('password130', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Nguyen', 'Linda', 'Linda.Nguyen@gmail.com', TRUE, SHA2('password131', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Clark', 'James', 'James.Clark@gmail.com', TRUE, SHA2('password132', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Wilson', 'Emma', 'Emma.Wilson@gmail.com', TRUE, SHA2('password233', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Moore', 'Jack', 'Jack.Moore@gmail.com', TRUE, SHA2('password234', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Taylor', 'Olivia', 'Olivia.Taylor@gmail.com', TRUE, SHA2('password235', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Anderson', 'George', 'George.Anderson@gmail.com', TRUE, SHA2('password236', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Thomas', 'Mia', 'Mia.Thomas@gmail.com', TRUE, SHA2('password237', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Jackson', 'Ethan', 'Ethan.Jackson@gmail.com', TRUE, SHA2('password238', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('White', 'Sophia', 'Sophia.White@gmail.com', TRUE, SHA2('password239', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Harris', 'Noah', 'Noah.Harris@gmail.com', TRUE, SHA2('password240', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Martin', 'Amelia', 'Amelia.Martin@gmail.com', TRUE, SHA2('password241', 512), 'user');
+INSERT INTO users (last_name, first_name, email, activated, password, role)
+VALUES ('Garcia', 'Lucas', 'Lucas.Garcia@gmail.com', TRUE, SHA2('password242', 512), 'user');
+
 
 -- jeux de données pour la table shopping_cart
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
@@ -825,7 +858,7 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS delete_user_cart;
-CREATE PROCEDURE `delete_user_cart` (IN `id_user` INT)
+CREATE PROCEDURE `delete_user_cart`(IN `id_user` INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
     IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
@@ -839,7 +872,7 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS get_user_cart;
-CREATE PROCEDURE get_user_cart (IN id_user INT)
+CREATE PROCEDURE get_user_cart(IN id_user INT)
 BEGIN
     -- Vérifier si l'utilisateur a des entrées dans le panier
     IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
@@ -854,12 +887,12 @@ DELIMITER ;
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS validate_user_cart;
-CREATE PROCEDURE `validate_user_cart` (IN `id_user` INT)
+CREATE PROCEDURE `validate_user_cart`(IN `id_user` INT)
 BEGIN
     DECLARE cartItemCount INT DEFAULT 0;
     DECLARE done INT DEFAULT FALSE;
     DECLARE cartId INT;
-    DECLARE cartType ENUM('purchase', 'rental');
+    DECLARE cartType ENUM ('purchase', 'rental');
     DECLARE movieId INT;
     DECLARE rentalDuration INT;
     DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = id_user;
@@ -873,7 +906,8 @@ BEGIN
 
     -- Parcourir les éléments du panier
     OPEN cur;
-    read_loop: LOOP
+    read_loop:
+    LOOP
         FETCH cur INTO cartId, cartType, movieId, rentalDuration;
         IF done THEN
             LEAVE read_loop;
@@ -883,7 +917,8 @@ BEGIN
         IF cartType = 'purchase' THEN
             INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, movieId, CURDATE());
         ELSEIF cartType = 'rental' THEN
-            INSERT INTO rentals (user_id, movie_id, rental_date, return_date) VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
+            INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
+            VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
         END IF;
     END LOOP;
     CLOSE cur;
