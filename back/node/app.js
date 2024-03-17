@@ -74,7 +74,7 @@ const verifyJWTAndRole = (req, res, next) => {
 
 app.use(verifyJWTAndRole);
 
-app.post('/signin', (req, res) => {
+app.post('/sign_in', (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
