@@ -5,7 +5,7 @@ import lombok.Setter;
 import mariadbPojo.MoviesPojo;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -26,6 +26,4 @@ public class MoviePostPutDTO {
     this.description = movie.getDescription();
     this.link = movie.getLink();
   }
-
-  // Getters et Setters
 }
