@@ -18,6 +18,8 @@ DROP PROCEDURE IF EXISTS add_rental;
 DROP PROCEDURE IF EXISTS add_purchase;
 DROP PROCEDURE IF EXISTS add_comment;
 DROP PROCEDURE IF EXISTS delete_comment;
+DROP PROCEDURE IF EXISTS get_main_image_by_movie_id;
+DROP PROCEDURE IF EXISTS get_images_by_movie_id;
 
 
 -- Drop Triggers
@@ -28,6 +30,7 @@ DROP TRIGGER IF EXISTS before_insert_shopping_cart_rental_duration;
 DROP TRIGGER IF EXISTS before_disable_movies;
 DROP TRIGGER IF EXISTS before_update_users;
 DROP TRIGGER IF EXISTS before_insert_movies;
+DROP TRIGGER IF EXISTS before_update_movies;
 DROP TRIGGER IF EXISTS before_insert_rentals;
 DROP TRIGGER IF EXISTS before_insert_purchases;
 DROP TRIGGER IF EXISTS check_rental_overlap;
@@ -65,7 +68,6 @@ CREATE TABLE IF NOT EXISTS users
     last_name  VARCHAR(255)           NOT NULL,
     first_name VARCHAR(255)           NOT NULL,
     email      VARCHAR(255)           NOT NULL UNIQUE,
-    activated  BOOLEAN default TRUE   NOT NULL,
     password   CHAR(128)              NOT NULL, -- sha512, est-ce que c'est la bonne taille ?
     role       ENUM ('user', 'admin') NOT NULL  -- connexion avec email + mdp
 );
@@ -157,22 +159,49 @@ INSERT INTO movies (available, title, release_date, daily_rental_price, purchase
 VALUES (TRUE, 'Schindler\'s List', '1994-02-04', 2.99, 9.99,
         'In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution',
         'https://www.youtube.com/watch?v=gG22XNhtnoY');
+INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
+VALUES (TRUE, 'Avatar', '2009-12-18', 3.99, 14.99,
+        'A paraplegic Marine dispatched to the moon Pandora on a unique mission becomes torn between following his orders and protecting the world he feels is his home.',
+        'https://www.youtube.com/watch?v=5PSNL1qE6VY');
+INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
+VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
+        'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.',
+        'https://www.youtube.com/watch?v=8hYlB38asDY');
 
 -- jeux de données pour la table users
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Doe', 'John', 'john.doe@example.com', TRUE, SHA2('password123', 512), 'user');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Smith', 'Jane', 'jane.smith@example.com', TRUE, SHA2('password456', 512), 'admin');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Brown', 'Bob', 'bob.brown@example.com', TRUE, SHA2('password789', 512), 'user');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Johnson', 'Alice', 'alice.johnson@example.com', TRUE, SHA2('password321', 512), 'admin');
+INSERT INTO users (last_name, first_name, email, password, role)
+VALUES ('User', 'Anonyme', 'anonyme@exemple.com', SHA2('anonyme', 512), 'user'),
+    ('Doe', 'John', 'john.doe@exemple.com', SHA2('password123', 512), 'user'),
+    ('Smith', 'Jane', 'jane.smith@example.com', SHA2('password456', 512), 'admin'),
+    ('Brown', 'Bob', 'bob.brown@example.com', SHA2('password789', 512), 'user'),
+    ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin'),
+    ('Garcia', 'Maria', 'Maria.Garcia@gmail.com', SHA2('password123', 512), 'user'),
+    ('Smith', 'John', 'John.Smith@gmail.com', SHA2('password124', 512), 'user'),
+    ('Brown', 'Sarah', 'Sarah.Brown@gmail.com', SHA2('password125', 512), 'user'),
+    ('Johnson', 'Mike', 'Mike.Johnson@gmail.com', SHA2('password126', 512), 'user'),
+    ('Lee', 'Karen', 'Karen.Lee@gmail.com', SHA2('password127', 512), 'user'),
+    ('Patel', 'Raj', 'Raj.Patel@gmail.com', SHA2('password128', 512), 'user'),
+    ('Davis', 'Jessica', 'Jessica.Davis@gmail.com', SHA2('password129', 512), 'user'),
+    ('Martinez', 'Carlos', 'Carlos.Martinez@gmail.com', SHA2('password130', 512), 'user'),
+    ('Nguyen', 'Linda', 'Linda.Nguyen@gmail.com', SHA2('password131', 512), 'user'),
+    ('Clark', 'James', 'James.Clark@gmail.com', SHA2('password132', 512), 'user'),
+    ('Wilson', 'Emma', 'Emma.Wilson@gmail.com', SHA2('password233', 512), 'user'),
+    ('Moore', 'Jack', 'Jack.Moore@gmail.com', SHA2('password234', 512), 'user'),
+    ('Taylor', 'Olivia', 'Olivia.Taylor@gmail.com', SHA2('password235', 512), 'user'),
+    ('Anderson', 'George', 'George.Anderson@gmail.com', SHA2('password236', 512), 'user'),
+    ('Thomas', 'Mia', 'Mia.Thomas@gmail.com', SHA2('password237', 512), 'user'),
+    ('Jackson', 'Ethan', 'Ethan.Jackson@gmail.com', SHA2('password238', 512), 'user'),
+    ('White', 'Sophia', 'Sophia.White@gmail.com', SHA2('password239', 512), 'user'),
+    ('Harris', 'Noah', 'Noah.Harris@gmail.com', SHA2('password240', 512), 'user'),
+    ('Martin', 'Amelia', 'Amelia.Martin@gmail.com', SHA2('password241', 512), 'user'),
+    ('Garcia', 'Lucas', 'Lucas.Garcia@gmail.com', SHA2('password242', 512), 'user');
+
 
 -- jeux de données pour la table shopping_cart
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
-VALUES ('rental', 1, 1, 3);
+VALUES ('rental', 4, 1, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
-VALUES ('rental', 1, 2, 3);
+VALUES ('rental', 4, 2, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
 VALUES ('rental', 2, 3, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
@@ -185,9 +214,9 @@ VALUES ('rental', 3, 6, 3);
 -- jeux de données pour la table rentals
 
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-VALUES (1, 1, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
+VALUES (4, 1, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-VALUES (1, 2, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
+VALUES (4, 2, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
 VALUES (2, 3, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
@@ -200,9 +229,9 @@ VALUES (3, 6, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 -- jeux de données pour la table purchases avec des dates en mars 2024
 
 INSERT INTO purchases (user_id, movie_id, purchase_date)
-VALUES (1, 1, '2024-03-01');
+VALUES (4, 1, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
-VALUES (1, 2, '2024-03-01');
+VALUES (4, 2, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
 VALUES (2, 3, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
@@ -214,31 +243,60 @@ VALUES (3, 6, '2024-03-01');
 
 -- jeux de données pour la table comments
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (1, 1, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (1, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (2, 1, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (2, 2, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (3, 2, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (3, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (4, 2, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (4, 4, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (5, 3, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (5, 4, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (6, 3, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (6, 3, 'THIS IS A GREAT MOVIE!', '2022-01-01 00:00:00');
 
 -- jeux de données pour la table images
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (1, 'https://www.imdb.com/title/tt0111161/mediaviewer/rm10105600/', TRUE);
+VALUES (1,
+        'https://m.media-amazon.com/images/M/MV5BNDE3ODcxYzMtY2YzZC00NmNlLWJiNDMtZDViZWM2MzIxZDYwXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg',
+        FALSE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (2, 'https://www.imdb.com/title/tt0068646/mediaviewer/rm10105600/', TRUE);
+VALUES (1, 'https://m.media-amazon.com/images/I/815qtzaP9iL._AC_UF1000,1000_QL80_.jpg', FALSE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (3, 'https://www.imdb.com/title/tt0468569/mediaviewer/rm10105600/', TRUE);
+VALUES (2,
+        'https://m.media-amazon.com/images/M/MV5BM2MyNjYxNmUtYTAwNi00MTYxLWJmNWYtYzZlODY3ZTk3OTFlXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_FMjpg_UX1000_.jpg',
+        TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (4, 'https://www.imdb.com/title/tt0167260/mediaviewer/rm10105600/', TRUE);
+VALUES (3, 'https://fr.web.img2.acsta.net/medias/nmedia/18/63/97/89/18949761.jpg', TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (5, 'https://www.imdb.com/title/tt0110912/mediaviewer/rm10105600/', TRUE);
+VALUES (4,
+        'https://m.media-amazon.com/images/M/MV5BN2EyZjM3NzUtNWUzMi00MTgxLWI0NTctMzY4M2VlOTdjZWRiXkEyXkFqcGdeQXVyNDUzOTQ5MjY@._V1_.jpg',
+        TRUE);
 INSERT INTO images (movie_id, image_url, main_image)
-VALUES (6, 'https://www.imdb.com/title/tt0108052/mediaviewer/rm10105600/', TRUE);
+VALUES (5, 'https://www.ecranlarge.com/media/cache/1600x1200/uploads/image/001/121/7p8x4u3o3p1jzmbqny3zaloby3m-861.jpg',
+        TRUE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (6, 'https://m.media-amazon.com/images/I/817sLmprCSL._AC_UF1000,1000_QL80_.jpg', TRUE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (1, 'https://cdn.theasc.com/Shawshank-Featured.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (1, 'https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p15987_k_h8_ad.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (2, 'https://www.artmajeur.com/medias/hd/p/a/paul-stowe/artwork/15733837_godfather-31cm-x-44cm.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (2, 'https://wordpress.wbur.org/wp-content/uploads/2020/12/1207_godfather-part-3-1-1000x669.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (3,
+        'https://thumb.canalplus.pro/http/unsafe/1200x630/filters:quality(80)/img-hapi.canalplus.pro:80/ServiceImage/ImageID/52831084',
+        FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (3, 'https://www.critikat.com/wp-content/uploads/fly-images/37370/arton2307-1450x800-c.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://variety.com/wp-content/uploads/2017/01/lord-of-the-rings-return-of-the-king.jpg', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://assets.mubicdn.net/images/film/2112/image-w1280.jpg?1546470042', FALSE);
+INSERT INTO images (movie_id, image_url, main_image)
+VALUES (4, 'https://www.pluggedin.com/wp-content/uploads/2019/12/lotr-the-return-of-the-king.jpg', FALSE);
 
 
 -- TRIGGER
@@ -250,8 +308,9 @@ CREATE TRIGGER before_insert_shopping_cart
     ON shopping_cart
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF (NEW.cart_type = 'rental' AND (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible pour la location.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est plus disponible.';
     END IF;
     IF (NEW.cart_type = 'purchase' AND (SELECT purchase_price FROM movies WHERE id = NEW.movie_id) = -1) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible pour l\'achat.';
@@ -267,11 +326,16 @@ CREATE TRIGGER before_insert_update_movies
     ON movies
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.daily_rental_price < 0 AND NEW.daily_rental_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix de location est invalide.';
+        SET msg = 'Vous avez sasi ' + NEW.daily_rental_price +
+                  ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NEW.purchase_price < 0 AND NEW.purchase_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix d\'achat est invalide.';
+        SET msg = 'Vous avez sasi ' + NEW.purchase_price +
+                  ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -299,8 +363,10 @@ CREATE TRIGGER before_insert_shopping_cart_rental_duration
     ON shopping_cart
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.cart_type = 'rental' AND NEW.rental_duration <= 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La durée en jours de location doit être supérieure à 0.';
+        SET msg = 'La durée de location doit être supérieure à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -329,15 +395,22 @@ CREATE TRIGGER before_update_users
     ON users
     FOR EACH ROW
 BEGIN
-    IF NEW.email <> OLD.email AND EXISTS (SELECT id FROM users WHERE email = NEW.email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'email est déjà utilisé par un autre utilisateur.';
+    DECLARE msg VARCHAR(255);
+
+    IF OLD.id = 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Impossible de modifier le premier utilisateur, il est fictif.';
+    ELSE
+        IF NEW.email <> OLD.email AND EXISTS (SELECT id FROM users WHERE email = NEW.email) THEN
+            SET msg = CONCAT('L\'email ', NEW.email, ' est déjà utilisé.');
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
+        END IF;
     END IF;
 END;
 //
 DELIMITER ;
 
 
--- Vérification d’un titre de film unique:
+-- Vérification d’un titre de film unique à l’ajout :
 
 DELIMITER //
 CREATE TRIGGER before_insert_movies
@@ -353,6 +426,21 @@ BEGIN
 END;
 //
 DELIMITER ;
+-- Vérification d’un titre de film unique à la modification:
+DELIMITER //
+CREATE TRIGGER before_update_movies
+    BEFORE UPDATE
+    ON movies
+    FOR EACH ROW
+BEGIN
+    DECLARE msg VARCHAR(255);
+    IF OLD.title <> NEW.title AND EXISTS (SELECT title FROM movies WHERE title = NEW.title) THEN
+        SET msg = CONCAT('Un film avec le titre ', NEW.title, ' existe déjà.');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
+    END IF;
+END;
+//
+DELIMITER ;
 
 
 -- Vérifie que le film est disponible à la location et que l'utilisateur est activé
@@ -362,10 +450,6 @@ CREATE TRIGGER before_insert_rentals
     ON rentals
     FOR EACH ROW
 BEGIN
-    IF (SELECT activated FROM users WHERE id = NEW.user_id) = FALSE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un utilisateur désactivé ne peut pas louer de films.';
-    END IF;
-
     IF (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est plus disponible.';
     END IF;
@@ -386,10 +470,6 @@ CREATE TRIGGER before_insert_purchases
     FOR EACH ROW
 BEGIN
 
-    IF (SELECT activated FROM users WHERE id = NEW.user_id) = FALSE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un utilisateur désactivé ne peut pas acheter de films.';
-    END IF;
-
     IF (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible.';
     END IF;
@@ -409,15 +489,16 @@ CREATE TRIGGER check_rental_overlap
     ON rentals
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF EXISTS (SELECT *
                FROM rentals
                WHERE user_id = NEW.user_id
                  AND movie_id = NEW.movie_id
                  AND (NEW.rental_date BETWEEN rental_date AND return_date
                    OR NEW.return_date BETWEEN rental_date AND return_date)) THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT =
-                    'Le même utilisateur ne peut pas louer le même film sur des périodes qui se chevauchent.';
+        SET msg =
+                'Vous avez déjà essayé de louer ce film pour une période qui se chevauche avec une location existante.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
@@ -449,12 +530,42 @@ CREATE TRIGGER check_return_date
     ON rentals
     FOR EACH ROW
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF NEW.return_date <= NEW.rental_date THEN
-        SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'La date de retour doit être postérieure à la date de début de la location.';
+        SET msg = 'La date de retour ( ' + NEW.return_date + ' ) doit être après la date de location ( ' +
+                  NEW.rental_date + ' ).';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
 END;
 //
+DELIMITER ;
+
+
+-- Trigger pour supprimer toutes les informations d'un user avant de le supprimer. Les commentaires ne seront pas supprimés, mais réassignés au premier faux utilisateur.
+DELIMITER //
+DROP TRIGGER IF EXISTS before_delete_user;
+CREATE TRIGGER before_delete_user
+    BEFORE DELETE
+    ON users
+    FOR EACH ROW
+BEGIN
+    DECLARE fake_user_id INT DEFAULT 1; -- ID de l'utilisateur fictif
+    IF OLD.id = 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Impossible de supprimer le premier utilisateur, il est fictif.';
+    ELSE
+        -- Réassignation des commentaires à l'utilisateur fictif
+        UPDATE comments SET user_id = fake_user_id WHERE user_id = OLD.id;
+
+        -- Suppression des enregistrements de l'utilisateur dans d'autres tables
+        DELETE FROM shopping_cart WHERE user_id = OLD.id;
+        DELETE FROM rentals WHERE user_id = OLD.id;
+        DELETE FROM purchases WHERE user_id = OLD.id;
+
+        -- Pas besoin de supprimer explicitement des images ou des films, car
+        -- ils ne sont pas directement liés à l'ID de l'utilisateur supprimé.
+        -- Ajouter ici des commandes de suppression pour d'autres tables liées si nécessaire
+    END IF;
+end //
 DELIMITER ;
 
 
@@ -482,11 +593,16 @@ CREATE PROCEDURE update_movie(IN movie_id INT, IN title VARCHAR(255), IN release
                               IN daily_rental_price DECIMAL(10, 2), IN purchase_price DECIMAL(10, 2),
                               IN link VARCHAR(2000))
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF daily_rental_price < 0 AND daily_rental_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix de location est invalide.';
+        SET msg = 'Vous avez saisi ' + daily_rental_price +
+                  ' comme prix de location. Le prix de location doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF purchase_price < 0 AND purchase_price <> -1 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le prix d\'achat est invalide.';
+        SET msg = 'Vous avez saisi ' + purchase_price +
+                  ' comme prix d\'achat. Le prix d\'achat doit être supérieur à 0.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     END IF;
     IF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
@@ -521,6 +637,19 @@ DELIMITER ;
 
 -- CALL disable_movie(1);
 
+-- désactiver un film par son ID
+DELIMITER //
+DROP PROCEDURE IF EXISTS enable_movie;
+CREATE PROCEDURE enable_movie(IN _movie_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = _movie_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSE
+        UPDATE movies SET available = TRUE WHERE id = _movie_id;
+        DELETE FROM shopping_cart WHERE movie_id = _movie_id;
+    END IF;
+END //
+DELIMITER ;
 
 -- Définir l'image principale d'un film et désactiver les autres images
 DELIMITER //
@@ -539,9 +668,56 @@ DELIMITER ;
 
 -- CALL set_main_image(1, 2);
 
+-- Récupérer l'image principale d'un film
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_main_image_by_movie_id;
+CREATE PROCEDURE get_main_image_by_movie_id(IN id_movie INT)
+BEGIN
+    -- Vérifie si le film existe
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT id FROM images WHERE movie_id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune image n\'est disponible pour ce film.';
+    ELSE
+        -- Essayez de sélectionner l'image principale; sinon, sélectionnez l'image avec le plus petit ID
+        SELECT *
+        FROM images
+        WHERE movie_id = id_movie
+          AND main_image = TRUE
+        UNION ALL
+        SELECT *
+        FROM images
+        WHERE movie_id = id_movie
+        ORDER BY main_image DESC, id
+        LIMIT 1;
+    END IF;
+END //
+DELIMITER ;
+
+-- call getMainImageByMovieId(1);
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_images_by_movie_id;
+CREATE PROCEDURE get_images_by_movie_id(IN id_movie INT)
+BEGIN
+    -- Vérifie si le film existe
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT id FROM images WHERE movie_id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune image n\'est disponible pour ce film.';
+    ELSE
+        SELECT * FROM images WHERE movie_id = id_movie;
+    END IF;
+END //
+DELIMITER ;
+
+-- call getImagesByMovieId(1);
+
 
 -- AJouter une image à un film
 DELIMITER //
+DROP PROCEDURE IF EXISTS add_image_to_movie;
 CREATE PROCEDURE add_image_to_movie(IN _movie_id INT, IN _image_url VARCHAR(2000))
 BEGIN
     IF NOT EXISTS (SELECT id FROM movies WHERE id = _movie_id) THEN
@@ -575,11 +751,13 @@ DELIMITER //
 CREATE PROCEDURE create_user(IN last_name VARCHAR(255), IN first_name VARCHAR(255), IN new_email VARCHAR(255),
                              IN password CHAR(255), IN role ENUM ('user', 'admin'))
 BEGIN
+    DECLARE msg VARCHAR(255);
     IF EXISTS (SELECT email FROM users WHERE email = new_email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'email est déjà utilisé.';
+        SET msg = CONCAT('L\'email ', new_email, ' est déjà utilisé.');
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     ELSE
-        INSERT INTO users (last_name, first_name, email, password, role, activated)
-        VALUES (last_name, first_name, new_email, password, role, TRUE);
+        INSERT INTO users (last_name, first_name, email, password, role)
+        VALUES (last_name, first_name, new_email, password, role);
     END IF;
 END //
 DELIMITER ;
@@ -590,7 +768,7 @@ DELIMITER ;
 -- Mettre à jour un utilisateur
 DELIMITER //
 CREATE PROCEDURE update_user(IN user_id INT, IN new_last_name VARCHAR(255), IN new_first_name VARCHAR(255),
-                             IN new_email VARCHAR(255), IN new_activated BOOLEAN, IN new_role ENUM ('user', 'admin'))
+                             IN new_email VARCHAR(255), new_role ENUM ('user', 'admin'))
 BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
@@ -599,7 +777,6 @@ BEGIN
         SET last_name  = new_last_name,
             first_name = new_first_name,
             email      = new_email,
-            activated=new_activated,
             role       = new_role
         WHERE id = user_id;
     END IF;
@@ -608,20 +785,32 @@ DELIMITER ;
 
 -- CALL update_user(1, 'Doe', 'Jane', 'jane.doe@example.com', TRUE, 'admin');
 
-
--- Désactiver un utilisateur
 DELIMITER //
-CREATE PROCEDURE disable_user(IN user_id INT)
+DROP PROCEDURE IF EXISTS delete_user;
+CREATE PROCEDURE delete_user(IN user_id INT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
     ELSE
-        UPDATE users SET activated = FALSE WHERE id = user_id;
+        DELETE FROM users WHERE id = user_id;
+    END IF;
+END //
+
+-- CALL delete_user(1);
+
+-- Mettre à jour le mot de passe d'un utilisateur
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS update_user_password;
+CREATE PROCEDURE update_user_password(IN user_id INT, IN new_password CHAR(255))
+BEGIN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
+    ELSE
+        UPDATE users SET password = new_password WHERE id = user_id;
     END IF;
 END //
 DELIMITER ;
-
--- CALL disable_user(1);
 
 
 -- Ajouter un article au panier
@@ -658,20 +847,93 @@ DELIMITER ;
 -- CALL remove_from_cart(1);
 
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS delete_user_cart;
+CREATE PROCEDURE `delete_user_cart`(IN `id_user` INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des entrées dans le panier
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
+    ELSE
+        -- Supprimer les entrées du panier pour cet utilisateur
+        DELETE FROM shopping_cart WHERE user_id = id_user;
+    END IF;
+END //
+DELIMITER ;
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_user_cart;
+CREATE PROCEDURE get_user_cart(IN id_user INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des entrées dans le panier
+    IF (SELECT COUNT(*) FROM shopping_cart WHERE user_id = id_user) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun panier trouvé pour cet utilisateur.';
+    ELSE
+        -- Sélectionner et retourner les entrées du panier pour cet utilisateur
+        SELECT * FROM shopping_cart WHERE user_id = id_user;
+    END IF;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS validate_user_cart;
+CREATE PROCEDURE `validate_user_cart`(IN `id_user` INT)
+BEGIN
+    DECLARE cartItemCount INT DEFAULT 0;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cartId INT;
+    DECLARE cartType ENUM ('purchase', 'rental');
+    DECLARE movieId INT;
+    DECLARE rentalDuration INT;
+    DECLARE cur CURSOR FOR SELECT id, cart_type, movie_id, rental_duration FROM shopping_cart WHERE user_id = id_user;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Compter les éléments dans le panier de l'utilisateur
+    SELECT COUNT(*) INTO cartItemCount FROM shopping_cart WHERE user_id = id_user;
+    IF cartItemCount = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le panier est vide.';
+    END IF;
+
+    -- Parcourir les éléments du panier
+    OPEN cur;
+    read_loop:
+    LOOP
+        FETCH cur INTO cartId, cartType, movieId, rentalDuration;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        -- Traitement en fonction du type d'élément dans le panier
+        IF cartType = 'purchase' THEN
+            INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, movieId, CURDATE());
+        ELSEIF cartType = 'rental' THEN
+            INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
+            VALUES (id_user, movieId, NOW(), DATE_ADD(NOW(), INTERVAL rentalDuration DAY));
+        END IF;
+    END LOOP;
+    CLOSE cur;
+
+    -- Vider le panier de l'utilisateur en appelant la procédure précédemment créée
+    CALL delete_user_cart(id_user);
+END //
+DELIMITER ;
+
 -- Gestion des Locations (Rentals)
 
 
 -- Enregistrer une nouvelle location
 DELIMITER //
-CREATE PROCEDURE add_rental(IN user_id INT, IN movie_id INT, IN rental_date DATETIME, IN return_date DATETIME)
+DROP PROCEDURE IF EXISTS add_rental;
+CREATE PROCEDURE add_rental(IN id_user INT, IN id_movie INT, IN date_rental DATETIME, IN date_return DATETIME)
 BEGIN
-    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = id_user) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
-    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
+    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
         INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-        VALUES (user_id, movie_id, rental_date, return_date);
+        VALUES (id_user, id_movie, date_rental, date_return);
     END IF;
 END //
 DELIMITER ;
@@ -684,14 +946,15 @@ DELIMITER ;
 
 -- Enregistrer un nouvel achat
 DELIMITER //
-CREATE PROCEDURE add_purchase(IN user_id INT, IN movie_id INT, IN purchase_date DATE)
+DROP PROCEDURE IF EXISTS add_purchase;
+CREATE PROCEDURE add_purchase(IN id_user INT, IN id_movie INT, IN date_purchase DATE)
 BEGIN
-    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
+    IF NOT EXISTS (SELECT id FROM users WHERE id = id_user) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
-    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = movie_id) THEN
+    ELSEIF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
     ELSE
-        INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (user_id, movie_id, purchase_date);
+        INSERT INTO purchases (user_id, movie_id, purchase_date) VALUES (id_user, id_movie, date_purchase);
     END IF;
 END //
 DELIMITER ;
@@ -733,4 +996,33 @@ END //
 DELIMITER ;
 
 -- CALL delete_comment(1);
+
+
+-- Récupère les commentaires d'un film
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_comments_by_movie_id;
+CREATE PROCEDURE get_comments_by_movie_id(IN id_movie INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'existe pas.';
+    ELSE
+        SELECT * FROM comments WHERE movie_id = id_movie;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- CALL get_comments_by_movie_id(1);
+
+-- modifier un commentaire
+DELIMITER //
+DROP PROCEDURE IF EXISTS update_comment_by_id;
+CREATE PROCEDURE update_comment_by_id(IN comment_id INT, IN text_comment TEXT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = comment_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        UPDATE comments SET comment_text = text_comment WHERE id = comment_id;
+    END IF;
+END //
 

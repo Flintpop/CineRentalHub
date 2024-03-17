@@ -1,12 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
-import Login from '../views/Login.vue';
-import Register from '../views/Register.vue';
-import HomeConnected  from "../views/HomeConnected.vue";
-import GestionMembre from "../views/GestionMembre.vue";
-import GestionEvenement from "../views/GestionEvenement.vue";
-import GestionLieu from "../views/GestionLieu.vue";
-import About from "../views/About.vue";
+import Home from '../views/NoConnected/Home.vue';
+import Login from '../views/NoConnected/Login.vue';
+import Register from '../views/NoConnected/Register.vue';
+import About from "../views/NoConnected/About.vue";
+import manageUsers from "../views/Admin/ManageUsers.vue";
+import HomeUser from "../views/User/HomeUser.vue";
+import MyMovies from "../views/User/MyMovies.vue";
+import MyHistory from "../views/User/MyHistory.vue";
+import MyAccount from "../views/User/MyAccount.vue";
+import MyCart from "../views/MyCart.vue";
+import MovieDetailsPage from "../views/MovieDetailsPage.vue";
+import ManageUsers from "../views/Admin/ManageUsers.vue";
+import ManageMovies from "../views/Admin/ManageMovies.vue";
+import HomeAdmin from "../views/Admin/HomeAdmin.vue";
+
+
+
 
 const routes = [
     {
@@ -24,32 +33,64 @@ const routes = [
         name: 'Register',
         component: Register,
     },
-    {
-        path: '/homeConnected',
-        name: 'homeConnected',
-        component: HomeConnected,
-    },
-    {
-        path: '/gestionMembre',
-        name: 'gestionMembre',
-        component: GestionMembre,
-    },
-    {
-        path:'/gestionEvenement',
-        name:'gestionEvenement',
-        component: GestionEvenement,
-    },
-    {
-        path: '/gestionLieu',
-        name: 'gestionLieu',
-        component: GestionLieu,
-    },
+
     {
         path: '/about',
         name: 'about',
         component: About,
-    }
+    },
+    {
+        path: '/ManageUsers',
+        name: 'manageUsers',
+        component: manageUsers,
+    },
+    {
+        path: '/HomeUser',
+        name: 'HomeUser',
+        component: HomeUser,
+    },
+    {
+        path: '/MyMovies',
+        name: 'MyMovies',
+        component: MyMovies,
+    },
+    {
+        path: '/MyHistory',
+        name: 'MyHistory',
+        component: MyHistory,
+    },
+    {
+        path: '/MyAccount',
+        name: 'MyAccount',
+        component: MyAccount,
+    },
+    {
+        path: '/MyCart',
+        name: 'MyCart',
+        component: MyCart,
+    },
     // ...autres routes
+    {
+        path: '/MovieDetailsPage/:movieId',
+        name: 'MovieDetailsPage',
+        component: MovieDetailsPage
+    },
+    {
+        path: '/HomeAdmin',
+        name: 'HomeAdmin',
+        component: HomeAdmin
+    },
+    {
+        path: '/ManageUsers',
+        name: 'ManageUsers',
+        component: ManageUsers
+    },
+    {
+        path: '/ManageMovies',
+        name: 'ManageMovies',
+        component: ManageMovies,
+    },
+
 ];
 
 const router = createRouter({

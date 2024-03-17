@@ -1,13 +1,5 @@
 version: '3.8'
 services:
-#  vuejs-client:
-#    build:
-#       context: ./front
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - ubo-network
-
   mariadb:
     image: mariadb:11.3.2
     environment:
@@ -21,19 +13,17 @@ services:
     networks:
       - ubo-network
 
-#  mongo:
-#    build:
-#      context:
-#        ./back/mongodb
-#    ports:
-#      - "27017:27017"
-#    networks:
-#      - ubo-network
+  mongo:
+    build:
+      context: ./back/mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - ubo-network
 
   front:
     build:
-      context:
-        ./front
+      context: ./front
     ports:
       - "8080:8080"
     networks:
@@ -41,8 +31,7 @@ services:
 
   node:
     build:
-      context:
-        ./back/node
+      context: ./back/node
     ports:
       - "3000:3000"
     networks:
@@ -50,10 +39,41 @@ services:
 
   movie-api:
     build:
-      context:
-        ./back/api/movie
+      context: ./back/api/movie
+    ports:
+      - "8081:8080"
+    networks:
+      - ubo-network
+
+  user-api:
+    build:
+      context: ./back/api/user
     ports:
       - "8082:8080"
+    networks:
+      - ubo-network
+
+  cart-api:
+    build:
+      context: ./back/api/cart
+    ports:
+      - "8083:8080"
+    networks:
+      - ubo-network
+
+  comment-api:
+    build:
+      context: ./back/api/comment
+    ports:
+      - "8084:8080"
+    networks:
+      - ubo-network
+
+  stats-api:
+    build:
+      context: ./back/api/stats
+    ports:
+      - "8085:8080"
     networks:
       - ubo-network
 
@@ -63,4 +83,3 @@ networks:
 
 volumes:
   mariadb-data:
-  # mongodb-data:

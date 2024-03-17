@@ -14,7 +14,7 @@ done
 echo "MongoDB a démarré"
 
 # Importer les données JSON dans MongoDB
-mongoimport --uri "mongodb://localhost:27017/views" --collection views --file /usr/src/configs/mongodb_file.json --jsonArray
+mongoimport --uri "mongodb://localhost:27017/stats" --collection stats --file /usr/src/configs/mongodb_file.json --jsonArray
 
 # Maintenant que l'importation est terminée, nous ne voulons pas terminer le script
 # immédiatement car cela arrêterait le conteneur. On laisse donc MongoDB tourner en foreground.
