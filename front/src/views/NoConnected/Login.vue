@@ -36,9 +36,9 @@ export default {
     Footer
   },
   mounted() {
-    if (localStorage.getItem('membreId')) {
-      this.$router.push('/homeConnected');
-    }
+    // if (localStorage.getItem('membreId')) {
+    //   this.$router.push('/homeConnected');
+    // }
   },
   data() {
     return {
