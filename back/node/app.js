@@ -81,7 +81,7 @@ app.post('/sign_in', (req, res) => {
         return res.status(400).send('Nom d’utilisateur et mot de passe sont requis');
     }
 
-    db.query('SELECT email, password FROM users WHERE email = ?', [email], async (err, results) => {
+    db.query('SELECT id, role, email, password FROM users WHERE email = ?', [email], async (err, results) => {
         if (err) {
             return res.status(500).json({ error: "Erreur interne" });
         }
@@ -97,7 +97,7 @@ app.post('/sign_in', (req, res) => {
         const hashedPassword = hash.digest('hex');
 
         if (hashedPassword === user.password) {
-            const token = jwt.sign({ userId: user.id }, SECRET_KEY, { expiresIn: '1000h' });
+            const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
             res.json({ token });
         } else {
             res.status(401).json({ error: "Mot de passe incorrect" });
