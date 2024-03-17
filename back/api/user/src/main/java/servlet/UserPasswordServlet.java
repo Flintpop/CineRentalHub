@@ -31,7 +31,7 @@ public class UserPasswordServlet extends HttpServlet {
       UserPasswordDTO userPassword = User.getUserPassword(userId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(userPassword));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -46,7 +46,6 @@ public class UserPasswordServlet extends HttpServlet {
 
     try {
       UserPasswordDTO userPassword = ServletUtils.readRequestBodyAndGetObject(request, UserPasswordDTO.class);
-//      UserPasswordDTO userPassword = gson.fromJson(jsonBody, UserPasswordDTO.class);
       userPassword.hashPassword();
       User.updateUserPassword(userId, userPassword.getPassword());
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Mot de passe modifié.\"}");

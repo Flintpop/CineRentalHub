@@ -68,7 +68,6 @@ CREATE TABLE IF NOT EXISTS users
     last_name  VARCHAR(255)           NOT NULL,
     first_name VARCHAR(255)           NOT NULL,
     email      VARCHAR(255)           NOT NULL UNIQUE,
-    activated  BOOLEAN default TRUE   NOT NULL,
     password   CHAR(128)              NOT NULL, -- sha512, est-ce que c'est la bonne taille ?
     role       ENUM ('user', 'admin') NOT NULL  -- connexion avec email + mdp
 );
@@ -170,21 +169,19 @@ VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
         'https://www.youtube.com/watch?v=8hYlB38asDY');
 
 -- jeux de données pour la table users
-INSERT
-INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Doe', 'John', 'john.doe@example.com', TRUE, SHA2('password123', 512), 'user');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Smith', 'Jane', 'jane.smith@example.com', TRUE, SHA2('password456', 512), 'admin');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Brown', 'Bob', 'bob.brown@example.com', TRUE, SHA2('password789', 512), 'user');
-INSERT INTO users (last_name, first_name, email, activated, password, role)
-VALUES ('Johnson', 'Alice', 'alice.johnson@example.com', TRUE, SHA2('password321', 512), 'admin');
+INSERT INTO users (last_name, first_name, email, password, role)
+VALUES ('User', 'Deleted', 'deleted@email.com', SHA2('deleted', 512), 'user'),
+    ('Doe', 'John', 'john.doe@exemple.com', SHA2('password123', 512), 'user'),
+    ('Smith', 'Jane', 'jane.smith@example.com', SHA2('password456', 512), 'admin'),
+    ('Brown', 'Bob', 'bob.brown@example.com', SHA2('password789', 512), 'user'),
+    ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin');
+
 
 -- jeux de données pour la table shopping_cart
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
-VALUES ('rental', 1, 1, 3);
+VALUES ('rental', 4, 1, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
-VALUES ('rental', 1, 2, 3);
+VALUES ('rental', 4, 2, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
 VALUES ('rental', 2, 3, 3);
 INSERT INTO shopping_cart (cart_type, user_id, movie_id, rental_duration)
@@ -197,9 +194,9 @@ VALUES ('rental', 3, 6, 3);
 -- jeux de données pour la table rentals
 
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-VALUES (1, 1, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
+VALUES (4, 1, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
-VALUES (1, 2, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
+VALUES (4, 2, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
 VALUES (2, 3, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 INSERT INTO rentals (user_id, movie_id, rental_date, return_date)
@@ -212,9 +209,9 @@ VALUES (3, 6, '2022-01-01 00:00:00', '2022-01-04 00:00:00');
 -- jeux de données pour la table purchases avec des dates en mars 2024
 
 INSERT INTO purchases (user_id, movie_id, purchase_date)
-VALUES (1, 1, '2024-03-01');
+VALUES (4, 1, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
-VALUES (1, 2, '2024-03-01');
+VALUES (4, 2, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
 VALUES (2, 3, '2024-03-01');
 INSERT INTO purchases (user_id, movie_id, purchase_date)
@@ -226,17 +223,17 @@ VALUES (3, 6, '2024-03-01');
 
 -- jeux de données pour la table comments
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (1, 1, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (1, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (2, 1, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (2, 2, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (3, 2, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (3, 3, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (4, 2, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (4, 4, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (5, 3, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (5, 4, 'This is a great movie!', '2022-01-01 00:00:00');
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (6, 3, 'This is a great movie!', '2022-01-01 00:00:00');
+VALUES (6, 3, 'THIS IS A GREAT MOVIE!', '2022-01-01 00:00:00');
 
 -- jeux de données pour la table images
 INSERT INTO images (movie_id, image_url, main_image)
@@ -379,9 +376,14 @@ CREATE TRIGGER before_update_users
     FOR EACH ROW
 BEGIN
     DECLARE msg VARCHAR(255);
-    IF NEW.email <> OLD.email AND EXISTS (SELECT id FROM users WHERE email = NEW.email) THEN
-        SET msg = CONCAT('L\'email ', NEW.email, ' est déjà utilisé.');
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
+
+    IF OLD.id = 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Impossible de modifier le premier utilisateur, il est fictif.';
+    ELSE
+        IF NEW.email <> OLD.email AND EXISTS (SELECT id FROM users WHERE email = NEW.email) THEN
+            SET msg = CONCAT('L\'email ', NEW.email, ' est déjà utilisé.');
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
+        END IF;
     END IF;
 END;
 //
@@ -428,10 +430,6 @@ CREATE TRIGGER before_insert_rentals
     ON rentals
     FOR EACH ROW
 BEGIN
-    IF (SELECT activated FROM users WHERE id = NEW.user_id) = FALSE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un utilisateur désactivé ne peut pas louer de films.';
-    END IF;
-
     IF (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est plus disponible.';
     END IF;
@@ -451,10 +449,6 @@ CREATE TRIGGER before_insert_purchases
     ON purchases
     FOR EACH ROW
 BEGIN
-
-    IF (SELECT activated FROM users WHERE id = NEW.user_id) = FALSE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Un utilisateur désactivé ne peut pas acheter de films.';
-    END IF;
 
     IF (SELECT available FROM movies WHERE id = NEW.movie_id) = FALSE THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le film n\'est pas disponible.';
@@ -524,6 +518,34 @@ BEGIN
     END IF;
 END;
 //
+DELIMITER ;
+
+
+-- Trigger pour supprimer toutes les informations d'un user avant de le supprimer. Les commentaires ne seront pas supprimés, mais réassignés au premier faux utilisateur.
+DELIMITER //
+DROP TRIGGER IF EXISTS before_delete_user;
+CREATE TRIGGER before_delete_user
+    BEFORE DELETE
+    ON users
+    FOR EACH ROW
+BEGIN
+    DECLARE fake_user_id INT DEFAULT 1; -- ID de l'utilisateur fictif
+    IF OLD.id = 1 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Impossible de supprimer le premier utilisateur, il est fictif.';
+    ELSE
+        -- Réassignation des commentaires à l'utilisateur fictif
+        UPDATE comments SET user_id = fake_user_id WHERE user_id = OLD.id;
+
+        -- Suppression des enregistrements de l'utilisateur dans d'autres tables
+        DELETE FROM shopping_cart WHERE user_id = OLD.id;
+        DELETE FROM rentals WHERE user_id = OLD.id;
+        DELETE FROM purchases WHERE user_id = OLD.id;
+
+        -- Pas besoin de supprimer explicitement des images ou des films, car
+        -- ils ne sont pas directement liés à l'ID de l'utilisateur supprimé.
+        -- Ajouter ici des commandes de suppression pour d'autres tables liées si nécessaire
+    END IF;
+end //
 DELIMITER ;
 
 
@@ -714,8 +736,8 @@ BEGIN
         SET msg = CONCAT('L\'email ', new_email, ' est déjà utilisé.');
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = msg;
     ELSE
-        INSERT INTO users (last_name, first_name, email, password, role, activated)
-        VALUES (last_name, first_name, new_email, password, role, TRUE);
+        INSERT INTO users (last_name, first_name, email, password, role)
+        VALUES (last_name, first_name, new_email, password, role);
     END IF;
 END //
 DELIMITER ;
@@ -726,7 +748,7 @@ DELIMITER ;
 -- Mettre à jour un utilisateur
 DELIMITER //
 CREATE PROCEDURE update_user(IN user_id INT, IN new_last_name VARCHAR(255), IN new_first_name VARCHAR(255),
-                             IN new_email VARCHAR(255), IN new_activated BOOLEAN, IN new_role ENUM ('user', 'admin'))
+                             IN new_email VARCHAR(255), new_role ENUM ('user', 'admin'))
 BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
@@ -735,7 +757,6 @@ BEGIN
         SET last_name  = new_last_name,
             first_name = new_first_name,
             email      = new_email,
-            activated=new_activated,
             role       = new_role
         WHERE id = user_id;
     END IF;
@@ -744,35 +765,18 @@ DELIMITER ;
 
 -- CALL update_user(1, 'Doe', 'Jane', 'jane.doe@example.com', TRUE, 'admin');
 
-
--- Désactiver un utilisateur
 DELIMITER //
-CREATE PROCEDURE disable_user(IN user_id INT)
+DROP PROCEDURE IF EXISTS delete_user;
+CREATE PROCEDURE delete_user(IN user_id INT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
     ELSE
-        UPDATE users SET activated = FALSE WHERE id = user_id;
+        DELETE FROM users WHERE id = user_id;
     END IF;
 END //
-DELIMITER ;
 
--- CALL disable_user(1);
-
--- Activer un utilisateur
-DELIMITER //
-DROP PROCEDURE IF EXISTS enable_user;
-CREATE PROCEDURE enable_user(IN user_id INT)
-BEGIN
-    IF NOT EXISTS (SELECT id FROM users WHERE id = user_id) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'L\'utilisateur n\'existe pas.';
-    ELSE
-        UPDATE users SET activated = TRUE WHERE id = user_id;
-    END IF;
-END //
-DELIMITER ;
-
--- CALL enable_user(1);
+-- CALL delete_user(1);
 
 -- Mettre à jour le mot de passe d'un utilisateur
 
@@ -974,6 +978,7 @@ DELIMITER ;
 
 -- Récupère les commentaires d'un film
 DELIMITER //
+DROP PROCEDURE IF EXISTS get_comments_by_movie_id;
 CREATE PROCEDURE get_comments_by_movie_id(IN id_movie INT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM movies WHERE id = id_movie) THEN

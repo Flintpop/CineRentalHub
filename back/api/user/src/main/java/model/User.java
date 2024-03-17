@@ -2,9 +2,9 @@ package model;
 
 import database.MariaDB;
 import dto.UserLowDTO;
-import dto.UserDTO;
 import dto.UserPasswordDTO;
 import dto.UserPostDTO;
+import dto.UserPutDTO;
 import jakarta.persistence.*;
 import mariadbPojo.UsersPojo;
 
@@ -22,14 +22,14 @@ public class User {
     }
   }
 
-  public static UserDTO getUser(Integer userId) {
+  public static UserLowDTO getUser(Integer userId) {
     EntityManager em = MariaDB.getEntityManager();
     try {
       UsersPojo usersPojo = em.find(UsersPojo.class, userId);
       if (usersPojo == null) {
         throw new EntityNotFoundException("L'utilisateur avec l'ID " + userId + " n'existe pas.");
       }
-      return new UserDTO(usersPojo);
+      return new UserLowDTO(usersPojo);
     } finally {
       em.close();
     }
@@ -70,7 +70,7 @@ public class User {
     }
   }
 
-  public static UserLowDTO updateUser(Integer userId, UserLowDTO userDto) throws Exception {
+  public static UserPutDTO updateUser(Integer userId, UserPutDTO userDto) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
 
     try {
@@ -93,13 +93,11 @@ public class User {
               .registerStoredProcedureParameter("new_last_name", String.class, ParameterMode.IN)
               .registerStoredProcedureParameter("new_first_name", String.class, ParameterMode.IN)
               .registerStoredProcedureParameter("new_email", String.class, ParameterMode.IN)
-              .registerStoredProcedureParameter("new_activated", Byte.class, ParameterMode.IN)
               .registerStoredProcedureParameter("new_role", String.class, ParameterMode.IN)
               .setParameter("user_id", userId)
               .setParameter("new_last_name", userDto.getLast_name())
               .setParameter("new_first_name", userDto.getFirst_name())
               .setParameter("new_email", userDto.getEmail())
-              .setParameter("new_activated", userDto.getActivated())
               .setParameter("new_role", userDto.getRole());
 
       query.execute();
@@ -119,38 +117,13 @@ public class User {
   }
 
   // Disable user
-  public static void disableUser(Integer userId) throws Exception {
+  public static void deleteUser(Integer userId) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
 
     try {
       em.getTransaction().begin();
 
-      StoredProcedureQuery query = em.createStoredProcedureQuery("disable_user")
-              .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
-              .setParameter("user_id", userId);
-
-      query.execute();
-
-      em.getTransaction().commit();
-    } catch (PersistenceException e) {
-      if (em.getTransaction().isActive()) {
-        em.getTransaction().rollback();
-      }
-
-      ModelUtils.generateException(e);
-    } finally {
-      em.close();
-    }
-  }
-
-  // Enable user
-  public static void enableUser(Integer userId) throws Exception {
-    EntityManager em = MariaDB.getEntityManager();
-
-    try {
-      em.getTransaction().begin();
-
-      StoredProcedureQuery query = em.createStoredProcedureQuery("enable_user")
+      StoredProcedureQuery query = em.createStoredProcedureQuery("delete_user")
               .registerStoredProcedureParameter("user_id", java.math.BigDecimal.class, ParameterMode.IN)
               .setParameter("user_id", userId);
 

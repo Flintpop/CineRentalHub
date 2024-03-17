@@ -7,7 +7,6 @@ import mariadbPojo.UsersPojo;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
 
 @Getter
 @Setter
@@ -15,7 +14,6 @@ public class UserPostDTO {
   private String last_name;
   private String first_name;
   private String email;
-  private Byte activated;
   private String password;
   private String role;
 /*
@@ -36,7 +34,6 @@ Json pour tester requete :
     this.last_name = user.getLastName();
     this.first_name = user.getFirstName();
     this.email = user.getEmail();
-    this.activated = user.getActivated();
     this.password = user.getPassword();
     this.role = user.getRole().toString();
   }
@@ -48,17 +45,17 @@ Json pour tester requete :
   public void hashPassword() {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-512");
-      Byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+      byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
       this.password = bytesToHex(hash);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Problème lors du hachage du mot de passe", e);
     }
   }
 
-  private static String bytesToHex(Byte[] hash) {
+  private static String bytesToHex(byte[] hash) {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
-    for (int i = 0; i < hash.length; i++) {
-      String hex = Integer.toHexString(0xff & hash[i]);
+    for (byte b : hash) {
+      String hex = Integer.toHexString(0xff & b);
       if (hex.length() == 1) {
         hexString.append('0');
       }
