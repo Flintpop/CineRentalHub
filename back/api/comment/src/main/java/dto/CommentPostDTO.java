@@ -9,8 +9,8 @@ import mariadbPojo.CommentsPojo;
 @Setter
 public class CommentPostDTO {
 
-  private int movie_id;
-  private int user_id;
+  private Integer movie_id;
+  private Integer user_id;
   private String comment_text;
   private String comment_date;
 
@@ -21,7 +21,7 @@ public class CommentPostDTO {
     this.comment_date = comment.getCommentDate().toString();
   }
 
-  public CommentPostDTO(int movieId, int userId, String commentText, String commentDate) {
+  public CommentPostDTO(Integer movieId, Integer userId, String commentText, String commentDate) {
     this.movie_id = movieId;
     this.user_id = userId;
     this.comment_text = commentText;

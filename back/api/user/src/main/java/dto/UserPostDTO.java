@@ -15,7 +15,7 @@ public class UserPostDTO {
   private String last_name;
   private String first_name;
   private String email;
-  private byte activated;
+  private Byte activated;
   private String password;
   private String role;
 /*
@@ -48,14 +48,14 @@ Json pour tester requete :
   public void hashPassword() {
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-512");
-      byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+      Byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
       this.password = bytesToHex(hash);
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException("Problème lors du hachage du mot de passe", e);
     }
   }
 
-  private static String bytesToHex(byte[] hash) {
+  private static String bytesToHex(Byte[] hash) {
     StringBuilder hexString = new StringBuilder(2 * hash.length);
     for (int i = 0; i < hash.length; i++) {
       String hex = Integer.toHexString(0xff & hash[i]);

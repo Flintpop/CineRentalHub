@@ -7,11 +7,11 @@ import mariadbPojo.UsersPojo;
 @Getter
 @Setter
 public class UserDTO {
-  private int id;
+  private Integer id;
   private String last_name;
   private String first_name;
   private String email;
-  private byte activated;
+  private Byte activated;
   private String password;
   private String role;
 

@@ -10,7 +10,7 @@ public class UserLowDTO {
   private String last_name;
   private String first_name;
   private String email;
-  private byte activated;
+  private Byte activated;
   private String role;
 
 
