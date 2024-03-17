@@ -1,7 +1,11 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "shopping_cart", schema = "cine_rental_hub")
 public class ShoppingCartPojo {
@@ -21,30 +25,6 @@ public class ShoppingCartPojo {
   @ManyToOne
   @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false)
   private MoviesPojo moviesByMovieId;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public Object getCartType() {
-    return cartType;
-  }
-
-  public void setCartType(Object cartType) {
-    this.cartType = cartType;
-  }
-
-  public int getRentalDuration() {
-    return rentalDuration;
-  }
-
-  public void setRentalDuration(int rentalDuration) {
-    this.rentalDuration = rentalDuration;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -68,19 +48,4 @@ public class ShoppingCartPojo {
     return result;
   }
 
-  public UsersPojo getUsersByUserId() {
-    return usersByUserId;
-  }
-
-  public void setUsersByUserId(UsersPojo usersByUserId) {
-    this.usersByUserId = usersByUserId;
-  }
-
-  public MoviesPojo getMoviesByMovieId() {
-    return moviesByMovieId;
-  }
-
-  public void setMoviesByMovieId(MoviesPojo moviesByMovieId) {
-    this.moviesByMovieId = moviesByMovieId;
-  }
 }

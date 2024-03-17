@@ -6,8 +6,8 @@ import lombok.Setter;
 
 import java.util.Collection;
 
-@Getter
 @Setter
+@Getter
 @Entity
 @Table(name = "users", schema = "cine_rental_hub")
 public class UsersPojo {
@@ -28,9 +28,6 @@ public class UsersPojo {
   @Column(name = "password", nullable = false, length = 255)
   private String password;
   @Basic
-  @Column(name = "activated", nullable = false)
-  private byte activated;
-  @Basic
   @Column(name = "role", nullable = false)
   private Object role;
   @OneToMany(mappedBy = "usersByUserId")
@@ -41,6 +38,7 @@ public class UsersPojo {
   private Collection<RentalsPojo> rentalsById;
   @OneToMany(mappedBy = "usersByUserId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -68,4 +66,5 @@ public class UsersPojo {
     result = 31 * result + (role != null ? role.hashCode() : 0);
     return result;
   }
+
 }

@@ -1,7 +1,11 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "images", schema = "cine_rental_hub")
 public class ImagesPojo {
@@ -18,30 +22,6 @@ public class ImagesPojo {
   @ManyToOne
   @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false)
   private MoviesPojo moviesByMovieId;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getImageUrl() {
-    return imageUrl;
-  }
-
-  public void setImageUrl(String imageUrl) {
-    this.imageUrl = imageUrl;
-  }
-
-  public byte getMainImage() {
-    return mainImage;
-  }
-
-  public void setMainImage(byte mainImage) {
-    this.mainImage = mainImage;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -65,11 +45,4 @@ public class ImagesPojo {
     return result;
   }
 
-  public MoviesPojo getMoviesByMovieId() {
-    return moviesByMovieId;
-  }
-
-  public void setMoviesByMovieId(MoviesPojo moviesByMovieId) {
-    this.moviesByMovieId = moviesByMovieId;
-  }
 }

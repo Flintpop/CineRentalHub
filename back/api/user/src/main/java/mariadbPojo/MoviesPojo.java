@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.sql.Date;
 import java.util.Collection;
 
 @Setter
@@ -25,7 +25,7 @@ public class MoviesPojo {
   private String title;
   @Basic
   @Column(name = "release_date", nullable = true)
-  private LocalDate releaseDate;
+  private Date releaseDate;
   @Basic
   @Column(name = "daily_rental_price", nullable = false, precision = 2)
   private BigDecimal dailyRentalPrice;

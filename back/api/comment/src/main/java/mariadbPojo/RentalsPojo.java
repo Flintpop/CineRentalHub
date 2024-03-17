@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Setter
 @Getter
@@ -17,10 +17,10 @@ public class RentalsPojo {
   private int id;
   @Basic
   @Column(name = "rental_date", nullable = false)
-  private LocalDateTime rentalDate;
+  private Timestamp rentalDate;
   @Basic
   @Column(name = "return_date", nullable = false)
-  private LocalDateTime returnDate;
+  private Timestamp returnDate;
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UsersPojo usersByUserId;
