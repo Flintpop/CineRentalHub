@@ -1,9 +1,13 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "users", schema = "cine_rental_hub")
 public class UsersPojo {
@@ -35,54 +39,6 @@ public class UsersPojo {
   @OneToMany(mappedBy = "usersByUserId")
   private Collection<ShoppingCartPojo> shoppingCartsById;
 
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public String getFirstName() {
-    return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
-
-  public Object getRole() {
-    return role;
-  }
-
-  public void setRole(Object role) {
-    this.role = role;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -111,35 +67,4 @@ public class UsersPojo {
     return result;
   }
 
-  public Collection<CommentsPojo> getCommentsById() {
-    return commentsById;
-  }
-
-  public void setCommentsById(Collection<CommentsPojo> commentsById) {
-    this.commentsById = commentsById;
-  }
-
-  public Collection<PurchasesPojo> getPurchasesById() {
-    return purchasesById;
-  }
-
-  public void setPurchasesById(Collection<PurchasesPojo> purchasesById) {
-    this.purchasesById = purchasesById;
-  }
-
-  public Collection<RentalsPojo> getRentalsById() {
-    return rentalsById;
-  }
-
-  public void setRentalsById(Collection<RentalsPojo> rentalsById) {
-    this.rentalsById = rentalsById;
-  }
-
-  public Collection<ShoppingCartPojo> getShoppingCartsById() {
-    return shoppingCartsById;
-  }
-
-  public void setShoppingCartsById(Collection<ShoppingCartPojo> shoppingCartsById) {
-    this.shoppingCartsById = shoppingCartsById;
-  }
 }

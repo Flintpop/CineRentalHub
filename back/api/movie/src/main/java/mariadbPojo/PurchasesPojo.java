@@ -1,9 +1,13 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "purchases", schema = "cine_rental_hub")
 public class PurchasesPojo {
@@ -20,22 +24,6 @@ public class PurchasesPojo {
   @ManyToOne
   @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false)
   private MoviesPojo moviesByMovieId;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public Date getPurchaseDate() {
-    return purchaseDate;
-  }
-
-  public void setPurchaseDate(Date purchaseDate) {
-    this.purchaseDate = purchaseDate;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -57,19 +45,4 @@ public class PurchasesPojo {
     return result;
   }
 
-  public UsersPojo getUsersByUserId() {
-    return usersByUserId;
-  }
-
-  public void setUsersByUserId(UsersPojo usersByUserId) {
-    this.usersByUserId = usersByUserId;
-  }
-
-  public MoviesPojo getMoviesByMovieId() {
-    return moviesByMovieId;
-  }
-
-  public void setMoviesByMovieId(MoviesPojo moviesByMovieId) {
-    this.moviesByMovieId = moviesByMovieId;
-  }
 }

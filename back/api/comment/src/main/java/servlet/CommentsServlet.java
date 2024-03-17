@@ -34,15 +34,8 @@ public class CommentsServlet extends HttpServlet {
 
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Integer movieId;
-    try {
-      movieId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, false);
-    } catch (IdValidationException | NumberFormatException | IdMissingException e) {
-      return; // Erreur déjà envoyée
-    }
     try {
       CommentPostDTO commentEntity  = ServletUtils.readRequestBodyAndGetObject(request, CommentPostDTO.class);
-      // Ici, implémentez la validation du commentaire si nécessaire
       CommentPostDTO createdComment = Comment.addComment(commentEntity);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(createdComment));
     } catch (Exception e) {

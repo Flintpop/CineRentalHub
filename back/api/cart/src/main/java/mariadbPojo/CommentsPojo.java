@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
-@Getter
 @Setter
+@Getter
 @Entity
 @Table(name = "comments", schema = "cine_rental_hub")
 public class CommentsPojo {
@@ -20,13 +20,14 @@ public class CommentsPojo {
   private String commentText;
   @Basic
   @Column(name = "comment_date", nullable = false)
-  private LocalDateTime commentDate;
+  private Timestamp commentDate;
   @ManyToOne
   @JoinColumn(name = "movie_id", referencedColumnName = "id", nullable = false)
   private MoviesPojo moviesByMovieId;
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UsersPojo usersByUserId;
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -48,4 +49,5 @@ public class CommentsPojo {
     result = 31 * result + (commentDate != null ? commentDate.hashCode() : 0);
     return result;
   }
+
 }

@@ -1,8 +1,7 @@
 package servlet;
 
 import com.google.gson.Gson;
-import dto.CommentDTO;
-import dto.CommentPostDTO;
+import dto.CommentPutDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.annotation.WebServlet;
@@ -43,8 +42,8 @@ public class CommentsManageServlet extends HttpServlet {
     }
 
     try {
-      CommentDTO commentEntity = ServletUtils.readRequestBodyAndGetObject(request, CommentDTO.class);
-      CommentPostDTO updateComment = Comment.updateCommentById(commentId, commentEntity);
+      CommentPutDTO commentEntity = ServletUtils.readRequestBodyAndGetObject(request, CommentPutDTO.class);
+      CommentPutDTO updateComment = Comment.updateCommentById(commentId, commentEntity);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson(updateComment));
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);

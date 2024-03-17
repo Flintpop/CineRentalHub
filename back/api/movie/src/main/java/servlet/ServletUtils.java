@@ -1,17 +1,25 @@
 package servlet;
 
 import com.google.gson.JsonSyntaxException;
+import exceptions.ApiException;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class ServletUtils {
   public static <T> T readRequestBodyAndGetObject(HttpServletRequest request, Class<T> clazz) throws IOException, JsonSyntaxException {
@@ -26,8 +34,18 @@ public class ServletUtils {
   }
 
   private static <T> T convertObjectToJson(String json, Class<T> clazz) {
-    Gson gson = new Gson();
+    GsonBuilder builder = new GsonBuilder();
 
+    // Ajoute un désérialiseur personnalisé pour les objets Date
+    JsonDeserializer<Date> deserializer = (jsonDeserialize, typeOfT, context) -> {
+      try {
+        return new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).parse(jsonDeserialize.getAsJsonPrimitive().getAsString());
+      } catch (ParseException e) {
+        throw new RuntimeException(e); // Gérer l'exception comme il convient
+      }
+    };
+
+    Gson gson = builder.registerTypeAdapter(Date.class, deserializer).create();
     T object = gson.fromJson(json, clazz);
 
     for (Field field : clazz.getDeclaredFields()) {
@@ -126,22 +144,25 @@ public class ServletUtils {
       String jsonResponse = """
               {
                 "error": "Format de date incorrect.",
-                "expected_format": "MMM DD, YYYY",
+                "expected_format": "MMM dd, YYYY",
                 "example": "Jan 01, 2021",
-                "received_value": %s
+                "received_value": %s,
+                "stack_trace": %s
               }
-              """.formatted(pe.getMessage().split(": ")[1]);
+              """.formatted(pe.getMessage().split(": ")[1], Arrays.toString(e.getStackTrace()).replace(",", ",\n"));
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonResponse);
     } else if (e instanceof JsonSyntaxException json) {
-      String jsonReponse = """
+      String jsonResponse = """
               {
                 "error": "Format JSON invalide, données incorrect.",
                 "message": %s
               }
               """.formatted(json.getMessage());
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonReponse);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonResponse);
     } else {
-      if (isEntityNotFound(e)) {
+      if (e instanceof ApiException apiException) {
+        statusCodeToSend = apiException.getStatusCode();
+      } else if (isEntityNotFound(e)) {
         statusCodeToSend = HttpServletResponse.SC_NOT_FOUND;
       }
       StringWriter sw = new StringWriter();

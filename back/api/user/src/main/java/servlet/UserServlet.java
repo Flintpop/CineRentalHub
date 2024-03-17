@@ -3,13 +3,13 @@ package servlet;
 import com.google.gson.Gson;
 import dto.UserLowDTO;
 import dto.UserPostDTO;
+import dto.UserPutDTO;
 import exceptions.IdMissingException;
 import exceptions.IdValidationException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dto.UserDTO;
 import model.User;
 
 import java.io.IOException;
@@ -29,10 +29,10 @@ public class UserServlet extends HttpServlet {
     }
 
     try {
-      UserDTO user = User.getUser(userId);
+      UserLowDTO user = User.getUser(userId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(user));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -58,8 +58,8 @@ public class UserServlet extends HttpServlet {
     }
 
     try {
-      UserLowDTO userDto = ServletUtils.readRequestBodyAndGetObject(request, UserLowDTO.class);
-      UserLowDTO userUpdated = User.updateUser(userId, userDto);
+      UserPutDTO userDto = ServletUtils.readRequestBodyAndGetObject(request, UserPutDTO.class);
+      UserPutDTO userUpdated = User.updateUser(userId, userDto);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(userUpdated));
     } catch (Exception e) {
       ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
@@ -76,10 +76,10 @@ public class UserServlet extends HttpServlet {
     }
 
     try {
-      User.disableUser(userId);
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Utilisateur désactivé.\"}");
+      User.deleteUser(userId);
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Utilisateur supprimé.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }

@@ -1,9 +1,13 @@
 package mariadbPojo;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "comments", schema = "cine_rental_hub")
 public class CommentsPojo {
@@ -23,30 +27,6 @@ public class CommentsPojo {
   @ManyToOne
   @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
   private UsersPojo usersByUserId;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
-
-  public String getCommentText() {
-    return commentText;
-  }
-
-  public void setCommentText(String commentText) {
-    this.commentText = commentText;
-  }
-
-  public Timestamp getCommentDate() {
-    return commentDate;
-  }
-
-  public void setCommentDate(Timestamp commentDate) {
-    this.commentDate = commentDate;
-  }
 
   @Override
   public boolean equals(Object o) {
@@ -70,19 +50,4 @@ public class CommentsPojo {
     return result;
   }
 
-  public MoviesPojo getMoviesByMovieId() {
-    return moviesByMovieId;
-  }
-
-  public void setMoviesByMovieId(MoviesPojo moviesByMovieId) {
-    this.moviesByMovieId = moviesByMovieId;
-  }
-
-  public UsersPojo getUsersByUserId() {
-    return usersByUserId;
-  }
-
-  public void setUsersByUserId(UsersPojo usersByUserId) {
-    this.usersByUserId = usersByUserId;
-  }
 }
