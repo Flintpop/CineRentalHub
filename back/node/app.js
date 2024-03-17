@@ -39,7 +39,7 @@ const verifyJWTAndRole = (req, res, next) => {
         { path: '/movies/[^/]+/?', methods: ['GET'] },
         { path: '/movies/images/[^/]+/?', methods: ['GET'] },
         { path: '/movies/main_image/[^/]+/?', methods: ['GET'] },
-        { path: '/signin', methods: ['POST'] },
+        { path: '/sign_in', methods: ['POST'] },
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
