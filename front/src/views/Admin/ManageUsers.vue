@@ -3,7 +3,7 @@
     <NavbarAdmin/>
     <div class="main-content">
       <h1>Gestion des utilisateurs</h1>
-      <button class="create-user-button" @click="createUser">Créer un utilisateur</button>
+      <button @click.stop="selectUser({}, 'createUser')">Ajouter un utilisateur</button>
       <div class="content-wrapper">
         <div class="user-list">
 
@@ -40,9 +40,7 @@
             <!-- Affichage conditionnel basé sur l'utilisateur sélectionné -->
             <div v-if="selectedUser">
               <component v-if="currentAction" :is="components[currentAction]" :user="selectedUser"
-                         @close="currentAction = null"></component>
-
-
+                         @close="currentAction = null" :updateUser="updateUser" @userCreated="fetchUsers"></component>
             </div>
           </div>
         </div>
@@ -58,6 +56,7 @@ import Footer from '../../components/Core/Footer.vue';
 import axios from 'axios';
 import UserEditForm from "../../components/Admin/UserEditForm.vue";
 import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
+import CreateUserForm from "../../components/Admin/CreateUserForm.vue";
 
 export default {
   components: {
@@ -65,6 +64,7 @@ export default {
     Footer,
     UserEditForm,
     UserRentedMovies,
+    CreateUserForm,
 
   },
 
@@ -83,6 +83,7 @@ export default {
         // 'details': UserDetailsComponent,
         'edit': UserEditForm,
         'rentedMovies': UserRentedMovies,
+        'createUser': CreateUserForm,
         // 'purchasedMovies': UserPurchasedMoviesComponent,
       };
     },
@@ -106,7 +107,17 @@ export default {
       return this.users.filter(user => user.role === role);
     },
     selectUser(user, action) {
-      this.selectedUser = user;
+      if (action === 'createUser') {
+        this.selectedUser = {
+          firstName: '',
+          lastName: '',
+          email: '',
+          role: 'user', // Valeur par défaut
+          activated: true, // Valeur par défaut
+        };
+      } else {
+        this.selectedUser = user;
+      }
       this.currentAction = action;
     },
     async deleteUser(user) {
@@ -123,11 +134,19 @@ export default {
         console.error("Erreur lors de la suppression de l'utilisateur:", error);
       }
     },
-    showRentedMovies(user) {
-      // Logique pour afficher les films loués par l'utilisateur
-    },
-    showPurchasedMovies(user) {
-      // Logique pour afficher les films achetés par l'utilisateur
+    async updateUser(user) {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+          'authorization': 'Bearer ' + token
+        };
+        const response = await axios.put(`http://localhost:3000/user/${user.id}`, user, {headers});
+        console.log('Mise à jour réussie', response.data);
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs après la mise à jour
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
+      }
     },
   },
   mounted() {

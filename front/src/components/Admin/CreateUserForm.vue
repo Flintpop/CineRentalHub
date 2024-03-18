@@ -5,25 +5,32 @@
       <h2>Inscription d'un membre</h2>
 
       <div class="form-field">
+        <label for="memberEmail">Email</label>
+        <input id="memberEmail" type="email" v-model="email" required>
+      </div>
+
+      <div class="form-field">
         <label for="memberName">Nom</label>
-        <input id="memberName" type="text" v-model="UserData.first_name" required>
+        <input id="memberName" type="text" v-model="last_name" required>
       </div>
 
       <div class="form-field">
         <label for="memberFirstName">Prénom</label>
-        <input id="memberFirstName" type="text" v-model="UserData.last_name" required>
+        <input id="memberFirstName" type="text" v-model="first_name" required>
+      </div>
+
+      <div class="form-field">
+        <label for="memberRole">Role</label>
+        <select id="memberRole" v-model="role" required>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
       </div>
 
       <div class="form-field">
         <label for="memberPassword">Mot de passe</label>
-        <input id="memberPassword" type="text" v-model="UserData.password" required>
+        <input id="memberPassword" type="password" v-model="password" required>
       </div>
-
-      <div class="form-field">
-        <label for="memberEmail">Email</label>
-        <input id="memberEmail" type="email" v-model="UserData.email" required>
-      </div>
-
 
 
       <button type="submit">Inscription</button>
@@ -33,36 +40,48 @@
 
 <script>
 import axios from 'axios';
+
 export default {
   name: 'CreateMemberForm',
   data() {
     return {
-      UserData: {
         first_name: '',
         last_name: '',
         email: '',
         password: '',
-        role: 'user',
-      },
+        role: '',
     };
   },
 
-
   methods: {
     async createUser() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
       try {
-        console.log('Création du membre', this.UserData);
-        const response = await axios.post('http://localhost:3000/user', this.UserData);
+        const userData = {
+          last_name: this.last_name,
+          first_name: this.first_name,
+          email: this.email,
+          password: this.password,
+          role: this.role,
+        };
+        console.log('Inscription en cours', userData);
+        const response = await axios.post('http://localhost:3000/user', userData, {headers});
         console.log('Inscription réussie', response.data);
-        this.$emit('memberCreated');
-        // Vous pouvez également rediriger l'utilisateur vers une autre page ici
+        this.$emit('userCreated');
       } catch (error) {
-        console.error('Erreur lors de l\'inscription', error.response.data.error);
+        console.error('Erreur lors de l\'inscription', error.response ? error.response.data.error : error);
+        console.log('Inscription échouée');
+        console.log('Inscription échouée', error);
       }
     }
   }
 };
 </script>
+
 
 <style scoped>
 .Create-member-form-container {
@@ -98,6 +117,7 @@ button {
   border-radius: 5px;
   cursor: pointer;
 }
+
 .close-form-button {
   position: absolute;
   top: 10px;

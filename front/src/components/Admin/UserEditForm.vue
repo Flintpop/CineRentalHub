@@ -36,10 +36,10 @@
     <div v-if="showPasswordChangeForm">
       <form @submit.prevent="submitPasswordChange">
         <label for="new-password">Nouveau mot de passe:</label>
-        <input type="password" id="new-password" v-model="newPassword">
+        <input type="password" id="newPassword" v-model="newPassword">
 
         <label for="confirm-password">Confirmer le mot de passe:</label>
-        <input type="password" id="confirm-password" v-model="confirmPassword">
+        <input type="password" id="confirmPassword" v-model="confirmPassword">
 
         <button type="submit">Changer le mot de passe</button>
       </form>
@@ -55,6 +55,10 @@ export default {
   props: {
     user: {
       type: Object,
+      required: true
+    },
+    updateUser: {
+      type: Function,
       required: true
     }
   },
@@ -78,6 +82,7 @@ export default {
       // Logique de mise à jour de l'utilisateur
       console.log('Submitted', this.editFormData);
       // Mise à jour via API...
+      this.updateUser(this.editFormData);
       this.$emit('close');
     },
     async submitPasswordChange() {
@@ -87,12 +92,15 @@ export default {
       }
 
       try {
-        // Utilisez le bon endpoint pour la modification du mot de passe
-        const response = await axios.post(`http://localhost:3000/user/password/${this.user.id}`, {
-          user_id: this.user.id,
-          new_password: this.newPassword,
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+          'authorization': 'Bearer ' + token
+        };
+        const response = await axios.put(`http://localhost:3000/user/password/${this.user.id}`, {
+          password: this.newPassword,
           // Vous pourriez avoir besoin d'envoyer l'ancien mot de passe également, selon votre API
-        });
+        }, {headers});
         console.log('Changement de mot de passe réussi', response.data);
         this.showPasswordChangeForm = false; // Cacher le formulaire après la réussite
       } catch (error) {
