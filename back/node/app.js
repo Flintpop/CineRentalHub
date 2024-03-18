@@ -128,6 +128,7 @@ const proxyOptions = (target) => ({
 });
 
 app.use('/movies', createProxyMiddleware(proxyOptions(MOVIE_API_SERVICE_URL)));
+app.use('/user', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
 app.use('/users', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
 app.use('/comments', createProxyMiddleware(proxyOptions(COMMENT_API_SERVICE_URL)));
 app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));

@@ -89,8 +89,13 @@ export default {
   methods: {
 
     async fetchUsers() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+        'authorization': 'Bearer ' + token
+      };
       try {
-        const response = await axios.get('http://localhost:3000/users');
+        const response = await axios.get('http://localhost:3000/users', {headers});
         this.users = response.data;
       } catch (error) {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
