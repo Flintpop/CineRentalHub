@@ -31,6 +31,14 @@ docker-compose down -v
 # Suppression explicite du volume mariadb-data
 docker volume rm mariadb-data
 
+# Build du front pour copie dans /back/apache
+echo "Build du front..."
+cd front
+npm run build
+cd ..
+echo "Copie du front dans /back/apache..."
+cp -rf front/dist back/apache/
+
 # Vérifier si le réseau existe
 if ! docker network ls --format "{{.Name}}" | grep -w "^ubo-network$"; then
   # Créer le réseau si ce n'est pas le cas
@@ -47,6 +55,6 @@ docker-compose up&
 
 echo "Les conteneurs Docker ont été démarrés."
 # Affichez un lien pour accéder au client web
-echo "Accédez au client web à l'adresse suivante : http://localhost:8080"
+echo "Accédez au client web à l'adresse suivante : https://localhost"
 
 sleep 50

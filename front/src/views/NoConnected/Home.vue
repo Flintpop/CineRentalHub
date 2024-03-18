@@ -77,7 +77,7 @@ export default {
   methods: {
     async fetchMovies() {
       // Simulation de la récupération de données depuis la base de données
-      await axios.get("http://localhost:3000/movies")
+      await axios.get("https://localhost/api/movies")
           .then(async response => {
             this.movies = response.data;
 
