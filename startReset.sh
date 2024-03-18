@@ -49,7 +49,7 @@ fi
 
 # Lancez les services définis dans votre docker-compose.yml
 echo "Démarrage des conteneurs Docker..."
-docker-compose build
+docker-compose build --no-cache
 
 docker-compose up&
 

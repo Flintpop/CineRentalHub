@@ -24,13 +24,13 @@ let tentativeDeConnexion = 0;
 app.use(cors());
 app.use(express.json());
 
-const dbConfig = mysql.createConnection({
+const dbConfig = {
     host: 'mariadb',
     port: '3306',
     user: 'root',
     password: 'root',
     database: 'cine_rental_hub'
-});
+}
 
 const connectWithRetry = () => {
     console.log('Tentative de connexion à la base de données MariaDB...');
@@ -67,7 +67,22 @@ const connectWithRetry = () => {
     return db;
 };
 
-const db = connectWithRetry();
+db = connectWithRetry();
+
+// const db = mysql.createConnection({
+//     host: 'mariadb',
+//     port: '3306',
+//     user: 'root',
+//     password: 'root',
+//     database: 'cine_rental_hub'
+// });
+//
+// db.connect((err) => {
+//     if (err) {
+//         throw err;
+//     }
+//     console.log('Connecté à la base de données MySQL');
+// });
 
 const verifyJWTAndRole = (req, res, next) => {
     // Routes autorisées sans token. [^/]+ signifie "n'importe quel caractère sauf /"
