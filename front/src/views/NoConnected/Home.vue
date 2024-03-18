@@ -46,6 +46,7 @@ import MovieForm from '../../components/Admin/MovieForm.vue';
 import axios from "axios";
 import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
+import {jwtDecode} from "jwt-decode";
 
 export default {
   name: 'Home',
@@ -59,8 +60,15 @@ export default {
   },
 
   mounted() {
-    if (localStorage.getItem('userId')) {
-      this.$router.push('/homeConnected');
+// test si token est présent dans le local storage et test le role de l'utilisateur pour rediriger vers la page d'accueil
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwtDecode(token);
+      if (decoded.role === 'admin') {
+        this.$router.push('/HomeAdmin');
+      } else {
+        this.$router.push('/HomeUser');
+      }
     }
     // Simuler la récupération de données
     this.fetchMovies();

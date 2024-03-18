@@ -43,6 +43,7 @@ import MovieForm from '../../components/Admin/MovieForm.vue';
 import axios from "axios";
 import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
+import {jwtDecode} from "jwt-decode";
 
 export default {
   name: 'Home',
@@ -56,8 +57,14 @@ export default {
   },
 
   mounted() {
-    if (localStorage.getItem('userId')) {
-      this.$router.push('/homeConnected');
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = jwtDecode(token);
+      if (decoded.role === 'admin') {
+        this.$router.push('/HomeAdmin');
+      } else {
+        this.$router.push('/HomeUser');
+      }
     }
     // Simuler la récupération de données
     this.fetchMovies();
@@ -65,17 +72,20 @@ export default {
 
   methods: {
     async fetchMovies() {
-      // Simulation de la récupération de données depuis la base de données
-      await axios.get("http://localhost:3000/movies")
-          .then(async response => {
-            this.movies = response.data;
+      //ajoute un header à la requete pour l'authentification
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+      };
+      try {
+        const response = await axios.get('http://localhost:3000/movies', {headers});
+        this.movies = response.data;
+      } catch (error) {
 
-            this.clicked_added_movie = false;
-            this.clicked_modification_movie = false;
-          })
-          .catch(error => {
-            console.log(error);
-          });
+        console.error("Erreur lors de la récupération des films:", error);
+      }
+
+
     },
     handleEditMovie(movieId) {
       this.selectedMovieId = movieId;

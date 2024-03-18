@@ -10,7 +10,7 @@
       </div>
       <div class="form-group">
         <label for="password">Mot de passe:</label>
-        <input type="password" id="password" v-model="user.motDePasse" required>
+        <input type="password" id="password" v-model="user.password" required>
       </div>
       <!--        bouton avec redirection vers la page HommeConnected en type bouton et non routerlink-->
       <button type="submit">Se connecter</button>
@@ -25,9 +25,10 @@
 </template>
 
 <script>
+import axios from "axios";
+import { jwtDecode } from 'jwt-decode';
 import Navbar from "../../components/NoConnected/Navbar.vue";
 import Footer from "../../components/Core/Footer.vue";
-import axios from "axios";
 
 export default {
   name: 'Login',
@@ -36,43 +37,62 @@ export default {
     Footer
   },
   mounted() {
-    // if (localStorage.getItem('membreId')) {
-    //   this.$router.push('/homeConnected');
-    // }
+   // vérifier si un token est présent dans le local storage
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Si un token est présent, décodez-le pour obtenir les informations de l'utilisateur
+      const decoded = jwtDecode(token);
+      // Redirigez l'utilisateur vers la page d'accueil en fonction de son rôle
+      if (decoded.role === 'admin') {
+        this.$router.push('/HomeAdmin');
+      } else {
+        this.$router.push('/HomeUser');
+      }
+    }
   },
   data() {
     return {
       user: {
-        email: '',
-        motDePasse: '',
+        email: "",
+        password: "",
       },
-      membres: [],
+      users: [],
     };
   },
   methods: {
     async login() {
-      await axios.get("http://localhost:8085/membres")
-          .then(response => {
-            this.membres = response.data;
-            let estConnecte = false;
+      try {
+        console.log('Connexion de l\'utilisateur', this.user.email, this.user.password);
+        const response = await axios.post('http://localhost:3000/sign_in', {
+          email: this.user.email,
+          password: this.user.password,
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-            for (let i = 0; i < this.membres.length; i++) {
-              if (this.membres[i].mail === this.user.email && this.membres[i].motDePasse === this.user.motDePasse) {
-                localStorage.setItem('membreId', this.membres[i].id);
-                estConnecte = true;
-                this.$router.push('/homeConnected'); // Redirection vers la page souhaitée
-                return; // Pour arrêter la boucle et la fonction après la réussite de la connexion
-              }
-            }
+        const { token } = response.data;
+        const decoded = jwtDecode(token);
 
-            if (!estConnecte) {
-              alert('E-mail ou mot de passe incorrect');
-            }
-          })
-          .catch(error => {
-            console.error("Il y a eu un problème avec la requête de l'API :", error);
-          });
-    },
+        // Stockez le token, l'ID de l'utilisateur et son rôle dans localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('userId', decoded.userId); // Assurez-vous que c'est bien userId et non id
+        localStorage.setItem('role', decoded.role);
+
+        // Redirection basée sur le rôle de l'utilisateur
+        if (decoded.role === 'admin') {
+          this.$router.push('/HomeAdmin');
+        } else {
+          this.$router.push('/HomeUser');
+        }
+      } catch (error) {
+        console.error('Erreur lors de la connexion', error.response ? error.response.data : error);
+      }
+    }
+
+
+
   },
 };
 </script>
