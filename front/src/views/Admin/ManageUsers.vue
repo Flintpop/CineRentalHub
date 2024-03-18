@@ -22,10 +22,10 @@
                 <div class="user-actions">
 
                   <!-- Boutons d'actions, notez l'utilisation de stop pour empêcher la propagation de l'événement au conteneur parent -->
-                  <button @click.stop="selectUser(user, 'edit')"> Modifier </button>
-                  <button @click.stop="deleteUser(user)"> Supprimer </button>
-                  <button @click.stop="selectUser(user, 'rentedMovies')"> Films loués </button>
-                  <button @click.stop="selectUser(user, 'purchasedMovies')"> Films achetés </button>
+                  <button @click.stop="selectUser(user, 'edit')"> Modifier</button>
+                  <button @click.stop="deleteUser(user)"> Supprimer</button>
+                  <button @click.stop="selectUser(user, 'rentedMovies')"> Films loués</button>
+                  <button @click.stop="selectUser(user, 'purchasedMovies')"> Films achetés</button>
                 </div>
               </div>
             </div>
@@ -57,12 +57,14 @@ import NavbarAdmin from '../../components/Admin/NavbarAdmin.vue';
 import Footer from '../../components/Core/Footer.vue';
 import axios from 'axios';
 import UserEditForm from "../../components/Admin/UserEditForm.vue";
+import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
 
 export default {
   components: {
     NavbarAdmin,
     Footer,
     UserEditForm,
+    UserRentedMovies,
 
   },
 
@@ -80,7 +82,7 @@ export default {
       return {
         // 'details': UserDetailsComponent,
         'edit': UserEditForm,
-        // 'rentedMovies': UserRentedMoviesComponent,
+        'rentedMovies': UserRentedMovies,
         // 'purchasedMovies': UserPurchasedMoviesComponent,
       };
     },
@@ -142,6 +144,7 @@ export default {
   max-height: 100vh;
   overflow-y: hidden;
 }
+
 .main-content {
   display: flex;
   flex-direction: column;
