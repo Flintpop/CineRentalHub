@@ -153,7 +153,7 @@ export default {
     addMovie(movieData) {
       const token = localStorage.getItem('token');
       const headers = {
-        'Content-Type': 'application / json',
+        'Content-Type': 'application/json',
         'authorization': 'Bearer ' + token
       };
       axios.post(`http://localhost:3000/movies`, movieData, {headers})
