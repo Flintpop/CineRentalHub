@@ -137,6 +137,7 @@ export default {
         this.showImageManagement = null; // Cacher les images
       } else {
         this.showEditMovieForm = false;
+        this.showCommentManagement = null;
         this.showImageManagement = movieId; // Afficher les images
       }
     },
@@ -144,6 +145,8 @@ export default {
       if (this.showCommentManagement === movieId) {
         this.showCommentManagement = null; // Cacher les commentaires
       } else {
+        this.showEditMovieForm = false;
+        this.showImageManagement = null;
         this.showCommentManagement = movieId; // Afficher les commentaires
       }
     },
@@ -168,6 +171,7 @@ export default {
     },
     selectMovie(movie) {
       this.showImageManagement = null;
+      this.showCommentManagement = null;
       this.selectedMovie = movie;
       this.showEditMovieForm = true;
     },
