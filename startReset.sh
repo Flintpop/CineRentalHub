@@ -51,7 +51,7 @@ fi
 echo "Démarrage des conteneurs Docker..."
 docker-compose build --no-cache
 
-docker-compose up&
+docker-compose up --force-recreate&
 
 echo "Les conteneurs Docker ont été démarrés."
 # Affichez un lien pour accéder au client web
