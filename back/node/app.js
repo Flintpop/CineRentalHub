@@ -18,11 +18,13 @@ const CART_API_SERVICE_URL = "http://cart-api:8080";
 // const COMMENT_API_SERVICE_URL = "http://localhost:8083";
 // const CART_API_SERVICE_URL = "http://localhost:8084";
 const SECRET_KEY = "votreCleSecrete";
+const MAX_TENTATIVES = 24;
+let tentativeDeConnexion = 0;
 
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createConnection({
+const dbConfig = mysql.createConnection({
     host: 'mariadb',
     port: '3306',
     user: 'root',
@@ -30,12 +32,42 @@ const db = mysql.createConnection({
     database: 'cine_rental_hub'
 });
 
-db.connect((err) => {
-    if (err) {
-        throw err;
-    }
-    console.log('Connecté à la base de données MySQL');
-});
+const connectWithRetry = () => {
+    console.log('Tentative de connexion à la base de données MariaDB...');
+    const db = mysql.createConnection(dbConfig);
+
+    db.connect(err => {
+        if (err) {
+            console.error('Erreur de connexion à la base de données:', err);
+            tentativeDeConnexion += 1;
+
+            if (tentativeDeConnexion < MAX_TENTATIVES) {
+                console.log(`Ré-essai de connexion dans 5 secondes... (Tentative ${tentativeDeConnexion}/${MAX_TENTATIVES})`);
+                setTimeout(connectWithRetry, 5000); // Attendre 10 secondes avant de réessayer
+            } else {
+                console.error('Nombre maximal de tentatives de connexion atteint. Veuillez vérifier votre base de données.');
+            }
+        } else {
+            console.log('Connecté à la base de données MySQL avec succès.');
+            // Ici, vous pouvez initialiser d'autres parties de votre application qui dépendent de la connexion à la base de données.
+        }
+    });
+
+    // Gestion de la déconnexion inopinée
+    db.on('error', (err) => {
+        console.error('Erreur de base de données', err);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+            console.log('Connexion à la base de données perdue. Tentative de reconnexion...');
+            connectWithRetry();
+        } else {
+            throw err;
+        }
+    });
+
+    return db;
+};
+
+const db = connectWithRetry();
 
 const verifyJWTAndRole = (req, res, next) => {
     // Routes autorisées sans token. [^/]+ signifie "n'importe quel caractère sauf /"
