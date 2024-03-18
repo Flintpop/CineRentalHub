@@ -36,6 +36,8 @@ services:
       - "3000:3000"
     networks:
       - ubo-network
+    depends_on:
+      - mariadb
 
   movie-api:
     build:
