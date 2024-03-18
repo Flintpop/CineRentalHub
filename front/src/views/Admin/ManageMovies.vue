@@ -151,7 +151,12 @@ export default {
       }
     },
     addMovie(movieData) {
-      axios.post(`http://localhost:3000/movies`, movieData)
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+        'authorization': 'Bearer ' + token
+      };
+      axios.post(`http://localhost:3000/movies`, movieData, {headers})
           .then(() => {
             console.log('Film ajouté avec succès');
             this.fetchMovies(); // Recharger les films pour afficher les modifications
@@ -181,8 +186,13 @@ export default {
     },
     async disableMovie(movieId) {
       const url = `http://localhost:3000/movies/deactivated/${movieId}`;
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+        'authorization': 'Bearer ' + token
+      };
       try {
-        await axios.patch(url);
+        await axios.patch(url,  null, {headers});
         alert(`Film désactivé avec succès !`);
         await this.fetchMovies(); // Rafraîchir la liste des films après la désactivation
       } catch (error) {
@@ -193,9 +203,13 @@ export default {
     },
     async enableMovie(movieId) {
       const url = `http://localhost:3000/movies/activated/${movieId}`;
-
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+        'authorization': 'Bearer ' + token
+      };
       try {
-        await axios.patch(url);
+        await axios.patch(url,  null, {headers});
         alert(`Film activé avec succès !`);
         await this.fetchMovies(); // Rafraîchir la liste des films après l'activation
       } catch (error) {
