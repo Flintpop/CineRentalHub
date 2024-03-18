@@ -124,7 +124,12 @@ const proxyOptions = (target) => ({
             proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
             proxyReq.write(bodyData);
         }
+    },
+    onError: (err, req, res) => {
+        console.error('Une erreur s\'est produite lors du proxy de la requête:', err);
+        res.status(500).json({ error: 'Une erreur s\'est produite lors du proxy de la requête.' });
     }
+
 });
 
 app.use('/movies', createProxyMiddleware(proxyOptions(MOVIE_API_SERVICE_URL)));

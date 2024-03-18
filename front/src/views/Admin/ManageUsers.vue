@@ -80,7 +80,6 @@ export default {
       return {
         // 'details': UserDetailsComponent,
         'edit': UserEditForm,
-        // 'delete': UserDeleteComponent,
         // 'rentedMovies': UserRentedMoviesComponent,
         // 'purchasedMovies': UserPurchasedMoviesComponent,
       };
@@ -110,7 +109,13 @@ export default {
     },
     async deleteUser(user) {
       try {
-        await axios.delete(`http://localhost:3000/users/${user.id}`);
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application / json',
+          'authorization': 'Bearer ' + token
+        };
+        console.log('Suppression de l\'utilisateur', user, user.id);
+        await axios.delete(`http://localhost:3000/user/${user.id}`, {headers});
         this.users = this.users.filter(u => u.id !== user.id);
       } catch (error) {
         console.error("Erreur lors de la suppression de l'utilisateur:", error);
