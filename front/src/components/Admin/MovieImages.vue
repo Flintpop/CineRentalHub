@@ -61,8 +61,13 @@ export default defineComponent({
           .catch(error => console.error("Erreur lors de la récupération des images :", error));
     },
     setMainImage(imageId) {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
       const image_id = imageId;
-      axios.put(`http://localhost:3000/movies/main_image/${this.movieId}`, { image_id })
+      axios.put(`http://localhost:3000/movies/main_image/${this.movieId}`, { image_id }, {headers})
           .then(() => {
             console.log('Image principale mise à jour avec succès');
             window.location.reload();
@@ -71,7 +76,12 @@ export default defineComponent({
           .catch(error => console.error('Erreur lors de la mise à jour de l\'image principale:', error));
     },
     deleteImage(imageId) {
-      axios.delete(`http://localhost:3000/movies/images/${imageId}`)
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+      axios.delete(`http://localhost:3000/movies/images/${imageId}`, {headers})
           .then(() => {
             console.log('Image supprimée avec succès');
             this.fetchImages(); // Recharger les images pour afficher les modifications
@@ -82,7 +92,12 @@ export default defineComponent({
       const imageUrl = window.prompt('Veuillez entrer l\'URL de l\'image');
       if (imageUrl) {
         const image_url = imageUrl;
-        axios.post(`http://localhost:3000/movies/images/${this.movieId}`, { image_url })
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+          'authorization': 'Bearer ' + token
+        };
+        axios.post(`http://localhost:3000/movies/images/${this.movieId}`, { image_url }, {headers})
             .then(() => {
               console.log('Image ajoutée avec succès');
               this.fetchImages(); // Recharger les images pour afficher les modifications
