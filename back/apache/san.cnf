@@ -7,7 +7,7 @@ distinguished_name = dn
 
 [dn]
 C = FR
-ST = State
+ST = Bretagne
 L = Location
 O = Organization
 OU = Organizational Unit
@@ -18,4 +18,3 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1 = localhost
-DNS.2 = votre-domaine.com

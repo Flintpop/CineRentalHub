@@ -139,3 +139,4 @@ dist
 /back/api/movie/.idea/
 /back/api/movie/movie.iml
 /back/api/movie/.mvn/
+/back/apache/server.csr
