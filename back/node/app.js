@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
 const crypto = require('crypto');
 const cors = require('cors');
-
+const {createServer} = require("http");
+const socketIo = require('socket.io'); // Ajoutez socket.io
 const app = express();
 const PORT = 3000;
+const path = require('path');
 
 const MOVIE_API_SERVICE_URL = "http://movie-api:8080";
 const USER_API_SERVICE_URL = "http://user-api:8080";
@@ -224,7 +226,7 @@ app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));
 app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
 
 const chatApp = express();
-const server = http.createServer(chatApp); // Créez le serveur HTTP à partir de l'application Express
+const server = createServer(chatApp); // Créez le serveur HTTP à partir de l'application Express
 const io = socketIo(server, {
     cors: {
         origin: "*", // Autorisez les requêtes de toutes les origines
@@ -269,6 +271,6 @@ io.on('connection', (socket) => {
 });
 
 // Remplacez app.listen par server.listen pour intégrer Socket.IO
-server.listen(port_http, () => {
-    console.log(`Server is running on port ${port_http}`);
+server.listen(3001, () => {
+    console.log(`Server is running on port 3001`);
 });
