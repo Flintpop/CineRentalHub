@@ -13,21 +13,21 @@ services:
     networks:
       - ubo-network
 
-#  client:
-#    build:
-#      context: ./back/apache
-#    ports:
-#      - "443:443"
-#    networks:
-#      - ubo-network
-
-  front:
+  client:
     build:
-      context: ./front
+      context: ./back/apache
     ports:
-      - "8080:8080"
+      - "443:443"
     networks:
       - ubo-network
+
+#  front:
+#    build:
+#      context: ./front
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - ubo-network
 
   mongo:
     build:
