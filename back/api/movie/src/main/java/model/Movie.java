@@ -1,11 +1,13 @@
 package model;
 
 import database.MariaDB;
-import dto.ImageDTO;
-import dto.MoviePostPutDTO;
+import dto.*;
 import jakarta.persistence.*;
 import mariadbPojo.MoviesPojo;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -287,6 +289,87 @@ public class Movie {
         em.getTransaction().rollback();
       }
       throw new Exception(e.getCause().getCause().getMessage());
+    } finally {
+      em.close();
+    }
+  }
+
+  // Procédures à appeler
+
+//  DELIMITER //
+//  DROP PROCEDURE IF EXISTS get_movies_purchased_by_user;
+//  CREATE PROCEDURE get_movies_purchased_by_user(IN user_id INT)
+//  BEGIN
+//    -- Vérifier si l'utilisateur a des achats
+//  IF (SELECT COUNT(*) FROM purchases WHERE purchases.user_id = user_id) = 0 THEN
+//  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun achat trouvé pour cet utilisateur.';
+//  ELSE
+//        -- Prend tout le movie + purchase
+//  SELECT p.id, m.id as movie_id, m.available, m.title, m.release_date, m.description, m.daily_rental_price,
+//  m.purchase_price, m.link, p.purchase_date
+//  FROM purchases p
+//  JOIN movies m ON p.movie_id = m.id
+//  WHERE p.user_id = user_id;
+//  END IF;
+//  end //
+//          DELIMITER ;
+
+// CALL get_movies_purchased_by_user(2);
+  public static List<PurchasesDTO> getMoviesPurchasedByUserId(Integer userId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_movies_purchased_by_user")
+              .registerStoredProcedureParameter("user_id", Integer.class, ParameterMode.IN)
+              .setParameter("user_id", userId);
+
+      @SuppressWarnings("unchecked")
+      List<Object[]> result = query.getResultList();
+      em.getTransaction().commit();
+
+
+      return result.stream().map(row -> new PurchasesDTO(
+              (Integer) row[0], (Integer) row[1], (byte) ((boolean) row[2] ? 1 : 0), (String) row[3],
+              (Date) row[4], (String) row[5], (BigDecimal) row[6], (BigDecimal) row[7],
+              (String) row[8], (Date) row[9]))
+              .collect(Collectors.toList());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      ModelUtils.generateException(e);
+      return null;
+    } finally {
+      em.close();
+    }
+  }
+
+  public static List<RentalsDTO> getMoviesRentedByUserId(Integer userId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_movies_rented_by_user")
+              .registerStoredProcedureParameter("user_id", Integer.class, ParameterMode.IN)
+              .setParameter("user_id", userId);
+
+      @SuppressWarnings("unchecked")
+      List<Object[]> result = query.getResultList();
+      em.getTransaction().commit();
+
+
+      return result.stream().map(row -> new RentalsDTO(
+                      (Integer) row[0], (Integer) row[1], (byte) ((boolean) row[2] ? 1 : 0), (String) row[3],
+                      (Date) row[4], (String) row[5], (BigDecimal) row[6], (BigDecimal) row[7],
+                      (String) row[8], (Timestamp) row[9], (Timestamp) row[10]))
+              .collect(Collectors.toList());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      ModelUtils.generateException(e);
+      return null;
     } finally {
       em.close();
     }
