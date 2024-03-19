@@ -13,6 +13,7 @@ import MovieDetailsPage from "../views/MovieDetailsPage.vue";
 import ManageUsers from "../views/Admin/ManageUsers.vue";
 import ManageMovies from "../views/Admin/ManageMovies.vue";
 import HomeAdmin from "../views/Admin/HomeAdmin.vue";
+import MyMessages from "../views/MyMessages.vue";
 
 
 
@@ -90,7 +91,11 @@ const routes = [
         name: 'ManageMovies',
         component: ManageMovies,
     },
-
+    {
+        path: '/MyMessages',
+        name: 'MyMessages',
+        component: MyMessages,
+    }
 ];
 
 const router = createRouter({

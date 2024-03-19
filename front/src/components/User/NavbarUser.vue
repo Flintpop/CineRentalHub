@@ -7,6 +7,7 @@
         <router-link to="/MyMovies">Mes films</router-link>
         <router-link to="/MyHistory">Mon historique</router-link>
         <router-link to="/MyAccount">Mon profil</router-link>
+        <router-link to="/MyMessages">Mes messages</router-link>
         <router-link to="/MyCart">Mon panier</router-link>
         <router-link to="/" @click.native="logout">Déconnexion</router-link> <!-- Lien de déconnexion -->
 
