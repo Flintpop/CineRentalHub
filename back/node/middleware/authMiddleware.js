@@ -19,6 +19,8 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
         {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
+        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user']},
+        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user']},
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
         {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['user'], selfOnly: false},
     ];
