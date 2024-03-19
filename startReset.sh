@@ -57,4 +57,4 @@ echo "Les conteneurs Docker ont été démarrés."
 # Affichez un lien pour accéder au client web
 echo "Accédez au client web à l'adresse suivante : https://localhost"
 
-sleep 50
+sleep 500

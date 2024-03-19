@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
 const crypto = require('crypto');
 const cors = require('cors');
+const util = require("util");
 
 const app = express();
 const PORT = 3000;
@@ -40,156 +41,148 @@ const dbConfig = {
     database: 'cine_rental_hub'
 }
 
-const connectWithRetry = () => {
-    console.log('Tentative de connexion à la base de données MariaDB...');
-    const db = mysql.createConnection(dbConfig);
+async function main() {
+    const connectWithRetry = async () => {
+        console.log('Tentative de connexion à la base de données MariaDB...');
 
-    db.connect(err => {
-        if (err) {
-            console.error('Erreur de connexion à la base de données:', err);
-            tentativeDeConnexion += 1;
+        const db = mysql.createConnection(dbConfig);
+        const connectAsync = util.promisify(db.connect).bind(db);
 
-            if (tentativeDeConnexion < MAX_TENTATIVES) {
+        while (tentativeDeConnexion < MAX_TENTATIVES) {
+            try {
+                await connectAsync();
+                console.log('Connecté à la base de données MySQL avec succès.');
+                // Gestion de la déconnexion inopinée
+                db.on('error', (err) => {
+                    console.error('Erreur de base de données', err);
+                    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+                        console.log('Connexion à la base de données perdue. Tentative de reconnexion...');
+                        db.destroy();
+                        tentativeDeConnexion = 0;
+                        connectWithRetry();
+                    } else {
+                        throw err;
+                    }
+                });
+                return db;
+            } catch (err) {
+                console.error('Erreur de connexion à la base de données:', err);
+                tentativeDeConnexion += 1;
                 console.log(`Ré-essai de connexion dans 5 secondes... (Tentative ${tentativeDeConnexion}/${MAX_TENTATIVES})`);
-                setTimeout(connectWithRetry, 5000); // Attendre 10 secondes avant de réessayer
-            } else {
-                console.error('Nombre maximal de tentatives de connexion atteint. Veuillez vérifier votre base de données.');
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Attendre 5 secondes avant de réessayer
             }
-        } else {
-            console.log('Connecté à la base de données MySQL avec succès.');
-            // Ici, vous pouvez initialiser d'autres parties de votre application qui dépendent de la connexion à la base de données.
         }
+
+        throw new Error('Nombre maximal de tentatives de connexion atteint. Veuillez vérifier votre base de données.');
+    };
+
+    const db = await connectWithRetry();
+
+    const verifyJWTAndRole = (req, res, next) => {
+        // Routes autorisées sans token. [^/]+ signifie "n'importe quel caractère sauf /"
+        const openRoutes = [
+            { path: '/movies', methods: ['GET'] },
+            { path: '/movies/[^/]+/?', methods: ['GET'] },
+            { path: '/movies/images/[^/]+/?', methods: ['GET'] },
+            { path: '/movies/main_image/[^/]+/?', methods: ['GET'] },
+            { path: '/sign_in', methods: ['POST'] },
+        ];
+
+        const reqPath = req.originalUrl.split('?')[0];
+        const reqMethod = req.method;
+
+        const isRouteOpen = openRoutes.some(route => {
+            // correspondre exactement à la route depuis le début (^) jusqu'à la fin ($) de la chaîne.
+            const matchPath = reqPath.match(new RegExp("^" + route.path + "$"));
+            const methodAllowed = route.methods.includes(reqMethod);
+            return matchPath && methodAllowed;
+        });
+
+        // Si la route est dans la liste des routes ouvertes ET que la méthode est GET, on passe au middleware suivant sans vérification du JWT
+        if (isRouteOpen) {
+            // Next c'est pour passer au middleware suivant, sinon la requête serait bloquée ici (si pas de token ou pas le bon)
+            return next();
+        }
+
+        const token = req.headers['authorization']?.split(' ')[1];
+        if (!token) {
+            return res.status(403).json({ error: "Accès refusé, token non fourni" });
+        }
+
+        jwt.verify(token, SECRET_KEY, (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ error: "Token invalide" });
+            }
+            req.user = decoded;
+            next();
+        });
+    };
+
+    app.use(verifyJWTAndRole);
+
+    app.post('/sign_in', (req, res) => {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).send('Nom d’utilisateur et mot de passe sont requis');
+        }
+
+        db.query('SELECT id, role, email, password FROM users WHERE email = ?', [email], async (err, results) => {
+            if (err) {
+                return res.status(500).json({ error: "Erreur interne" });
+            }
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: "Utilisateur non trouvé" });
+            }
+
+            const user = results[0];
+
+            const hash = crypto.createHash('sha512');
+            hash.update(password);
+            const hashedPassword = hash.digest('hex');
+
+            if (hashedPassword === user.password) {
+                const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
+                res.json({ token });
+            } else {
+                res.status(401).json({ error: "Mot de passe incorrect" });
+            }
+        });
     });
 
-    // Gestion de la déconnexion inopinée
-    db.on('error', (err) => {
-        console.error('Erreur de base de données', err);
-        if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-            console.log('Connexion à la base de données perdue. Tentative de reconnexion...');
-            connectWithRetry();
-        } else {
-            throw err;
-        }
-    });
-
-    return db;
-};
-
-db = connectWithRetry();
-
-// const db = mysql.createConnection({
-//     host: 'mariadb',
-//     port: '3306',
-//     user: 'root',
-//     password: 'root',
-//     database: 'cine_rental_hub'
-// });
-//
-// db.connect((err) => {
-//     if (err) {
-//         throw err;
-//     }
-//     console.log('Connecté à la base de données MySQL');
-// });
-//
-const verifyJWTAndRole = (req, res, next) => {
-    // Routes autorisées sans token. [^/]+ signifie "n'importe quel caractère sauf /"
-    const openRoutes = [
-        { path: '/movies', methods: ['GET'] },
-        { path: '/movies/[^/]+/?', methods: ['GET'] },
-        { path: '/movies/images/[^/]+/?', methods: ['GET'] },
-        { path: '/movies/main_image/[^/]+/?', methods: ['GET'] },
-        { path: '/sign_in', methods: ['POST'] },
-    ];
-
-    const reqPath = req.originalUrl.split('?')[0];
-    const reqMethod = req.method;
-
-    const isRouteOpen = openRoutes.some(route => {
-        // correspondre exactement à la route depuis le début (^) jusqu'à la fin ($) de la chaîne.
-        const matchPath = reqPath.match(new RegExp("^" + route.path + "$"));
-        const methodAllowed = route.methods.includes(reqMethod);
-        return matchPath && methodAllowed;
-    });
-
-    // Si la route est dans la liste des routes ouvertes ET que la méthode est GET, on passe au middleware suivant sans vérification du JWT
-    if (isRouteOpen) {
-        // Next c'est pour passer au middleware suivant, sinon la requête serait bloquée ici (si pas de token ou pas le bon)
-        return next();
-    }
-
-    const token = req.headers['authorization']?.split(' ')[1];
-    if (!token) {
-        return res.status(403).json({ error: "Accès refusé, token non fourni" });
-    }
-
-    jwt.verify(token, SECRET_KEY, (err, decoded) => {
-        if (err) {
-            return res.status(401).json({ error: "Token invalide" });
-        }
-        req.user = decoded;
-        next();
-    });
-};
-
-app.use(verifyJWTAndRole);
-
-app.post('/sign_in', (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-        return res.status(400).send('Nom d’utilisateur et mot de passe sont requis');
-    }
-
-    db.query('SELECT id, role, email, password FROM users WHERE email = ?', [email], async (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: "Erreur interne" });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ error: "Utilisateur non trouvé" });
-        }
-
-        const user = results[0];
-
-        const hash = crypto.createHash('sha512');
-        hash.update(password);
-        const hashedPassword = hash.digest('hex');
-
-        if (hashedPassword === user.password) {
-            const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
-            res.json({ token });
-        } else {
-            res.status(401).json({ error: "Mot de passe incorrect" });
-        }
-    });
-});
-
-const proxyOptions = (target) => ({
-    target: target,
-    changeOrigin: true,
-    /*
-        pathRewrite: {
-            [`^/movies`]: '',
+// noinspection JSUnusedGlobalSymbols,JSUnusedLocalSymbols
+    const proxyOptions = (target) => ({
+        target: target,
+        changeOrigin: true,
+        /*
+            pathRewrite: {
+                [`^/movies`]: '',
+            },
+        */
+        onProxyReq: (proxyReq, req, res) => {
+            if (req.body && req.headers['content-type']) {
+                let bodyData = JSON.stringify(req.body);
+                proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+                proxyReq.write(bodyData);
+            }
         },
-    */
-    onProxyReq: (proxyReq, req, res) => {
-        if (req.body && req.headers['content-type']) {
-            let bodyData = JSON.stringify(req.body);
-            proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
-            proxyReq.write(bodyData);
+        onError: (err, req, res) => {
+            console.error('Une erreur s\'est produite lors du proxy de la requête:', err);
+            res.status(500).json({ error: 'Une erreur s\'est produite lors du proxy de la requête.' });
         }
-    },
-    onError: (err, req, res) => {
-        console.error('Une erreur s\'est produite lors du proxy de la requête:', err);
-        res.status(500).json({ error: 'Une erreur s\'est produite lors du proxy de la requête.' });
-    }
+    });
+
+    app.use('/movies', createProxyMiddleware(proxyOptions(MOVIE_API_SERVICE_URL)));
+    app.use('/user', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
+    app.use('/users', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
+    app.use('/comments', createProxyMiddleware(proxyOptions(COMMENT_API_SERVICE_URL)));
+    app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));
+
+    app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
+}
+
+main().catch(err => {
+    console.error("Erreur lors du démarrage de l'application:", err);
+    process.exit(1);
 });
-
-app.use('/movies', createProxyMiddleware(proxyOptions(MOVIE_API_SERVICE_URL)));
-app.use('/user', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
-app.use('/users', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
-app.use('/comments', createProxyMiddleware(proxyOptions(COMMENT_API_SERVICE_URL)));
-app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));
-
-app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
