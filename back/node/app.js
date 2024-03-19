@@ -1,5 +1,5 @@
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const {createProxyMiddleware} = require('http-proxy-middleware');
 const jwt = require('jsonwebtoken');
 const mysql = require('mysql');
 const crypto = require('crypto');
@@ -93,41 +93,69 @@ db = connectWithRetry();
 // });
 //
 const verifyJWTAndRole = (req, res, next) => {
-    // Routes autorisées sans token. [^/]+ signifie "n'importe quel caractère sauf /"
     const openRoutes = [
-        { path: '/movies', methods: ['GET'] },
-        { path: '/movies/[^/]+/?', methods: ['GET'] },
-        { path: '/movies/images/[^/]+/?', methods: ['GET'] },
-        { path: '/movies/main_image/[^/]+/?', methods: ['GET'] },
-        { path: '/sign_in', methods: ['POST'] },
+        {path: '/movies', methods: ['GET']},
+        {path: '/movies/[^/]+/?', methods: ['GET']},
+        {path: '/movies/images/[^/]+/?', methods: ['GET']},
+        {path: '/movies/main_image/[^/]+/?', methods: ['GET']},
+        {path: '/sign_in', methods: ['POST']},
+    ];
+
+    const protectedRoutes = [
+        {path: '/movies', methods: ['POST'], roles: ['admin']},
+        {path: '/movies/[^/]+/?', methods: ['PUT'], roles: ['admin']},
+        {path: '/movies/deactivated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
+        {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
+        {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
+        {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
+        // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
+        {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['user'], selfOnly: false},
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
     const reqMethod = req.method;
 
     const isRouteOpen = openRoutes.some(route => {
-        // correspondre exactement à la route depuis le début (^) jusqu'à la fin ($) de la chaîne.
         const matchPath = reqPath.match(new RegExp("^" + route.path + "$"));
-        const methodAllowed = route.methods.includes(reqMethod);
-        return matchPath && methodAllowed;
+        return matchPath && route.methods.includes(reqMethod);
     });
 
-    // Si la route est dans la liste des routes ouvertes ET que la méthode est GET, on passe au middleware suivant sans vérification du JWT
     if (isRouteOpen) {
-        // Next c'est pour passer au middleware suivant, sinon la requête serait bloquée ici (si pas de token ou pas le bon)
         return next();
     }
 
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
-        return res.status(403).json({ error: "Accès refusé, token non fourni" });
+        return res.status(403).json({error: "Accès refusé, token non fourni"});
     }
 
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) {
-            return res.status(401).json({ error: "Token invalide" });
+            return res.status(401).json({error: "Token invalide"});
         }
+
         req.user = decoded;
+
+        const isProtectedRoute = protectedRoutes.some(route => {
+            const matchPath = reqPath.match(new RegExp("^" + route.path + "$"));
+            const methodAllowed = route.methods.includes(reqMethod);
+            const roleAllowed = route.roles.includes(decoded.role);
+            const isSelfOnlyRoute = route.selfOnly;
+            let isUserAllowed = true;
+
+            if (isSelfOnlyRoute) {
+                const urlParts = reqPath.match(/[^/]+/g); // Extraire les segments de l'URL
+                const userIdFromURL = urlParts[urlParts.length - 1]; // Supposer que l'ID utilisateur est le dernier segment
+                isUserAllowed = decoded.userId === userIdFromURL; // Vérifier si l'ID utilisateur du token correspond à l'ID dans l'URL
+            }
+
+            return matchPath && methodAllowed && roleAllowed && isUserAllowed;
+        });
+
+        if (!isProtectedRoute) {
+            return res.status(403).json({error: "Accès refusé, rôle non autorisé, route invalide, ou action non autorisée sur la ressource"});
+        }
+
         next();
     });
 };
@@ -135,7 +163,7 @@ const verifyJWTAndRole = (req, res, next) => {
 app.use(verifyJWTAndRole);
 
 app.post('/sign_in', (req, res) => {
-    const { email, password } = req.body;
+    const {email, password} = req.body;
 
     if (!email || !password) {
         return res.status(400).send('Nom d’utilisateur et mot de passe sont requis');
@@ -143,11 +171,11 @@ app.post('/sign_in', (req, res) => {
 
     db.query('SELECT id, role, email, password FROM users WHERE email = ?', [email], async (err, results) => {
         if (err) {
-            return res.status(500).json({ error: "Erreur interne" });
+            return res.status(500).json({error: "Erreur interne"});
         }
 
         if (results.length === 0) {
-            return res.status(404).json({ error: "Utilisateur non trouvé" });
+            return res.status(404).json({error: "Utilisateur non trouvé"});
         }
 
         const user = results[0];
@@ -157,10 +185,10 @@ app.post('/sign_in', (req, res) => {
         const hashedPassword = hash.digest('hex');
 
         if (hashedPassword === user.password) {
-            const token = jwt.sign({ userId: user.id, role: user.role }, SECRET_KEY, { expiresIn: '2h' });
-            res.json({ token });
+            const token = jwt.sign({userId: user.id, role: user.role}, SECRET_KEY, {expiresIn: '2h'});
+            res.json({token});
         } else {
-            res.status(401).json({ error: "Mot de passe incorrect" });
+            res.status(401).json({error: "Mot de passe incorrect"});
         }
     });
 });
@@ -182,7 +210,7 @@ const proxyOptions = (target) => ({
     },
     onError: (err, req, res) => {
         console.error('Une erreur s\'est produite lors du proxy de la requête:', err);
-        res.status(500).json({ error: 'Une erreur s\'est produite lors du proxy de la requête.' });
+        res.status(500).json({error: 'Une erreur s\'est produite lors du proxy de la requête.'});
     }
 });
 

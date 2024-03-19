@@ -13,13 +13,13 @@ services:
     networks:
       - ubo-network
 
-  client:
-    build:
-      context: ./back/apache
-    ports:
-      - "443:443"
-    networks:
-      - ubo-network
+#  client:
+#    build:
+#      context: ./back/apache
+#    ports:
+#      - "443:443"
+#    networks:
+#      - ubo-network
 
 #  front:
 #    build:
@@ -29,13 +29,13 @@ services:
 #    networks:
 #      - ubo-network
 
-  mongo:
-    build:
-      context: ./back/mongodb
-    ports:
-      - "27017:27017"
-    networks:
-      - ubo-network
+#  mongo:
+#    build:
+#      context: ./back/mongodb
+#    ports:
+#      - "27017:27017"
+#    networks:
+#      - ubo-network
 
   node:
     build:
@@ -79,13 +79,13 @@ services:
     networks:
       - ubo-network
 
-  stats-api:
-    build:
-      context: ./back/api/stats
-    ports:
-      - "8085:8080"
-    networks:
-      - ubo-network
+#  stats-api:
+#    build:
+#      context: ./back/api/stats
+#    ports:
+#      - "8085:8080"
+#    networks:
+#      - ubo-network
 
 networks:
   ubo-network:

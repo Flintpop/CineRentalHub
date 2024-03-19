@@ -32,12 +32,12 @@ docker-compose down -v
 docker volume rm mariadb-data
 
 # Build du front pour copie dans /back/apache
-echo "Build du front..."
-cd front
-npm run build
-cd ..
-echo "Copie du front dans /back/apache..."
-cp -rf front/dist back/apache/
+#echo "Build du front..."
+#cd front
+#npm run build
+#cd ..
+#echo "Copie du front dans /back/apache..."
+#cp -rf front/dist back/apache/
 
 # Vérifier si le réseau existe
 if ! docker network ls --format "{{.Name}}" | grep -w "^ubo-network$"; then
@@ -49,9 +49,9 @@ fi
 
 # Lancez les services définis dans votre docker-compose.yml
 echo "Démarrage des conteneurs Docker..."
-docker-compose build --no-cache
+docker-compose build
 
-docker-compose up --build --force-recreate&
+docker-compose up&
 
 echo "Les conteneurs Docker ont été démarrés."
 # Affichez un lien pour accéder au client web
