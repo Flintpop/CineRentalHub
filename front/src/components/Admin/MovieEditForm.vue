@@ -35,9 +35,6 @@
             <input type="text" id="link" v-model="movie.link">
           </div>
 
-          <div class="form-group">
-            <label for="available">Disponibilité</label>
-          </div>
         </div>
         <button type="submit" class="submit-button">Modifier le film</button>
       </div>
