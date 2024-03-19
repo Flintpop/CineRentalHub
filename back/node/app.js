@@ -220,4 +220,55 @@ app.use('/users', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
 app.use('/comments', createProxyMiddleware(proxyOptions(COMMENT_API_SERVICE_URL)));
 app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));
 
+
 app.listen(PORT, () => console.log(`Serveur en écoute sur le port ${PORT}`));
+
+const chatApp = express();
+const server = http.createServer(chatApp); // Créez le serveur HTTP à partir de l'application Express
+const io = socketIo(server, {
+    cors: {
+        origin: "*", // Autorisez les requêtes de toutes les origines
+        methods: ["GET", "POST"]
+    }
+}); // Attachez Socket.IO au serveur HTTP
+
+chatApp.use(express.json());
+chatApp.use(cors());
+// Serveur de fichiers statiques pour le front-end
+// Remplacez 'path_to_your_front_end_dist_folder' par le chemin réel vers votre dossier 'dist' du front-end
+chatApp.use(express.static(path.join(__dirname, '../front/dist')));
+
+// Gestion des connexions Socket.IO
+io.on('connection', (socket) => {
+    console.log('Un utilisateur s\'est connecté');
+
+    socket.on('chat message', (msg) => {
+        // Traitez et enregistrez le message dans votre base de données
+        // Puis émettez-le vers tous les clients connectés
+        io.emit('chat message', msg);
+    });
+    socket.on('docEditor message', (msg) => {
+        // Traitez et enregistrez le message dans votre base de données
+        // Puis émettez-le vers tous les clients connectés sauf
+        io.emit('docEditor message', msg);
+    });
+    socket.on('docEditor message canEdit', () => {
+
+
+        io.emit('docEditor message canEdit');
+    });
+    socket.on('docEditor message BlockEdit', () => {
+// Traitez et enregistrez le message dans votre base de données
+        //Bloquer l'édition du document sauf pour la personne qui emet le message
+        io.emit('docEditor message BlockEdit');
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Un utilisateur s\'est déconnecté');
+    });
+});
+
+// Remplacez app.listen par server.listen pour intégrer Socket.IO
+server.listen(port_http, () => {
+    console.log(`Server is running on port ${port_http}`);
+});
