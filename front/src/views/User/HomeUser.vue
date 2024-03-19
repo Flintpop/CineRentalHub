@@ -5,28 +5,18 @@
     <div class="main-content">
 
 
-    <!-- Section Films -->
-    <section class="films">
+      <!-- Condition pour afficher la liste des films OU les détails du film -->
+      <section class="films" v-if="showMovieList">
         <h2>Nos Films</h2>
-        <div class="film-list">
-          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
-        </div>
+        <ListMovies :movies="movies" @movie-detail="handleMovieDetail" @edit-movie="handleEditMovie"></ListMovies>
       </section>
 
-
-    <!-- Section À propos -->
-    <section class="about">
-      <h2>À propos de CineRentalHub</h2>
-      <p>Nous sommes votre destination ultime pour la location de films en ligne. Parcourez une vaste sélection de
-        films, louez vos favoris et partagez vos avis !</p>
-    </section>
-
-    <!-- Section Contact -->
-    <section class="contact">
-      <h2>Contactez-nous</h2>
-      <p>Des questions ou des suggestions ? Nous sommes à votre écoute ! Contactez-nous.</p>
-      <p>Email: contact@CineRentalHub.com</p>
-    </section>
+      <!-- Condition pour afficher les détails d'un film spécifique -->
+      <MovieDetail
+          v-else-if="selectedMovie"
+          :movie="selectedMovie"
+          @close="handleCloseDetails"
+      />
 
     </div>
 
@@ -44,15 +34,18 @@ import axios from "axios";
 import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import {jwtDecode} from "jwt-decode";
+import ListMovies from "../../components/Core/ListMovies.vue";
+import MovieDetail from "../../components/Core/MovieDetail.vue";
 
 export default {
   name: 'Home',
   components: {
+    MovieDetail,
     MovieEditForm,
     EditMemberForm,
     Footer,
     NavbarUser,
-    MoviesList,
+    ListMovies,
     MovieForm
   },
 
@@ -86,21 +79,32 @@ export default {
   },
 
   methods: {
-    async fetchMovies() {
-      //ajoute un header à la requete pour l'authentification
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Content-Type': 'application / json',
-      };
-      try {
-        const response = await axios.get('http://localhost:3000/movies', {headers});
-        this.movies = response.data;
-      } catch (error) {
-
-        console.error("Erreur lors de la récupération des films:", error);
+    handleCloseDetails() {
+      this.selectedMovie = null; // Réinitialise le film sélectionné
+      this.showMovieList = true; // Montre la liste des films
+    },
+    handleMovieDetail(movieId) {
+      this.selectedMovieId = movieId;
+      const movieToShow = this.movies.find(movie => movie.id === movieId);
+      if (movieToShow) {
+        this.selectedMovie = movieToShow; // Assigne le film sélectionné
+        this.showMovieList = false; // Cache la liste des films
+      } else {
+        console.error("Film non trouvé");
       }
+    },
+    async fetchMovies() {
+      // Simulation de la récupération de données depuis la base de données
+      await axios.get("http://localhost:3000/movies")
+          .then(async response => {
+            this.movies = response.data;
 
-
+            this.clicked_added_movie = false;
+            this.clicked_modification_movie = false;
+          })
+          .catch(error => {
+            console.log(error);
+          });
     },
     handleEditMovie(movieId) {
       this.selectedMovieId = movieId;
@@ -123,7 +127,10 @@ export default {
       selectedMovieId: null, // Ajoutez ceci
       selectedMovie: null,
       clicked_added_movie: false,
-      clicked_modification_movie: false
+      clicked_modification_movie: false,
+      showMovieList: true, // Ajoutez ceci
+      showMovieDetails: false,
+
     };
   },
 };
