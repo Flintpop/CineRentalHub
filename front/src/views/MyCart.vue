@@ -3,35 +3,63 @@
   <div class="mycart">
     <h1>Mon Panier</h1>
     <div class="cart-items">
-      <div v-for="(item, index) in cartItems" :key="index" class="cart-item">
-        <img :src="item.image" alt="" class="item-image">
-        <div class="item-details">
-          <h2>{{ item.name }}</h2>
-          <p>Quantité: {{ item.quantity }}</p>
-          <p>Prix: {{ item.price }} €</p>
-        </div>
-      </div>
+      <CartList :rentMovies="rentMovies" :buyMovies="buyMovies"/>
     </div>
   </div>
 </template>
 
 <script>
 import NavbarUser from "../components/User/NavbarUser.vue";
+import axios from "axios";
+import CartList from "../components/Core/CartList.vue";
 
 export default {
   name: 'MyCart',
-  components: {NavbarUser},
+  components: {NavbarUser, CartList},
   data() {
     return {
-      cartItems: [
-        { name: 'Film A', quantity: 2, price: 10, image: 'path/to/imageA.jpg' },
-        { name: 'Film B', quantity: 1, price: 15, image: 'path/to/imageB.jpg' }
-      ]
+      rentMovies: [],
+      buyMovies: [],
     };
   },
   methods: {
-    // Méthodes pour gérer le panier ici
+    fetchRentMovies() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+
+      const userId = localStorage.getItem('userId');
+      axios.get(`http://localhost:3000/movies/rentals/${userId}`, {headers})
+          .then(response => {
+            this.rentMovies = response.data;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+    },
+    fetchBuyMovies() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+
+      const userId = localStorage.getItem('userId');
+      axios.get(`http://localhost:3000/movies/purchases/${userId}`, {headers})
+          .then(response => {
+            this.buyMovies = response.data;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+    },
   },
+  created() {
+    this.fetchRentMovies();
+    this.fetchBuyMovies();
+  }
 };
 </script>
 
