@@ -1,4 +1,5 @@
 <template>
+  <Navbar></Navbar>
   <div class="chat-container">
     <div v-for="message in messages" :key="message.id" class="message">
       <div class="message-text">{{ message.text }}</div>
@@ -10,12 +11,14 @@
 
 <script>
 import io from 'socket.io-client';
+import Navbar from "../components/User/NavbarUser.vue";
 
 const baseUrl = process.env.NODE_ENV === 'production' ?
     'https://app-779d80a6-6ecb-4f58-8311-7029241cbbd8.cleverapps.io' : 'http://localhost:3001';
 const socket = io(baseUrl);
 export default {
   name: 'ChatMessages',
+  components: {Navbar},
   data() {
     return {
       // Exemple de messages

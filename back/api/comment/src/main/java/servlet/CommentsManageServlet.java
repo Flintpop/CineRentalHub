@@ -17,6 +17,22 @@ public class CommentsManageServlet extends HttpServlet {
   private final Gson gson = new Gson();
 
   @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Integer commentId;
+    try {
+      commentId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+    } catch (IdValidationException | NumberFormatException | IdMissingException e) {
+      return; // Erreur déjà envoyée
+    }
+
+    try {
+      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(Comment.getCommentById(commentId)));
+    } catch (Exception e) {
+      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+    }
+  }
+
+  @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Integer commentId;
     try {
