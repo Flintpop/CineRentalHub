@@ -79,21 +79,6 @@ const connectWithRetry = () => {
 
 db = connectWithRetry();
 
-// const db = mysql.createConnection({
-//     host: 'mariadb',
-//     port: '3306',
-//     user: 'root',
-//     password: 'root',
-//     database: 'cine_rental_hub'
-// });
-//
-// db.connect((err) => {
-//     if (err) {
-//         throw err;
-//     }
-//     console.log('Connecté à la base de données MySQL');
-// });
-//
 const verifyJWTAndRole = (req, res, next) => {
     const openRoutes = [
         {path: '/movies', methods: ['GET']},
@@ -109,6 +94,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/deactivated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
+        {path: '/users', methods: ['GET'], roles: ['admin']},
         {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
         {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['user'], selfOnly: false},
