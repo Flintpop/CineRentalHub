@@ -18,8 +18,8 @@
     </form>
 
   </div>
-  <router-link to="/HomeUser" class="router-link">HomeUser</router-link>
-  <router-link to="/HomeAdmin" class="router-link">HomeAdmin</router-link>
+<!--  <router-link to="/HomeUser" class="router-link">HomeUser</router-link>-->
+<!--  <router-link to="/HomeAdmin" class="router-link">HomeAdmin</router-link>-->
   <Footer/>
 </template>
 

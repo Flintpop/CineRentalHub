@@ -57,15 +57,30 @@ export default {
   },
 
   mounted() {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decoded = jwtDecode(token);
-      if (decoded.role === 'admin') {
-        this.$router.push('/HomeAdmin');
-      } else {
-        this.$router.push('/HomeUser');
+    this.$nextTick(() => {
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log("Vous devez vous connecter pour accéder à cette page");
+        this.$router.push('/Login');
+        return;
       }
-    }
+
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.role === 'admin') {
+          console.log("Bienvenue dans l'espace administrateur");
+          this.$router.push('/HomeAdmin');
+        } else {
+          console.log("Bienvenue dans l'espace utilisateur");
+          this.$router.push('/HomeUser');
+        }
+      } catch (error) {
+        console.error("Erreur lors de la décodage du token: ", error);
+        localStorage.removeItem('token');
+        this.$router.push('/Login');
+      }
+    });
     // Simuler la récupération de données
     this.fetchMovies();
   },

@@ -31,6 +31,7 @@ import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import ListMovies from "../../components/Core/ListMovies.vue";
 import MovieDetail from "../../components/Core/MovieDetail.vue";
+import {jwtDecode} from "jwt-decode";
 
 export default {
   name: 'homeAdmin',
@@ -46,7 +47,30 @@ export default {
   },
 
   mounted() {
-    // Simuler la récupération de données
+    this.$nextTick(() => {
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.log("Vous devez vous connecter pour accéder à cette page");
+        this.$router.push('/Login');
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.role === 'admin') {
+          console.log("Bienvenue dans l'espace administrateur");
+          this.$router.push('/HomeAdmin');
+        } else {
+          console.log("Bienvenue dans l'espace utilisateur");
+          this.$router.push('/HomeUser');
+        }
+      } catch (error) {
+        console.error("Erreur lors de la décodage du token: ", error);
+        localStorage.removeItem('token');
+        this.$router.push('/Login');
+      }
+    });
     this.fetchMovies();
   },
 
