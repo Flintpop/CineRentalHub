@@ -10,14 +10,6 @@
         <p>Découvrez | Louez | Partagez</p>
       </section>
 
-      <!-- Section Films -->
-      <section class="films">
-        <h2>Nos Films</h2>
-        <div class="film-list">
-          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>
-        </div>
-      </section>
-
 
       <!-- Section À propos -->
       <section class="about">
@@ -25,6 +17,27 @@
         <p>Nous sommes votre destination ultime pour la location de films en ligne. Parcourez une vaste sélection de
           films, louez vos favoris et partagez vos avis !</p>
       </section>
+
+
+      <!-- Section Films -->
+<!--      <section class="films">-->
+<!--        <h2>Nos Films</h2>-->
+<!--        <div class="film-list">-->
+<!--          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>-->
+<!--        </div>-->
+
+        <section class="films" v-if="showMovieList">
+          <h2>Nos Films</h2>
+          <ListMovies :movies="movies" @movie-detail="handleMovieDetail" @edit-movie="handleEditMovie"></ListMovies>
+        </section>
+      <MovieDetail
+          v-else-if="selectedMovie"
+          :movie="selectedMovie"
+          @close="handleCloseDetails"
+      />
+
+
+
 
       <!-- Section Contact -->
       <section class="contact">
@@ -47,16 +60,21 @@ import axios from "axios";
 import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
 import MovieEditForm from "../../components/Admin/MovieEditForm.vue";
 import {jwtDecode} from "jwt-decode";
+import ListMovies from "../../components/Core/ListMovies.vue";
+import MovieDetail from "../../components/Core/MovieDetail.vue";
+
 
 export default {
   name: 'Home',
   components: {
+    MovieDetail,
+    ListMovies,
     MovieEditForm,
     EditMemberForm,
     Footer,
     Navbar,
     MoviesList,
-    MovieForm
+    MovieForm,
   },
 
   mounted() {
@@ -75,6 +93,46 @@ export default {
   },
 
   methods: {
+    // async fetchMovies() {
+    //   // Simulation de la récupération de données depuis la base de données
+    //   await axios.get("http://localhost:3000/movies")
+    //       .then(async response => {
+    //         this.movies = response.data;
+    //
+    //         this.clicked_added_movie = false;
+    //         this.clicked_modification_movie = false;
+    //       })
+    //       .catch(error => {
+    //         console.log(error);
+    //       });
+    // },
+    // handleEditMovie(movieId) {
+    //   this.selectedMovieId = movieId;
+    //   // Trouver le film par son ID
+    //   const movieToEdit = this.movies.find(movie => movie.id === movieId);
+    //   if (movieToEdit) {
+    //     this.selectedMovie = movieToEdit;
+    //     this.clicked_modification_movie = true;
+    //     this.clicked_added_movie = false;
+    //   } else {
+    //     console.error("Film non trouvé");
+    //     this.selectedMovie = null;
+    //   }
+    // },
+    handleCloseDetails() {
+      this.selectedMovie = null; // Réinitialise le film sélectionné
+      this.showMovieList = true; // Montre la liste des films
+    },
+    handleMovieDetail(movieId) {
+      this.selectedMovieId = movieId;
+      const movieToShow = this.movies.find(movie => movie.id === movieId);
+      if (movieToShow) {
+        this.selectedMovie = movieToShow; // Assigne le film sélectionné
+        this.showMovieList = false; // Cache la liste des films
+      } else {
+        console.error("Film non trouvé");
+      }
+    },
     async fetchMovies() {
       // Simulation de la récupération de données depuis la base de données
       await axios.get("http://localhost:3000/movies")
@@ -109,7 +167,9 @@ export default {
       selectedMovieId: null, // Ajoutez ceci
       selectedMovie: null,
       clicked_added_movie: false,
-      clicked_modification_movie: false
+      clicked_modification_movie: false,
+      showMovieList: true,
+      showMovieDetails: false,
     };
   },
 };

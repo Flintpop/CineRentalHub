@@ -4,7 +4,7 @@
         class="movie-card"
         v-for="movie in movies"
         :key="movie.id"
-        @click="goToMovieDetails(movie.id)"
+        @click="$emit('movie-detail', movie.id)"
     >
       <div class="movie-image-container">
         <img :src="movie.main_image_url" :alt="movie.title" class="movie-image"/>
@@ -15,7 +15,7 @@
               <span class="movie-year">{{ movie.release_date }}</span>
             </div>
             <p class="movie-description">{{ movie.description }}</p>
-            <button class="movie-detail-button" @click.stop="$emit('movie-detail', movie.id)">+ d'information</button>
+            <button class="movie-detail-button">+ d'information</button>
           </div>
         </div>
       </div>
