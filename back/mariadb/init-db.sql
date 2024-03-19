@@ -111,6 +111,7 @@ CREATE TABLE purchases
 
 
 -- Création de la table Commentaires
+DROP TABLE IF EXISTS comments;
 CREATE TABLE IF NOT EXISTS comments
 (
     id           INT AUTO_INCREMENT PRIMARY KEY,
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS comments
     user_id      INT      NOT NULL,
     comment_text TEXT     NOT NULL,
     comment_date DATETIME NOT NULL,
+    image_text   TEXT,
     FOREIGN KEY (movie_id) REFERENCES movies (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
@@ -1051,10 +1053,22 @@ BEGIN
         SELECT * FROM comments WHERE movie_id = id_movie;
     END IF;
 END //
-
 DELIMITER ;
 
 -- CALL get_comments_by_movie_id(1);
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_comment_by_id;
+CREATE PROCEDURE get_comment_by_id(IN id_comment INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = id_comment) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        SELECT * FROM comments WHERE id = id_comment;
+    END IF;
+END //
+
+# CALL get_comment_by_comment_id(1);
 
 -- modifier un commentaire
 DELIMITER //
@@ -1068,3 +1082,33 @@ BEGIN
     END IF;
 END //
 
+-- Ajouter une image à un commentaire
+DELIMITER //
+DROP PROCEDURE IF EXISTS add_image_to_comment;
+CREATE PROCEDURE add_image_to_comment(IN comment_id INT, IN image_base64 TEXT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = comment_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        UPDATE comments SET comments.image_text = image_base64 WHERE id = comment_id;
+    END IF;
+END //
+DELIMITER ;
+
+# CALL add_image_to_comment(1, 'base64imagestring');
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS delete_image_from_comment;
+CREATE PROCEDURE delete_image_from_comment(IN id_comment INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = id_comment) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT image_text FROM comments WHERE id = id_comment AND image_text IS NOT NULL) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'a pas d\'image.';
+    ELSE
+        UPDATE comments SET image_text = NULL WHERE id = id_comment;
+    END IF;
+END //
+DELIMITER ;
+
+# CALL delete_image_from_comment(1);
