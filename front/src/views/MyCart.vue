@@ -28,8 +28,10 @@ export default {
       const token = localStorage.getItem('token');
       try {
         const decoded = jwtDecode(token);
-        return !!decoded && decoded.role === 'user';
-      } catch {
+        return decoded && 'role' in decoded && decoded.role === 'user';
+
+      } catch (error) {
+        console.error('Erreur lors du décodage du token:', error);
         return false;
       }
     },
@@ -76,27 +78,26 @@ export default {
     },
     validateCart() {
       if (this.isUserConnected) {
-        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+        // const userId = localStorage.getItem('userId');
+        // const token = localStorage.getItem('token');
+        //
+        // axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
+        //   headers: {Authorization: `Bearer ${token}`}
+        // }).then(response => {
+        //   // Handle successful validation
+        //   console.log('Cart validated successfully:', response.data);
+        // }).catch(error => {
+        //   // Handle error during validation
+        //   console.error('Error during cart validation:', error);
+        // });
       } else {
-        alert('Veuiilez vous connecter pour valider votre panier');
-        setTimeout(() => {
+        alert('Veuillez vous connecter pour valider votre panier');
+        this.$nextTick(() => {
           this.$router.push('/Login');
-        }, 1000);
+        });
       }
 
 
-      // const userId = localStorage.getItem('userId');
-      // const token = localStorage.getItem('token');
-      //
-      // axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
-      //   headers: {Authorization: `Bearer ${token}`}
-      // }).then(response => {
-      //   // Handle successful validation
-      //   console.log('Cart validated successfully:', response.data);
-      // }).catch(error => {
-      //   // Handle error during validation
-      //   console.error('Error during cart validation:', error);
-      // });
     },
     removeItem(id_item) {
       if (this.isUserConnected) {
@@ -122,32 +123,32 @@ export default {
       }
     },
 
-  clearCart() {
-    if (this.isUserConnected) {
-      const userId = localStorage.getItem('userId');
-      const token = localStorage.getItem('token');
+    clearCart() {
+      if (this.isUserConnected) {
+        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('token');
 
-      axios.delete(`http://localhost:3000/cart/delete/${userId}`, {
-        headers: {Authorization: `Bearer ${token}`}
-      }).then(() => {
+        axios.delete(`http://localhost:3000/cart/delete/${userId}`, {
+          headers: {Authorization: `Bearer ${token}`}
+        }).then(() => {
+          this.moviesCart = [];
+          console.log('Panier vidé avec succès');
+        }).catch(error => {
+          console.error('Erreur lors du vidage du panier:', error);
+        });
+      } else {
+        localStorage.removeItem('cart');
         this.moviesCart = [];
-        console.log('Panier vidé avec succès');
-      }).catch(error => {
-        console.error('Erreur lors du vidage du panier:', error);
-      });
-    } else {
-      localStorage.removeItem('cart');
-      this.moviesCart = [];
-      console.log('Panier vidé.');
-    }
-  },
-  updateRentalDuration({id_item, newRentalDuration}) {
-    if (this.isUserConnected) {
-      // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
-    } else {
-      this.updateRentalDurationLocal(id_item, newRentalDuration);
-    }
-  },
+        console.log('Panier vidé.');
+      }
+    },
+    updateRentalDuration({id_item, newRentalDuration}) {
+      if (this.isUserConnected) {
+        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+      } else {
+        this.updateRentalDurationLocal(id_item, newRentalDuration);
+      }
+    },
     updateRentalDurationLocal(id, newRentalDuration) {
       let cart = JSON.parse(localStorage.getItem('cart')) || [];
       const itemIndex = cart.findIndex(item => item.id === id && item.cart_type === 'rental');
@@ -162,19 +163,19 @@ export default {
     },
 
     useMockData() {
-    // Implémenter la logique pour utiliser des données fictives
-    this.moviesCart = [
-      // {id: 1, movie_id: 1, cart_type: 'rental', rental_duration: 3},
-      // {id: 2, movie_id: 2, cart_type: 'purchase'},
-      // {id: 3, movie_id: 3, cart_type: 'rental', rental_duration: 7},
-    ];
+      this.moviesCart = [
+        // {id: 1, movie_id: 1, cart_type: 'rental', rental_duration: 3},
+        // {id: 2, movie_id: 2, cart_type: 'purchase'},
+        // {id: 3, movie_id: 3, cart_type: 'rental', rental_duration: 7},
+      ];
+    }
   }
-}
-,
-mounted()
-{
-  this.fetchCartItems();
-}
+  ,
+  mounted() {
+    this.fetchCartItems();
+    console.log(this.$router);
+
+  }
 }
 ;
 </script>
@@ -193,41 +194,6 @@ h1 {
   text-align: center;
   color: #333;
   margin-bottom: 20px;
-}
-
-.cart-list {
-  margin-top: 20px;
-}
-
-.movie-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px;
-  margin-bottom: 10px;
-  background: #f7f7f7;
-  border-radius: 5px;
-}
-
-.movie-info {
-  flex: 1;
-}
-
-.movie-title {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-
-.movie-details {
-  margin-top: 5px;
-  font-size: 16px;
-  color: #666;
-}
-
-.action-buttons {
-  display: flex;
-  align-items: center;
 }
 
 button {
