@@ -52,7 +52,7 @@ export default {
             this.loadLocalCart();
           }
         }).catch(error => {
-          console.error('Erreur lors de la récupération des éléments du panier:', error);
+          // console.error('Erreur lors de la récupération des éléments du panier:', error);
           this.loadLocalCart();
         });
       } else {
