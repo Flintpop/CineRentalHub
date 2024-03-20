@@ -41,6 +41,7 @@
           </div>
         </div>
       </div>
+      <CommentList :movie-id="this.movie.id"></CommentList>
     </div>
   </div>
 </template>
@@ -51,10 +52,12 @@ import axios from "axios";
 import {defineComponent} from "vue";
 import {Carousel, Slide, Pagination, Navigation} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
+import CommentList from "./CommentList.vue";
 
 export default defineComponent({
   name: 'MovieDetailsComponent',
   components: {
+    CommentList,
     Carousel,
     Slide,
     Pagination,
@@ -96,30 +99,40 @@ export default defineComponent({
           });
     },
     rentMovie(movieId) {
-      if (this.rentalDuration < 1) {
-        alert("La durée de location doit être d'au moins un jour.");
+      if (this.inYourCart(movieId)) {
+        alert("Ce film est déjà dans votre panier.");
         return;
-      }
-      this.calculatedRentalPrice = this.rentalDuration * this.movie.daily_rental_price;
-
-      // Vérifiez si l'utilisateur est connecté
-      const token = localStorage.getItem('token');
-      if (token) {
-        this.addToCart(movieId, this.rentalDuration, 'rental');
-        console.log(`Le film ${movieId} a été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
       } else {
-        // Stockez le panier en localStorage si l'utilisateur n'est pas connecté
-        this.saveToLocalStorage(movieId, this.rentalDuration, 'rental');
+        if (this.rentalDuration < 1) {
+          alert("La durée de location doit être d'au moins un jour.");
+          return;
+        }
+        this.calculatedRentalPrice = this.rentalDuration * this.movie.daily_rental_price;
+
+        // Vérifiez si l'utilisateur est connecté
+        const token = localStorage.getItem('token');
+        if (token) {
+          this.addToCart(movieId, this.rentalDuration, 'rental');
+          console.log(`Le film ${movieId} a été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
+        } else {
+          // Stockez le panier en localStorage si l'utilisateur n'est pas connecté
+          this.saveToLocalStorage(movieId, this.rentalDuration, 'rental');
+        }
       }
     },
 
     purchaseMovie(movieId) {
-      const token = localStorage.getItem('token');
-      if (token) {
-        this.addToCart(movieId, 1, 'purchase');
-        console.log(`Le film ${movieId} a été ajouté au panier pour achat.`);
+      if (this.inYourCart(movieId)) {
+        alert("Ce film est déjà dans votre panier.");
+        return;
       } else {
-        this.saveToLocalStorage(movieId, 1, 'purchase');
+        const token = localStorage.getItem('token');
+        if (token) {
+          this.addToCart(movieId, 1, 'purchase');
+          console.log(`Le film ${movieId} a été ajouté au panier pour achat.`);
+        } else {
+          this.saveToLocalStorage(movieId, 1, 'purchase');
+        }
       }
     },
 
@@ -137,7 +150,7 @@ export default defineComponent({
         const newItem = {
           id: tempIdCounter, // Utiliser le compteur comme ID temporaire
           movie_id: movieId,
-          rental_duration: type === 'rental' ? rentalDuration : undefined,
+          rental_duration: type === 'rental' ? rentalDuration : 1,
           cart_type: type,
           user_id: null
         };
@@ -147,6 +160,16 @@ export default defineComponent({
         console.log(`Le film ${movieId} (temp ID: ${tempIdCounter}) a été ajouté au panier.`);
       } else {
         console.log(`Le film ${movieId} est déjà présent dans le panier.`);
+      }
+    },
+    inYourCart(movieId) {
+      if (this.isUserConnected) {
+        const userId = localStorage.getItem('userId');
+        const cart = this.moviesCart;
+        return cart.some(item => item.movie_id === movieId && item.user_id === userId);
+      } else {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        return cart.some(item => item.movie_id === movieId);
       }
     },
 

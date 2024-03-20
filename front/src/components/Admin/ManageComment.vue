@@ -4,7 +4,7 @@
     <div v-for="comment in comments" :key="comment.id" class="comment-bubble">
       <div class="comment-container">
         <div class="comment-content">
-          <strong>{{ fetchAuthor(comment.user_id) }}:</strong>
+          <strong>{{ authors[comment.user_id] }} :</strong>
           <div v-if="editingCommentId !== comment.id">
             {{ comment.comment_text }}
           </div>
@@ -42,6 +42,7 @@ export default {
     return {
       editingCommentId: null,
       editingCommentText: null,
+      authors: {},
       comments: [
         {
           id: 1,
@@ -67,21 +68,27 @@ export default {
   },
   methods: {
     fetchComments() {
-      axios.get(`http://localhost:3000/movies/comments/${this.movieId}`)
+      axios.get(`http://localhost:3000/comments/${this.movieId}`)
           .then(response => {
             this.comments = response.data;
+            this.comments.forEach(comment => {
+              if (!this.authors[comment.user_id]) {
+                this.fetchAuthor(comment.user_id);
+              }
+            });
           })
           .catch(error => console.error('Erreur lors de la récupération des commentaires:', error));
     },
-    fetchAuthor(authorId) {
-      axios.get(`http://localhost:3000/users/${authorId}`)
-          .then(response => {
-            return response.data.last_name; // Retourne le nom de l'auteur
-          })
-          .catch(error => console.error('Erreur lors de la récupération de l\'auteur:', error));
+    async fetchAuthor(authorId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/user/${authorId}`);
+        this.authors[authorId] = response.data.last_name; // Mettez à jour l'objet authors ici
+      } catch (error) {
+        console.error('Erreur lors de la récupération de l\'auteur:', error);
+      }
     },
     deleteComment(commentId) {
-      axios.delete(`http://localhost:3000/movies/comments/${commentId}`)
+      axios.delete(`http://localhost:3000/comments/manage/${commentId}`)
           .then(() => {
             console.log('Commentaire supprimé avec succès');
             this.fetchComments(); // Recharger les commentaires pour afficher les modifications
@@ -94,7 +101,7 @@ export default {
         // const id_user = $_SESSION['user_id'];
 
 
-        axios.post(`http://localhost:3000/movies/comments/${this.movieId}`, { user_id:id_user ,comment_text: commentText })
+        axios.post(`http://localhost:3000/comments/${this.movieId}`, {user_id: id_user, comment_text: commentText})
             .then(() => {
               console.log('Commentaire ajouté avec succès');
               this.fetchComments(); // Recharger les commentaires pour afficher les modifications
@@ -107,7 +114,7 @@ export default {
       this.editingCommentText = commentText;
     },
     updateComment(commentId) {
-      axios.put(`http://localhost:3000/movies/comments/${commentId}`, { text: this.editingCommentText })
+      axios.put(`http://localhost:3000/comments/manage/${commentId}`, {text: this.editingCommentText})
           .then(() => {
             console.log('Commentaire modifié avec succès');
             this.fetchComments(); // Recharger les commentaires pour afficher les modifications
@@ -124,6 +131,7 @@ export default {
 .comment-form button {
   padding: 5px 15px;
 }
+
 .comment-form {
   display: flex;
   align-items: center;
@@ -153,6 +161,7 @@ export default {
   margin-bottom: 10px;
   padding: 10px;
 }
+
 .comment-bubble {
   background-color: #f4f4f8;
   border-radius: 15px;
@@ -170,6 +179,7 @@ export default {
   text-align: right;
   color: #888;
 }
+
 .comment-container {
   display: flex;
   justify-content: space-between;

@@ -28,7 +28,7 @@ public class CommentsServlet extends HttpServlet {
     try {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(Comment.getCommentsByMovieId(movie_id)));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 

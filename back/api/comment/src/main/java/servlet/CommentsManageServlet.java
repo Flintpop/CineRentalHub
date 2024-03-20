@@ -28,7 +28,7 @@ public class CommentsManageServlet extends HttpServlet {
     try {
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, gson.toJson(Comment.getCommentById(commentId)));
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 
@@ -45,7 +45,7 @@ public class CommentsManageServlet extends HttpServlet {
       Comment.deleteCommentById(commentId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, "{\"message\":\"Commentaire supprimé.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
   @Override

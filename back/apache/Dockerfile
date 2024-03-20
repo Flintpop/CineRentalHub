@@ -35,4 +35,4 @@ RUN echo 'Include conf/extra/my-proxy.conf' >> /usr/local/apache2/conf/httpd.con
 
 RUN echo 'ServerName localhost' >> /usr/local/apache2/conf/httpd.conf
 
-EXPOSE 80 443
+EXPOSE 443

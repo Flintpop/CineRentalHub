@@ -151,4 +151,23 @@ public class Cart {
       em.close();
     }
   }
+
+  public static void deleteByCartId(Integer cartId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+
+    try {
+      em.getTransaction().begin();
+      // Utiliser la procédure
+      StoredProcedureQuery query = em.createStoredProcedureQuery("delete_cart_by_id")
+              .registerStoredProcedureParameter("cart_id", Integer.class, jakarta.persistence.ParameterMode.IN)
+              .setParameter("cart_id", cartId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
 }

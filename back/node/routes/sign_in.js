@@ -30,7 +30,7 @@ router.post('/sign_in', (req, res) => {
         const hashedPassword = hash.digest('hex');
 
         if (hashedPassword === user.password) {
-            const token = jwt.sign({userId: user.id, role: user.role}, SECRET_KEY, {expiresIn: '2h'});
+            const token = jwt.sign({userId: user.id, role: user.role}, SECRET_KEY, {expiresIn: '24h'});
             res.json({token});
         } else {
             res.status(401).json({error: "Mot de passe incorrect"});

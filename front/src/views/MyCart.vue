@@ -28,10 +28,12 @@ export default {
       const token = localStorage.getItem('token');
       try {
         const decoded = jwtDecode(token);
-        return decoded && 'role' in decoded && decoded.role === 'user';
+        if(decoded && 'role' in decoded && decoded.role === 'user') {
+          return true;
+        }
 
       } catch (error) {
-        console.error('Erreur lors du décodage du token:', error);
+        // console.error('Erreur lors du décodage du token:', error);
         return false;
       }
     },
@@ -42,34 +44,126 @@ export default {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
-      // Si l'utilisateur est connecté, récupérer le panier du serveur
       if (this.isUserConnected) {
+        console.log('Récupération des éléments du panier pour l\'utilisateur', userId);
         axios.get(`http://localhost:3000/cart/${userId}`, {
           headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
-          // Si des éléments existent dans le panier serveur, les utiliser
           if (response.data && response.data.length > 0) {
-            this.moviesCart = response.data;
+            if (localStorage.getItem('cart')) {
+              console.log('Panier local trouvé:', JSON.parse(localStorage.getItem('cart')));
+            }
+            console.log('Éléments du panier récupérés avec succès:', response.data);
+            this.mergeCarts(response.data, JSON.parse(localStorage.getItem('cart') || '[]'));
           } else {
-            // Sinon, utiliser le panier local s'il existe
             this.loadLocalCart();
           }
         }).catch(error => {
-          console.error('Erreur lors de la récupération des éléments du panier:', error);
-          this.loadLocalCart(); // Charger le panier local en cas d'erreur
+          // console.error('Erreur lors de la récupération des éléments du panier:', error);
+          this.loadLocalCart();
         });
       } else {
-        // Si l'utilisateur n'est pas connecté, utiliser le panier local
-        console.log('Utilisateur non connecté. Charger le panier local.');
         this.loadLocalCart();
       }
     },
+    removeFromCart(itemId) {
+      console.log('Suppression de l\'élément du panier avec ID', itemId);
+      if (this.isUserConnected) {
+        console.log('Suppression de l\'élément du panier avec ID', itemId);
+        this.removeItemFromServer(itemId);
+      } else {
+        this.removeItemLocal(itemId);
+      }
+    },
+    mergeCarts(serverCart, localCart) {
+      const mergedCart = [...serverCart];
+
+      localCart.forEach(localItem => {
+        const serverItem = mergedCart.find(item => item.movie_id === localItem.movie_id);
+        if (!serverItem) {
+          // Si l'élément n'existe pas dans le panier du serveur, l'ajouter
+          this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+        } else {
+          // Si l'élément existe dans le panier du serveur, comparer les détails
+          if (localItem.cart_type !== serverItem.cart_type) {
+            // Si les types sont différents, supprimer l'élément du serveur et l'ajouter localement
+            this.removeItemFromServer(serverItem.id).then(() => {
+              this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+            });
+          } else if (localItem.cart_type === 'rental' && localItem.rental_duration > serverItem.rental_duration) {
+            // Si c'est une location et la durée est plus longue, supprimer l'élément du serveur et l'ajouter localement
+            this.removeItemFromServer(serverItem.id).then(() => {
+              this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+            });
+          }
+          // Si les types sont les mêmes et c'est un achat, ne rien faire
+          // Si les types sont les mêmes et c'est une location et la durée est la même, ne rien faire
+        }
+      });
+
+      this.moviesCart = mergedCart;
+      this.clearLocalCart(); // Supprimer le panier local après la synchronisation
+    },
+
+    clearLocalCart() {
+      localStorage.removeItem('cart');
+      console.log('Panier local supprimé.');
+    },
+
+    addToCart(movieId, rentalDuration, type) {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
+
+      // Créez un objet contenant les données à envoyer à l'API
+      const requestData = {
+        cart_type: type,
+        user_id: userId,
+        movie_id: parseInt(movieId), // Assurez-vous que movieId est un nombre
+        rental_duration: parseInt(rentalDuration), // Assurez-vous que rentalDuration est un nombre
+      };
+      //affichage de la
+      axios.post('http://localhost:3000/cart', requestData, {headers})
+          .then(response => {
+            console.log('Success:', response.data);
+            this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            console.log('response', error.response.data);
+          });
+    },
+
+    removeItemFromServer(itemId) {
+      const token = localStorage.getItem('token');
+      const headers = {'Authorization': `Bearer ${token}`};
+      console.log('Suppression de l\'élément du panier sur le serveur avec ID', itemId);
+      return axios.delete(`http://localhost:3000/cart/${itemId}`, { headers });
+    },
+
+    // updateCartItem(movieId, rentalDuration) {
+    //   const userId = localStorage.getItem('userId');
+    //   const token = localStorage.getItem('token');
+    //   const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
+    //
+    //   axios.put(`http://localhost:3000/cart/${userId}/${movieId}`, {
+    //     rental_duration: rentalDuration,
+    //   }, {headers}).then(response => {
+    //     console.log('Success:', response.data);
+    //     this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
+    //   }).catch(error => {
+    //     console.error('Error:', error);
+    //   });
+    // },
+
+
     loadLocalCart() {
       // Charger le panier à partir de localStorage
       console.log(localStorage.getItem('cart'))
       const localCart = localStorage.getItem('cart');
       if (localCart) {
         this.moviesCart = JSON.parse(localCart);
+        console.log('Panier local chargé:', this.moviesCart);
       } else {
         // S'il n'y a pas de panier dans localStorage, utilisez des données fictives ou laissez le panier vide
         this.useMockData();
@@ -101,8 +195,14 @@ export default {
     },
     removeItem(id_item) {
       if (this.isUserConnected) {
-        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+        this.removeItemFromServer(id_item).then(() => {
+          console.log('Suppression de l\'élément du panier avec ID', id_item);
+          this.fetchCartItems();
+        }).catch(error => {
+          console.error('Erreur lors de la suppression de l\'élément du panier:', error);
+        });
       } else {
+        console.log('Suppression de l\'élément du panier avec ID', id_item);
         this.removeItemLocal(id_item);
       }
     },

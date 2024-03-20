@@ -30,9 +30,12 @@ export default {
       };
 
       const userId = localStorage.getItem('userId');
-      axios.get(`http://localhost:3000/movies/rentals/${userId}`, {headers})
+      //cast de l'id en int
+      const idUser = parseInt(userId);
+      axios.get(`http://localhost:3000/movies/rentals/${idUser}`, {headers})
           .then(response => {
             this.rentMovies = response.data;
+            console.log("films loués :",this.rentMovies);
           })
           .catch(error => {
             console.error('Error:', error);
@@ -46,9 +49,11 @@ export default {
       };
 
       const userId = localStorage.getItem('userId');
+      console.log("utilisateur Id :",userId);
       axios.get(`http://localhost:3000/movies/purchases/${userId}`, {headers})
           .then(response => {
             this.buyMovies = response.data;
+            console.log("films achetés :",this.buyMovies);
           })
           .catch(error => {
             console.error('Error:', error);

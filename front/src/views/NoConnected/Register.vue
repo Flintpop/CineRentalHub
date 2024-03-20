@@ -1,37 +1,38 @@
 <template>
-  <Navbar />
+  <Navbar/>
   <div class="register-container">
-
     <h1>Inscription</h1>
-    <form @submit.prevent="login">
+    <form @submit.prevent="register">
       <div class="form-group">
         <label for="lastName">Nom:</label>
-        <input type="text" id="lastName" v-model="user.lastName" required>
+        <input type="text" id="lastName" v-model="user.lastName" placeholder="Entrez votre nom" required>
       </div>
       <div class="form-group">
         <label for="firstName">Prénom:</label>
-        <input type="text" id="firstName" v-model="user.firstName" required>
+        <input type="text" id="firstName" v-model="user.firstName" placeholder="Entrez votre prénom" required>
       </div>
       <div class="form-group">
         <label for="email">E-mail:</label>
-        <input type="email" id="email" v-model="user.email" required>
+        <input type="email" id="email" v-model="user.email" placeholder="Entrez votre e-mail" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
       </div>
       <div class="form-group">
         <label for="password">Mot de passe:</label>
-        <input type="password" id="password" v-model="user.password" required>
+        <input type="password" id="password" v-model="user.password" placeholder="Créez un mot de passe" required>
       </div>
       <div class="form-group">
         <label for="confirmPassword">Confirmation de Mot de passe:</label>
-        <input type="confirmPassword" id="confirmPassword" v-model="user.confirmPassword" required>
+        <input type="password" id="confirmPassword" v-model="user.confirmPassword" placeholder="Confirmez votre mot de passe" required>
       </div>
       <button type="submit">S'inscrire</button>
     </form>
   </div>
-  <Footer />
+  <Footer/>
 </template>
 <script>
 import Navbar from "../../components/NoConnected/Navbar.vue";
 import Footer from "../../components/Core/Footer.vue";
+import axios from 'axios';
+
 
 export default {
   name: 'Login',
@@ -47,16 +48,46 @@ export default {
         email: '',
         password: '',
         confirmPassword: '',
-        role:'user'
+        role: 'user'
       },
+      emailRegex: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      passwordRegex: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/
     };
   },
   methods: {
-    login() {
-      // Logique de connexion sera ajoutée plus tard
-      alert('Logique de connexion à implémenter.');
-    },
-  },
+      register() {
+        if (!this.emailRegex.test(this.user.email)) {
+          alert('Veuillez entrer une adresse e-mail valide.');
+          return;
+        }
+        if (!this.passwordRegex.test(this.user.password)) {
+          alert('Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule, une lettre minuscule et un chiffre.');
+          return;
+        }
+        if (this.user.password !== this.user.confirmPassword) {
+          alert('Les mots de passe ne correspondent pas.');
+          return;
+        }
+        axios.post('http://localhost:3000/user', {
+          last_name: this.user.lastName,
+          first_name: this.user.firstName,
+          email: this.user.email,
+          state: 'active',
+          password: this.user.password,
+          role: 'user'
+        })
+            .then(response => {
+              console.log('Inscription réussie:', response.data);
+              this.$router.push('/login');
+
+            })
+            .catch(error => {
+              console.error('Erreur lors de l\'inscription:', error);
+            });
+
+      }
+    }
+
 };
 </script>
 

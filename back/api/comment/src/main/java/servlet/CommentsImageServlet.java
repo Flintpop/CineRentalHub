@@ -2,6 +2,8 @@ package servlet;
 
 import com.google.gson.Gson;
 import dto.CommentImagePostDTO;
+import exceptions.IdMissingException;
+import exceptions.IdValidationException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,8 +32,14 @@ public class CommentsImageServlet extends HttpServlet {
 
   @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Integer commentId;
     try {
-      Integer commentId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+      commentId = ServletUtils.extractAndValidateId(request.getPathInfo(), response, true);
+    } catch (IdValidationException | NumberFormatException | IdMissingException e) {
+      return; // Erreur déjà envoyée
+    }
+
+    try {
       Comment.deleteImageFromComment(commentId);
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_CREATED, gson.toJson("{ \"message\": \"Image supprimée.\"}"));
     } catch (Exception e) {

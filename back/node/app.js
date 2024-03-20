@@ -3,7 +3,7 @@ const cors = require('cors');
 const { startChatServer } = require('./features/chatServer'); // Ajustez le chemin selon votre structure de projet
 const verifyJWTAndRole = require('./middleware/authMiddleware');
 const authRoutes = require('./routes/sign_in');
-const setupProxies = require('./config/proxyConfig'); // Assurez-vous que le chemin d'accès est correct
+const setupProxies = require('./middleware/proxyConfig'); // Assurez-vous que le chemin d'accès est correct
 
 const app = express();
 const PORT = 3000;
