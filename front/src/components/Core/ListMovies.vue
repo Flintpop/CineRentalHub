@@ -4,7 +4,7 @@
         class="movie-card"
         v-for="movie in movies"
         :key="movie.id"
-        @click="$emit('movie-detail', movie.id)"
+        @click="goToMovieDetails(movie.id)"
     >
       <div class="movie-image-container">
         <img :src="movie.main_image_url" :alt="movie.title" class="movie-image"/>
@@ -36,7 +36,7 @@ export default {
     // Surveiller les changements sur la prop 'movies'
     movies: {
       immediate: true, // Exécuter la fonction dès l'initialisation du composant
-      handler: "fetchMainImages", // Nom de la méthode à exécuter
+      handler: "fetchMainImages", // Appeler la méthode fetchMainImages lorsqu'il y a des changements
     }
   },
   methods: {
@@ -46,28 +46,44 @@ export default {
         return;
       }
 
-      await Promise.all(this.movies.map((movie, i) => {
+      const moviesCopy = this.movies.map(movie => ({...movie})); // Créer une copie profonde
+
+      await Promise.all(moviesCopy.map((movie, i) => {
         return axios.get(`http://localhost:3000/movies/main_image/${movie.id}`)
             .then(response => {
-              this.movies[i].main_image_url = response.data.image_url;
+              moviesCopy[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
               console.error("Error fetching image:", error);
-              this.movies[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
+              moviesCopy[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
             });
       }));
+
+      this.movies = moviesCopy; // Mettre à jour this.movies une fois toutes les modifications effectuées
     },
+
     useFictiveData() {
       this.movies = [
-        { id: 1, title: "Film fictif 1", main_image_url: "path/to/default/image1.jpg", description: "Description du film fictif 1", release_date: "2023" },
-        { id: 2, title: "Film fictif 2", main_image_url: "path/to/default/image2.jpg", description: "Description du film fictif 2", release_date: "2023" },
+        {
+          id: 1,
+          title: "Film fictif 1",
+          main_image_url: "path/to/default/image1.jpg",
+          description: "Description du film fictif 1",
+          release_date: "2023"
+        },
+        {
+          id: 2,
+          title: "Film fictif 2",
+          main_image_url: "path/to/default/image2.jpg",
+          description: "Description du film fictif 2",
+          release_date: "2023"
+        },
         // Ajoutez plus de films fictifs si nécessaire
       ];
     },
     goToMovieDetails(movieId) {
-      // Utilisez Vue Router pour naviguer programmatically
-      $emit('movie-detail', movieId)
-    }
+      this.$emit('movie-detail', movieId);  // Émettre un événement ici
+    },
   }
 }
 </script>
@@ -86,7 +102,6 @@ export default {
   overflow: hidden;
   position: relative;
   cursor: pointer;
-  transition: all 0.3s ease;
   background-color: #000; /* Fond noir pour les images avec des formats différents */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -129,28 +144,16 @@ export default {
   opacity: 1;
   visibility: visible;
 }
-.movie-card:hover .movie-details-content{
-transform: translateY(0);
+
+.movie-card:hover .movie-details-content {
+  transform: translateY(0);
 }
-.movie-card:hover  {
+
+.movie-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
 }
 
-.movie-details-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px;
-}
-
-.movie-icon {
-  /* Icônes pour l'achat et la location */
-  background: rgba(255, 255, 255, 0.8);
-  padding: 5px;
-  border-radius: 50%;
-  font-size: 24px; /* Ajustez la taille au besoin */
-  margin-left: 5px;
-}
 
 .movie-details-content {
   padding: 10px;
@@ -187,15 +190,16 @@ transform: translateY(0);
   border-radius: 4px;
   margin-top: 10px;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
+
 .movie-card:hover .movie-detail-button {
   opacity: 1;
 }
 
-.movie-card:hover .movie-edit-button {
+.movie-card:hover {
   display: block;
 }
 
