@@ -29,7 +29,7 @@
       <button v-if="moviesCart.length" @click="validateCart" class="validate-cart-btn">Valider le panier</button>
       <button v-if="moviesCart.length" @click="clearCart" class="clear-cart-btn">Vider le panier</button>
     </div>
-    <div v-else>
+    <div v-else class="empty-cart-message">
       <p>Votre panier est vide.</p>
     </div>
   </div>
