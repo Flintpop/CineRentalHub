@@ -75,8 +75,8 @@ export default {
     updateRentalDuration(movie) {
       if (this.newRentalDuration && this.newRentalDuration > 0) {
         this.$emit('updateRentalDuration', {
-          movieId: movie.id,
-          newRentalDuration: parseInt(this.newRentalDuration, 10) // Convertir en nombre
+          id_item: movie.id, // Assurez-vous que c'est le bon identifiant
+          newRentalDuration: parseInt(this.newRentalDuration, 10)
         });
         this.editingMovieId = null;
         this.newRentalDuration = '';

@@ -131,27 +131,27 @@ export default {
       console.log('Panier vidé.');
     }
   },
-  updateRentalDuration({movieId, newRentalDuration}) {
+  updateRentalDuration({id_item, newRentalDuration}) {
     if (this.isUserConnected) {
-      const movieIndex = this.moviesCart.findIndex(movie => movie.id === movieId);
-      if (movieIndex !== -1) {
-        this.moviesCart[movieIndex].rental_duration = newRentalDuration;
-        // Ici, vous pouvez ajouter la logique pour mettre à jour le panier sur le serveur
-      }
+      // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
     } else {
-      this.updateRentalDurationLocal({movieId, newRentalDuration});
+      this.updateRentalDurationLocal(id_item, newRentalDuration);
     }
   },
-  updateRentalDurationLocal({movieId, newRentalDuration}) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const movieIndex = cart.findIndex(item => item.movie_id === movieId && item.cart_type === 'rental');
-    if (movieIndex !== -1) {
-      cart[movieIndex].rental_duration = newRentalDuration;
-      localStorage.setItem('cart', JSON.stringify(cart));
-      console.log(`Durée de location mise à jour pour le film ${movieId} à ${newRentalDuration} jours.`);
-    }
-  },
-  useMockData() {
+    updateRentalDurationLocal(id, newRentalDuration) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const itemIndex = cart.findIndex(item => item.id === id && item.cart_type === 'rental');
+      if (itemIndex !== -1) {
+        cart[itemIndex].rental_duration = newRentalDuration;
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log(`Durée de location mise à jour pour l'article avec ID ${id} à ${newRentalDuration} jours.`);
+        this.fetchCartItems();
+      } else {
+        console.log(`Aucun article avec l'ID ${id} trouvé dans le panier.`);
+      }
+    },
+
+    useMockData() {
     // Implémenter la logique pour utiliser des données fictives
     this.moviesCart = [
       // {id: 1, movie_id: 1, cart_type: 'rental', rental_duration: 3},
