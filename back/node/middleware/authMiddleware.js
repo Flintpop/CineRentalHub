@@ -10,7 +10,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/images/[^/]+/?', methods: ['GET']},
         {path: '/movies/main_image/[^/]+/?', methods: ['GET']},
         {path: '/sign_in', methods: ['POST']},
-        {path : '/user', methods : ['POST']},
+        {path: '/user', methods: ['POST']},
     ];
 
     const protectedRoutes = [
@@ -20,11 +20,11 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/images/[^/]+/?', methods: ['POST', 'DELETE'], roles: ['admin']},
         {path: '/movies/main_image/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
-        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user'], selfOnly: false},
-        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user'], selfOnly: false},
+        {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['user'], selfOnly: false},
+        {path: '/movies/purchases/[^/]+?', methods: ['GET'], roles: ['user'], selfOnly: false},
 
-        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['admin']},
-        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['admin']},
+        {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['admin']},
+        {path: '/movies/purchases/[^/]+?', methods: ['GET'], roles: ['admin']},
 
         {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
         {path: '/user/[^/]+/?', methods: ['PUT'], roles: ['user'], selfOnly: false},
@@ -44,8 +44,8 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/cart/delete/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
         {path: '/cart/validate/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
 
-        {path: '/stats' ,methods : ['GET', 'POST'], roles: ['user'], selfOnly: false},
-        {path: '/stats/[^/]+?' ,methods : ['POST'], roles: ['user'], selfOnly: false},
+        {path: '/stats', methods: ['GET', 'POST'], roles: ['user'], selfOnly: false},
+        {path: '/stats/[^/]+?', methods: ['POST'], roles: ['user'], selfOnly: false},
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
@@ -86,23 +86,25 @@ const verifyJWTAndRole = (req, res, next) => {
                 const userIdFromURL = urlParts[urlParts.length - 1]; // Supposer que l'ID utilisateur est le dernier segment
                 isUserAllowed = decoded.userId === userIdFromURL; // Vérifier si l'ID utilisateur du token correspond à l'ID dans l'URL
             }
-            if (!isUserAllowed) {
-                reasonOfError = "Action non autorisée sur la ressource";
-            }
-            if (!matchPath) {
-                reasonOfError = "Route invalide";
+
+            let isValid = matchPath && methodAllowed && roleAllowed && isUserAllowed;
+            if (!isValid) {
+                reasonOfError = {
+                    message: "Vous n'avez pas les droits nécessaires pour accéder à cette ressource. Voici ce que vous avez envoyé :",
+                    details: {
+                        Path: reqPath,
+                        Method: reqMethod,
+                        Role: decoded.role,
+                        UserID: decoded.userId,
+                    }
+                };
             }
 
-            if (!methodAllowed) {
-                reasonOfError = "Méthode non autorisée, " + reqMethod + " n'est pas autorisé pour un usage autre que le votre (user qui veut modifier un autre user par exemple)";
-            }
-
-
-            return matchPath && methodAllowed && roleAllowed && isUserAllowed;
+            return isValid;
         });
 
         if (!isProtectedRoute) {
-            return res.status(403).json({error: "Accès refusé, " + reasonOfError});
+            return res.status(403).json({error: "Accès refusé", details: reasonOfError});
         }
 
         next();
