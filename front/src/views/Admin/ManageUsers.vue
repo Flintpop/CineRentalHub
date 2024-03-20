@@ -54,7 +54,7 @@
 import NavbarAdmin from '../../components/Admin/NavbarAdmin.vue';
 import Footer from '../../components/Core/Footer.vue';
 import axios from 'axios';
-import UserEditForm from "../../components/Admin/UserEditForm.vue";
+import UserEditForm from "../../components/Core/UserEditForm.vue";
 import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
 import CreateUserForm from "../../components/Admin/CreateUserForm.vue";
 
