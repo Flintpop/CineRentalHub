@@ -1,33 +1,37 @@
 <template>
   <div>
-    <section v-if="rentMovies.length" class="role-section">
-      <h1 class="role-title">Films à louer</h1>
-      <div class="movie-card" v-for="movie in rentMovies" :key="movie.id">
-        <div class="movie-info">
-          <h3>ID du film : {{ movie.movie_id }}</h3>
-          <p>Durée de location : {{ movie.rental_duration }} jours</p>
-          <div class="movie-actions">
-            <button @click.stop="removeFromCart(movie.id)">Supprimer</button>
+    <div v-if="moviesCart.length">
+
+      <div v-if="rentalMovies.length">
+        <h2>Films à louer</h2>
+        <div v-for="movie in rentalMovies" :key="movie.id" class="cart-item">
+          <p>Film ID: {{ movie.movie_id }}</p>
+          <p>Durée de location: {{ movie.rental_duration }} jours</p>
+          <button @click="removeFromCart(movie.id)">Supprimer</button>
+          <button v-if="editingMovieId !== movie.id" class="edit-btn" @click="editRentalDuration(movie)">Modifier la durée</button>
+          <!-- Champ pour saisir la nouvelle durée si le film est en mode d'édition -->
+          <div v-if="editingMovieId === movie.id">
+            <input type="number" v-model="newRentalDuration" min="1">
+            <button @click="updateRentalDuration(movie)">Valider</button>
+            <button @click="cancelEdit">Annuler</button>
           </div>
         </div>
       </div>
-    </section>
 
-    <p v-else>Aucun film à louer dans le panier.</p>
-
-    <section v-if="buyMovies.length" class="role-section">
-      <h1 class="role-title">Films à acheter</h1>
-      <div class="movie-card" v-for="movie in buyMovies" :key="movie.id">
-        <div class="movie-info">
-          <h3>ID du film : {{ movie.movie_id }}</h3>
-          <div class="movie-actions">
-            <button @click.stop="removeFromCart(movie.id)">Supprimer</button>
-          </div>
+      <div v-if="purchaseMovies.length">
+        <h2>Films à acheter</h2>
+        <div v-for="movie in purchaseMovies" :key="movie.id" class="cart-item">
+          <p>Film ID: {{ movie.movie_id }}</p>
+          <button @click="removeFromCart(movie.id)">Supprimer</button>
         </div>
       </div>
-    </section>
 
-    <p v-else>Aucun film à acheter dans le panier.</p>
+      <button v-if="moviesCart.length" @click="validateCart" class="validate-cart-btn">Valider le panier</button>
+      <button v-if="moviesCart.length" @click="clearCart" class="clear-cart-btn">Vider le panier</button>
+    </div>
+    <div v-else>
+      <p>Votre panier est vide.</p>
+    </div>
   </div>
 </template>
 
@@ -37,68 +41,124 @@ export default {
   props: {
     moviesCart: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
   },
   data() {
     return {
-      rentMovies: [],
-      buyMovies: []
+      editingMovieId: null,
+      newRentalDuration: '',
     };
   },
+  computed: {
+    rentalMovies() {
+      return this.moviesCart.filter(movie => movie.cart_type === 'rental');
+    },
+    purchaseMovies() {
+      return this.moviesCart.filter(movie => movie.cart_type === 'purchase');
+    },
+  },
   methods: {
-    removeFromCart(movieId) {
-      this.$emit('remove-from-cart', movieId);
-    }
-  },
-  watch: {
-    moviesCart: {
-      immediate: true,
-      handler(newVal) {
-        if (newVal) {
-          this.rentMovies = newVal.filter(movie => movie.cart_type === 'rental');
-          this.buyMovies = newVal.filter(movie => movie.cart_type === 'purchase');
-        }
+    removeFromCart(itemId) {
+      this.$emit('removeFromCart', itemId);
+    },
+    validateCart() {
+      this.$emit('validateCart');
+    },
+    clearCart() {
+      this.$emit('clearCart');
+    },
+    editRentalDuration(movie) {
+      this.editingMovieId = movie.id;
+      this.newRentalDuration = movie.rental_duration.toString(); // Convertir en chaîne pour le champ input
+    },
+    updateRentalDuration(movie) {
+      if (this.newRentalDuration && this.newRentalDuration > 0) {
+        this.$emit('updateRentalDuration', {
+          movieId: movie.id,
+          newRentalDuration: parseInt(this.newRentalDuration, 10) // Convertir en nombre
+        });
+        this.editingMovieId = null;
+        this.newRentalDuration = '';
       }
-    }
+    },
+    cancelEdit() {
+      this.editingMovieId = null;
+      this.newRentalDuration = '';
+    },
   },
-  mounted() {
-    this.rentMovies = this.moviesCart.filter(movie => movie.cart_type === 'rental');
-    this.buyMovies = this.moviesCart.filter(movie => movie.cart_type === 'purchase');
-    console.log('rentMovies:', this.rentMovies);
-    console.log('buyMovies:', this.buyMovies);
-  }
 };
 </script>
 
 <style scoped>
-.role-section {
+h2 {
+  color: #333;
   margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
 }
 
-.role-title {
-  margin-bottom: 10px;
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.movie-card {
-  background: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
+.cart-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-.movie-info h3 {
+.cart-item p {
   margin: 0;
+  color: #333;
   font-size: 16px;
 }
 
-.movie-actions {
-  margin-top: 10px;
+button {
+  cursor: pointer;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
-.movie-actions button {
-  margin-right: 10px;
-  padding: 5px 10px;
-  cursor: pointer;
+.validate-cart-btn, .clear-cart-btn {
+  width: 100%;
+  color: white;
+  margin-top: 20px;
+}
+
+.validate-cart-btn {
+  background-color: #2ecc71;
+}
+
+.validate-cart-btn:hover {
+  background-color: #27ae60;
+}
+
+.clear-cart-btn {
+  background-color: #e74c3c;
+}
+
+.clear-cart-btn:hover {
+  background-color: #c0392b;
+}
+
+.empty-cart-message {
+  text-align: center;
+  color: #777;
+  font-size: 18px;
+  margin-top: 20px;
 }
 </style>
+
+
