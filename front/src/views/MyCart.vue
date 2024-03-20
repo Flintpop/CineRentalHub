@@ -1,64 +1,119 @@
 <template>
-  <NavbarUser/>
+  <NavbarUser v-if="isUserConnected"/>
+  <Navbar v-else/>
   <div class="main-content">
     <h1>Mon Panier</h1>
-    <CartList :moviesCart="moviesCart" @updateRentalDuration="updateRentalDuration" />
+    <CartList :moviesCart="moviesCart" @updateRentalDuration="updateRentalDuration" @removeFromCart="removeItem"
+              @validateCart="validateCart" @clearCart="clearCart"/>
   </div>
 </template>
 
 <script>
 import NavbarUser from "../components/User/NavbarUser.vue";
 import CartList from "../components/Core/CartList.vue";
+import Navbar from "../components/NoConnected/Navbar.vue";
 import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
 export default {
   name: 'MyCart',
-  components: {NavbarUser, CartList},
+  components: {NavbarUser, CartList, Navbar},
   data() {
     return {
       moviesCart: [], // Fusionner les éléments de location et d'achat dans une seule liste
     };
   },
+  computed: {
+    isUserConnected() {
+      const token = localStorage.getItem('token');
+      try {
+        const decoded = jwtDecode(token);
+        return !!decoded && decoded.role === 'user';
+      } catch {
+        return false;
+      }
+    },
+  },
   methods: {
+
     fetchCartItems() {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
-      axios.get(`http://localhost:3000/cart/${userId}`, {
-        headers: {Authorization: `Bearer ${token}`}
-      }).then(response => {
-        // Vérifier si la réponse contient des éléments du panier
-        if (response.data && response.data.length > 0) {
-          this.moviesCart = response.data;
-        } else {
-          // Utiliser des données fictives si la réponse est vide
-          this.useMockData();
-        }
-      }).catch(error => {
-        console.error('Erreur lors de la récupération des éléments du panier:', error);
-        // Utiliser des données fictives en cas d'erreur
+      // Si l'utilisateur est connecté, récupérer le panier du serveur
+      if (this.isUserConnected) {
+        axios.get(`http://localhost:3000/cart/${userId}`, {
+          headers: {Authorization: `Bearer ${token}`}
+        }).then(response => {
+          // Si des éléments existent dans le panier serveur, les utiliser
+          if (response.data && response.data.length > 0) {
+            this.moviesCart = response.data;
+          } else {
+            // Sinon, utiliser le panier local s'il existe
+            this.loadLocalCart();
+          }
+        }).catch(error => {
+          console.error('Erreur lors de la récupération des éléments du panier:', error);
+          this.loadLocalCart(); // Charger le panier local en cas d'erreur
+        });
+      } else {
+        // Si l'utilisateur n'est pas connecté, utiliser le panier local
+        console.log('Utilisateur non connecté. Charger le panier local.');
+        this.loadLocalCart();
+      }
+    },
+    loadLocalCart() {
+      // Charger le panier à partir de localStorage
+      console.log(localStorage.getItem('cart'))
+      const localCart = localStorage.getItem('cart');
+      if (localCart) {
+        this.moviesCart = JSON.parse(localCart);
+      } else {
+        // S'il n'y a pas de panier dans localStorage, utilisez des données fictives ou laissez le panier vide
         this.useMockData();
-      });
+        console.log('Panier fictif utilisé:', this.moviesCart);
+      }
     },
     validateCart() {
-      const userId = localStorage.getItem('userId');
-      const token = localStorage.getItem('token');
+      // const userId = localStorage.getItem('userId');
+      // const token = localStorage.getItem('token');
+      //
+      // axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
+      //   headers: {Authorization: `Bearer ${token}`}
+      // }).then(response => {
+      //   // Handle successful validation
+      //   console.log('Cart validated successfully:', response.data);
+      // }).catch(error => {
+      //   // Handle error during validation
+      //   console.error('Error during cart validation:', error);
+      // });
+    },
+    removeItem(id_item) {
+      if (this.isUserConnected) {
+        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+      } else {
+        this.removeItemLocal(id_item);
+      }
+    },
+    removeItemLocal(id_item) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-      axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
-        headers: {Authorization: `Bearer ${token}`}
-      }).then(response => {
-        // Handle successful validation
-        console.log('Cart validated successfully:', response.data);
-      }).catch(error => {
-        // Handle error during validation
-        console.error('Error during cart validation:', error);
-      });
+      // Trouver l'index de l'élément avec l'id correspondant
+      const itemIndex = cart.findIndex(item => item.id === id_item);
+
+      // Vérifier si l'élément existe dans le panier
+      if (itemIndex !== -1) {
+        cart.splice(itemIndex, 1); // Supprimer l'élément du tableau
+        localStorage.setItem('cart', JSON.stringify(cart)); // Sauvegarder le nouveau panier
+        console.log(`Film avec l'ID ${id_item} supprimé du panier.`);
+        this.fetchCartItems();
+      } else {
+        console.log(`Aucun film avec l'ID ${id_item} trouvé dans le panier.`);
+      }
     },
-    removeItem(itemId) {
-      console.log('Supprimer l\'élément:', itemId);
-      // Implémenter la logique de suppression ici
-    },
-    clearCart() {
+
+  clearCart() {
+    if (this.isUserConnected) {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
@@ -70,27 +125,48 @@ export default {
       }).catch(error => {
         console.error('Erreur lors du vidage du panier:', error);
       });
-    },
-    updateRentalDuration({ movieId, newRentalDuration }) {
+    } else {
+      localStorage.removeItem('cart');
+      this.moviesCart = [];
+      console.log('Panier vidé.');
+    }
+  },
+  updateRentalDuration({movieId, newRentalDuration}) {
+    if (this.isUserConnected) {
       const movieIndex = this.moviesCart.findIndex(movie => movie.id === movieId);
       if (movieIndex !== -1) {
         this.moviesCart[movieIndex].rental_duration = newRentalDuration;
-        // Mettre à jour via API ici...
+        // Ici, vous pouvez ajouter la logique pour mettre à jour le panier sur le serveur
       }
-    },
-    useMockData() {
-      // Implémenter la logique pour utiliser des données fictives
-      this.moviesCart = [
-        {id: 1, movie_id: 1, cart_type: 'rental', rental_duration: 3},
-        {id: 2, movie_id: 2, cart_type: 'purchase'},
-        {id: 3, movie_id: 3, cart_type: 'rental', rental_duration: 7},
-      ];
+    } else {
+      this.updateRentalDurationLocal({movieId, newRentalDuration});
     }
   },
-  mounted() {
-    this.fetchCartItems();
+  updateRentalDurationLocal({movieId, newRentalDuration}) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const movieIndex = cart.findIndex(item => item.movie_id === movieId && item.cart_type === 'rental');
+    if (movieIndex !== -1) {
+      cart[movieIndex].rental_duration = newRentalDuration;
+      localStorage.setItem('cart', JSON.stringify(cart));
+      console.log(`Durée de location mise à jour pour le film ${movieId} à ${newRentalDuration} jours.`);
+    }
+  },
+  useMockData() {
+    // Implémenter la logique pour utiliser des données fictives
+    this.moviesCart = [
+      // {id: 1, movie_id: 1, cart_type: 'rental', rental_duration: 3},
+      // {id: 2, movie_id: 2, cart_type: 'purchase'},
+      // {id: 3, movie_id: 3, cart_type: 'rental', rental_duration: 7},
+    ];
   }
-};
+}
+,
+mounted()
+{
+  this.fetchCartItems();
+}
+}
+;
 </script>
 
 <style scoped>

@@ -8,12 +8,12 @@
         <div class="details-image-container">
           <Carousel v-if="movieImages.length > 0">
             <Slide v-for="(image, index) in movieImages" :key="index">
-              <img :src="image.image_url" :alt="`Image ${index + 1} pour ${movie.title}`" class="details-image" />
+              <img :src="image.image_url" :alt="`Image ${index + 1} pour ${movie.title}`" class="details-image"/>
             </Slide>
 
             <template #addons>
-              <Navigation />
-              <Pagination />
+              <Navigation/>
+              <Pagination/>
             </template>
           </Carousel>
           <p v-else>Aucune image disponible</p>
@@ -28,7 +28,8 @@
           <div class="details-action-buttons">
             <div class="rental-options">
               <label for="rentalDuration">Durée de location (jours) :</label>
-              <input type="number" v-model.number="rentalDuration" id="rentalDuration" min="1" @input="updateRentalPrice" />
+              <input type="number" v-model.number="rentalDuration" id="rentalDuration" min="1"
+                     @input="updateRentalPrice"/>
             </div>
             <button @click="rentMovie(movie.id)" class="details-action-btn rent-btn">
               Louer - {{ calculatedRentalPrice ? calculatedRentalPrice.toFixed(2) : '0.00' }}€
@@ -45,13 +46,10 @@
 </template>
 
 
-
-
-
 <script>
 import axios from "axios";
 import {defineComponent} from "vue";
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import {Carousel, Slide, Pagination, Navigation} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 
 export default defineComponent({
@@ -76,15 +74,6 @@ export default defineComponent({
     closeDetails() {
       this.$emit('close');
     },
-    rentMovie(movieId) {
-      if (this.rentalDuration < 1) {
-        alert("La durée de location doit être d'au moins un jour.");
-        return;
-      }
-      this.calculatedRentalPrice = this.rentalDuration * this.movie.daily_rental_price;
-      this.addToCart(movieId, this.rentalDuration, 'rental');
-      console.log(`Le film ${movieId} a été mit dans le panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
-    },
     addToCart(movieId, rentalDuration, type) {
       const userId = localStorage.getItem('userId'); //
       const token = localStorage.getItem('token');
@@ -106,10 +95,62 @@ export default defineComponent({
             console.error('Error:', error.response.data);
           });
     },
-    purchaseMovie(movieId) {
-      this.addToCart(movieId, 1, 'purchase');
-      console.log(`Le film ${movieId} a été mit dans le panier pour achat.`);
+    rentMovie(movieId) {
+      if (this.rentalDuration < 1) {
+        alert("La durée de location doit être d'au moins un jour.");
+        return;
+      }
+      this.calculatedRentalPrice = this.rentalDuration * this.movie.daily_rental_price;
+
+      // Vérifiez si l'utilisateur est connecté
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.addToCart(movieId, this.rentalDuration, 'rental');
+        console.log(`Le film ${movieId} a été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
+      } else {
+        // Stockez le panier en localStorage si l'utilisateur n'est pas connecté
+        this.saveToLocalStorage(movieId, this.rentalDuration, 'rental');
+      }
     },
+
+    purchaseMovie(movieId) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.addToCart(movieId, 1, 'purchase');
+        console.log(`Le film ${movieId} a été ajouté au panier pour achat.`);
+      } else {
+        this.saveToLocalStorage(movieId, 1, 'purchase');
+      }
+    },
+
+    saveToLocalStorage(movieId, rentalDuration, type) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let tempIdCounter = parseInt(localStorage.getItem('tempIdCounter'), 10) || 0;
+
+      // Vérifier si l'élément existe déjà dans le panier
+      const itemExists = cart.some(item => item.movie_id === movieId && item.cart_type === type);
+
+      if (!itemExists) {
+        tempIdCounter += 1; // Incrémenter le compteur pour un nouveau ID unique
+        localStorage.setItem('tempIdCounter', tempIdCounter.toString());
+
+        const newItem = {
+          id: tempIdCounter, // Utiliser le compteur comme ID temporaire
+          movie_id: movieId,
+          rental_duration: type === 'rental' ? rentalDuration : undefined,
+          cart_type: type,
+          user_id: null
+        };
+
+        cart.push(newItem);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        console.log(`Le film ${movieId} (temp ID: ${tempIdCounter}) a été ajouté au panier.`);
+      } else {
+        console.log(`Le film ${movieId} est déjà présent dans le panier.`);
+      }
+    },
+
+
     updateRentalPrice() {
       if (this.movie && this.movie.daily_rental_price) {
         this.calculatedRentalPrice = this.rentalDuration * this.movie.daily_rental_price;
@@ -137,8 +178,8 @@ export default defineComponent({
     },
     useFictiveImages() {
       this.movieImages = [
-        { image_url: "https://www.picclickimg.com/QXQAAOSwm2JgR4Qq/Avatar-Affiche-Cinema-Originale-120x160-cm-roulee.webp" },
-        { image_url: "https://business-cool.com/wp-content/uploads/2023/07/raw_62c3e2f1a9694_0.jpeg" },
+        {image_url: "https://www.picclickimg.com/QXQAAOSwm2JgR4Qq/Avatar-Affiche-Cinema-Originale-120x160-cm-roulee.webp"},
+        {image_url: "https://business-cool.com/wp-content/uploads/2023/07/raw_62c3e2f1a9694_0.jpeg"},
         // Ajoutez plus d'images fictives si nécessaire
       ];
     },
@@ -246,6 +287,7 @@ export default defineComponent({
 .details-action-btn:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
+
 /* Style général des composants de saisie */
 .rental-options {
   display: flex;
