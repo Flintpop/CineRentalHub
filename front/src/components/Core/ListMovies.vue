@@ -46,20 +46,17 @@ export default {
         return;
       }
 
-      const moviesCopy = this.movies.map(movie => ({...movie})); // Créer une copie profonde
-
-      await Promise.all(moviesCopy.map((movie, i) => {
+      await Promise.all(this.movies.map((movie, i) => {
         return axios.get(`http://localhost:3000/movies/main_image/${movie.id}`)
             .then(response => {
-              moviesCopy[i].main_image_url = response.data.image_url;
+              this.movies[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
               console.error("Error fetching image:", error);
-              moviesCopy[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
+              this.movies[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
             });
       }));
 
-      this.movies = moviesCopy; // Mettre à jour this.movies une fois toutes les modifications effectuées
     },
 
     useFictiveData() {
