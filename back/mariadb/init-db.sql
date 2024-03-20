@@ -890,6 +890,18 @@ DELIMITER ;
 
 -- CALL remove_from_cart(1);
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS delete_cart_by_id;
+CREATE PROCEDURE delete_cart_by_id(IN cart_id INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM shopping_cart WHERE id = cart_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun article de cet id n\'existe pas dans le panier.';
+    ELSE
+        DELETE FROM shopping_cart WHERE id = cart_id;
+    END IF;
+END //
+
+
 
 DELIMITER //
 DROP PROCEDURE IF EXISTS delete_user_cart;
@@ -936,7 +948,7 @@ BEGIN
     -- Compter les éléments dans le panier de l'utilisateur
     SELECT COUNT(*) INTO cartItemCount FROM shopping_cart WHERE user_id = id_user;
     IF cartItemCount = 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le panier est vide.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun article n\'est dans le panier.';
     END IF;
 
     -- Parcourir les éléments du panier
