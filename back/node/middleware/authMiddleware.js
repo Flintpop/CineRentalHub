@@ -10,6 +10,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/images/[^/]+/?', methods: ['GET']},
         {path: '/movies/main_image/[^/]+/?', methods: ['GET']},
         {path: '/sign_in', methods: ['POST']},
+        {path : '/user', methods : ['POST']},
     ];
 
     const protectedRoutes = [
@@ -17,9 +18,18 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/[^/]+/?', methods: ['PUT'], roles: ['admin']},
         {path: '/movies/deactivated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
-        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user']},
-        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user']},
+        {path: '/movies/images/[^/]+/?', methods: ['POST', 'DELETE'], roles: ['admin']},
+        {path: '/movies/main_image/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
+        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user'], selfOnly: false},
+        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user'], selfOnly: false},
+
+        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['admin']},
+        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['admin']},
+
         {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
+        {path: '/user/[^/]+/?', methods: ['PUT'], roles: ['user'], selfOnly: false},
+        {path: '/user/password/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false},
+
         {path: '/users', methods: ['GET'], roles: ['admin']},
         {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
 
@@ -27,6 +37,12 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user'], selfOnly: false},
         {path: '/comments/image', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/image/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false},
+
+        {path: '/cart', methods: ['POST'], roles: ['user'], selfOnly: false},
+        // TODO: Implementer verification ci-dessous que l'id de l'url par rapport au token, mais que pour le get
+        {path: '/cart/[^/]+/?', methods: ['GET', 'DELETE'], roles: ['user'], selfOnly: false},
+        {path: '/cart/delete/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
+        {path: '/cart/validate/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
