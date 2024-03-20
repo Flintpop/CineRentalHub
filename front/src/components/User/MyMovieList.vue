@@ -1,43 +1,108 @@
 <template>
-  <div>
-    <!-- Section pour les films loués -->
-    <section v-if="filteredRentMovies.length" class="role-section">
-      <h1 class="role-title">Films Loués</h1>
-      <div class="movie-card" v-for="movie in filteredRentMovies" :key="movie.id">
-        <div class="movie-info">
-          <h2>{{ movie.title }}</h2>
-          <p>Prix de location : {{ priceOfRent(movie) }} €</p>
-          <p>Date de location : du {{ movie.rental_date  }} au {{ movie.return_date  }}</p>
+  <div class="main-content">
+    <div class="filter-buttons">
+      <button @click="setFilter('all')">Tous les films</button>
+      <button @click="setFilter('rented')">Films Loués</button>
+      <button @click="setFilter('purchased')">Films Achetés</button>
+      <button v-if="currentFilter === 'all'" @click="toggleExpiredRentals">
+        {{ showExpiredRentals ? 'Masquer' : 'Afficher' }} les locations expirées
+      </button>
+    </div>
+
+    <!-- Section pour tous les films -->
+    <section v-if="currentFilter === 'all'">
+      <h1 class="role-title">Tous les Films</h1>
+      <div v-if="showAllMovies.length">
+        <div class="movie-card" v-for="movie in showAllMovies" :key="movie.id">
+          <div class="movie-info">
+            <h2>{{ movie.title }}</h2>
+            <p v-if="movie.rental_date">
+              <strong>Date de location:</strong> {{ movie.rental_date }}
+            </p>
+            <p v-if="movie.return_date">
+              <strong>Date de retour:</strong> {{ movie.return_date }}
+            </p>
+            <p v-if="movie.daily_rental_price">
+              <strong>Prix de location par jour:</strong> {{ movie.daily_rental_price }} €
+            </p>
+            <p v-if="movie.purchase_price">
+              <strong>Prix d'achat:</strong> {{ movie.purchase_price }} €
+            </p>
+            <p v-if="movie.purchase_date">
+              <strong>Date d'achat:</strong> {{ movie.purchase_date }}
+            </p>
+
+            <button v-if="isMovieAvailable(movie)" @click="viewMovie(movie)">Voir le film</button>
+            <button v-else disabled>Indisponible</button>
+
+
+          </div>
         </div>
       </div>
+      <p v-else>Aucun film disponible.</p>
     </section>
-    <p v-else>Aucun film actuellement loué.</p>
+
+    <!-- Section pour les films loués -->
+    <section v-else-if="currentFilter === 'rented'">
+      <h1 class="role-title">Films Loués</h1>
+      <div v-if="filteredRentMovies.length">
+        <div class="movie-card" v-for="movie in filteredRentMovies" :key="movie.id">
+          <div class="movie-info">
+            <h2>{{ movie.title }}</h2>
+            <p>
+              <strong>Date de location:</strong> {{ movie.rental_date }}
+            </p>
+            <p>
+              <strong>Date de retour:</strong> {{ movie.return_date }}
+            </p>
+            <p>
+              <strong>Prix de location:</strong> {{ priceOfRent(movie) }} €
+            </p>
+
+            <button v-if="isMovieAvailable(movie)" @click="viewMovie(movie)">Voir le film</button>
+            <button v-else disabled>Indisponible</button>
+          </div>
+        </div>
+      </div>
+      <p v-else>Aucun film loué.</p>
+
+    </section>
 
     <!-- Section pour les films achetés -->
-    <section v-if="buyMovies.length" class="role-section">
+    <section v-else-if="currentFilter === 'purchased'">
       <h1 class="role-title">Films Achetés</h1>
-      <div class="movie-card" v-for="movie in buyMovies" :key="movie.id">
-        <div class="movie-info">
-          <h3>{{ movie.title }}</h3>
-          <p>ID du film : {{ movie.id }}</p>
-          <p>Prix d'achat : {{ movie.purchase_price }} €</p>
-          <p>Date d'achat : {{ movie.purchase_date | formatDate }}</p>
+      <div v-if="localBuyMovies.length">
+        <div class="movie-card" v-for="movie in localBuyMovies" :key="movie.id">
+          <div class="movie-info">
+            <h2>{{ movie.title }}</h2>
+            <p>
+              <strong>Prix d'achat:</strong> {{ movie.purchase_price }} €
+            </p>
+            <p>
+              <strong>Date d'achat:</strong> {{ movie.purchase_date }}
+            </p>
+
+            <button  @click="viewMovie(movie)">Voir le film</button>
+          </div>
         </div>
       </div>
+      <p v-else>Aucun film acheté.</p>
     </section>
-    <p v-else>Aucun film acheté.</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'CartList',
   props: {
     rentMovies: Array,
     buyMovies: Array,
   },
   data(){
     return {
+      localRentMovies: this.rentMovies,
+      localBuyMovies: this.buyMovies,
+      currentFilter: 'all',
+      showExpiredRentals: true,
     }
   },
 
@@ -48,23 +113,123 @@ export default {
       const difference = dateDeRetour.getTime() - dateDeLocation.getTime();
       const jours = difference / (1000 * 3600 * 24);
       return jours * movie.daily_rental_price;
+    },
+    setFilter(filter) {
+      this.currentFilter = filter;
+    },
+    toggleExpiredRentals() {
+      this.showExpiredRentals = !this.showExpiredRentals;
+    },
+    viewMovie(movie) {
+      // Implement the logic to view the movie
+      console.log(`Viewing movie: ${movie.title}`);
+    },
+    isMovieAvailable(movie) {
+      if (movie.rental_date) {
+        return this.isRentalAvailable(movie);
+      } else {
+        return true;
+      }
+    },
+    isRentalAvailable(movie) {
+      const currentDate = new Date();
+      const returnDate = new Date(movie.return_date);
+      return returnDate >= currentDate;
     }
 
   },
   computed: {
     filteredRentMovies() {
       const currentDate = new Date();
-      return this.rentMovies.filter(movie => {
+      return this.localRentMovies.filter(movie => {
         const returnDate = new Date(movie.return_date);
         return returnDate >= currentDate;
       });
+    },
+    showAllMovies() {
+      let allMovies = [...this.localRentMovies, ...this.localBuyMovies];
+      if (!this.showExpiredRentals) {
+        allMovies = allMovies.filter(movie => {
+          return this.filteredRentMovies.some(filteredMovie => filteredMovie.id === movie.id);
+        });
+      }
+      return allMovies;
     }
   },
+  created() {
+    if (this.rentMovies.length === 0) {
+      // Use fictitious data for testing
+      this.localRentMovies = [
+        {
+          id: 1,
+          title: 'The Shawshank Redemption',
+          rental_date: '2021-01-01',
+          return_date: '2021-01-15',
+          daily_rental_price: 1.5
+        },
+        {
+          id: 2,
+          title: 'The Godfather',
+          rental_date: '2024-01-01',
+          return_date: '2024-12-15',
+          daily_rental_price: 1.5,
+        },
+      ];
+    }
+    if (this.buyMovies.length === 0) {
+      // Use fictitious data for testing
+      this.localBuyMovies = [
+        {
+          id: 1,
+          title: 'The Shawshank Redemption',
+          purchase_price: 10,
+          purchase_date: '2021-01-01',
+        },
+        {
+          id: 2,
+          title: 'The Godfather',
+          purchase_price: 10,
+          purchase_date: '2024-01-01',
+        },
+      ];
+    }
+  }
 
 };
 </script>
 
 <style scoped>
+.main-content {
+  max-width: 800px;
+  margin: auto;
+}
+
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  margin: 5px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-buttons button:hover {
+  background-color: #0056b3;
+}
+
+.filter-buttons button:active {
+  transform: translateY(2px);
+}
+
 .role-section {
   margin-bottom: 30px;
   padding: 15px;
@@ -76,7 +241,8 @@ export default {
 .role-title {
   color: #333;
   font-size: 24px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .movie-card {
@@ -86,22 +252,56 @@ export default {
   margin-bottom: 10px;
   transition: transform 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .movie-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.movie-info h2, h3 {
-  margin: 0 0 10px 0;
+.movie-info h2 {
+  margin: 0;
   color: #333;
   font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.movie-info h3 {
+  color: #333;
+  font-size: 18px;
+  margin: 10px 0;
+  text-align: center;
 }
 
 .movie-info p {
   color: #666;
   margin: 5px 0;
   font-size: 16px;
+  text-align: center;
+}
+
+.movie-card button {
+  margin-top: 15px;
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.movie-card button:hover {
+  background-color: #218838;
+}
+
+.movie-card button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 </style>
+
