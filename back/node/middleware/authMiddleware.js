@@ -33,7 +33,7 @@ const verifyJWTAndRole = (req, res, next) => {
 
 
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
-        {path: '/comments', methods: ['POST'], roles: ['user'], selfOnly: false},
+        {path: '/comments/[^/]+/?', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user'], selfOnly: false},
         {path: '/comments/image', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/image/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false},
