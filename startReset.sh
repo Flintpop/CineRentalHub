@@ -49,9 +49,8 @@ fi
 
 # Lancez les services définis dans votre docker-compose.yml
 echo "Démarrage des conteneurs Docker..."
-docker-compose build
-
-docker-compose up&
+docker-compose build --no-cache
+docker-compose up --build --force-recreate&
 
 echo "Les conteneurs Docker ont été démarrés."
 # Affichez un lien pour accéder au client web
