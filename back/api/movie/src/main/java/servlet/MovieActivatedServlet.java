@@ -42,10 +42,8 @@ public class MovieActivatedServlet extends HttpServlet {
       Movie.activateMovie(movieId);
 
       ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_OK, "{\"message\":\"Film activé.\"}");
-    } catch (JsonSyntaxException e) {
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, "{\"error\":\"Format de données incorrect.\"}");
     } catch (Exception e) {
-      ServletUtils.sendErrorJsonResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "{\"error\":\"" + e.getMessage() + "\"}");
+      ServletUtils.sendErrorJsonResponseWithTraceback(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e);
     }
   }
 }
