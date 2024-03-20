@@ -52,8 +52,8 @@ export default {
               this.movies[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
-              console.error("Error fetching image:", error);
-              this.movies[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
+              // console.error("Error fetching image:", error);
+              // this.movies[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
             });
       }));
 

@@ -28,10 +28,12 @@ export default {
       const token = localStorage.getItem('token');
       try {
         const decoded = jwtDecode(token);
-        return decoded && 'role' in decoded && decoded.role === 'user';
+        if(decoded && 'role' in decoded && decoded.role === 'user') {
+          return true;
+        }
 
       } catch (error) {
-        console.error('Erreur lors du décodage du token:', error);
+        // console.error('Erreur lors du décodage du token:', error);
         return false;
       }
     },
@@ -43,10 +45,15 @@ export default {
       const token = localStorage.getItem('token');
 
       if (this.isUserConnected) {
+        console.log('Récupération des éléments du panier pour l\'utilisateur', userId);
         axios.get(`http://localhost:3000/cart/${userId}`, {
           headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
           if (response.data && response.data.length > 0) {
+            if (localStorage.getItem('cart')) {
+              console.log('Panier local trouvé:', JSON.parse(localStorage.getItem('cart')));
+            }
+            console.log('Éléments du panier récupérés avec succès:', response.data);
             this.mergeCarts(response.data, JSON.parse(localStorage.getItem('cart') || '[]'));
           } else {
             this.loadLocalCart();
@@ -63,36 +70,92 @@ export default {
       const mergedCart = [...serverCart];
 
       localCart.forEach(localItem => {
-        if (!mergedCart.some(item => item.movie_id === localItem.movie_id)) {
+        const serverItem = mergedCart.find(item => item.movie_id === localItem.movie_id);
+        if (!serverItem) {
+          // Si l'élément n'existe pas dans le panier du serveur, l'ajouter
           this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+        } else {
+          // Si l'élément existe dans le panier du serveur, comparer les détails
+          if (localItem.cart_type !== serverItem.cart_type) {
+            // Si les types sont différents, supprimer l'élément du serveur et l'ajouter localement
+            this.removeItemFromServer(serverItem.id).then(() => {
+              this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+            });
+          } else if (localItem.cart_type === 'rental' && localItem.rental_duration > serverItem.rental_duration) {
+            // Si c'est une location et la durée est plus longue, supprimer l'élément du serveur et l'ajouter localement
+            this.removeItemFromServer(serverItem.id).then(() => {
+              this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+            });
+          }
+          // Si les types sont les mêmes et c'est un achat, ne rien faire
+          // Si les types sont les mêmes et c'est une location et la durée est la même, ne rien faire
         }
       });
 
       this.moviesCart = mergedCart;
+      this.clearLocalCart(); // Supprimer le panier local après la synchronisation
     },
+
+    clearLocalCart() {
+      localStorage.removeItem('cart');
+      console.log('Panier local supprimé.');
+    },
+
     addToCart(movieId, rentalDuration, type) {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
       const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
 
-      axios.post('http://localhost:3000/cart', {
+      // Créez un objet contenant les données à envoyer à l'API
+      const requestData = {
         cart_type: type,
-        movie_id: movieId,
         user_id: userId,
-        rental_duration: rentalDuration,
-      }, {headers}).then(response => {
-        console.log('Success:', response.data);
-        this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
-      }).catch(error => {
-        console.error('Error:', error);
-      });
+        movie_id: parseInt(movieId), // Assurez-vous que movieId est un nombre
+        rental_duration: parseInt(rentalDuration), // Assurez-vous que rentalDuration est un nombre
+      };
+      //affichage de la
+      axios.post('http://localhost:3000/cart', requestData, {headers})
+          .then(response => {
+            console.log('Success:', response.data);
+            this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            console.log('response', error.response.data);
+          });
     },
+
+    removeItemFromServer(itemId) {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      const headers = {'Authorization': `Bearer ${token}`};
+
+      return axios.delete(`http://localhost:3000/cart/${itemId}`, { headers });
+    },
+
+    // updateCartItem(movieId, rentalDuration) {
+    //   const userId = localStorage.getItem('userId');
+    //   const token = localStorage.getItem('token');
+    //   const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
+    //
+    //   axios.put(`http://localhost:3000/cart/${userId}/${movieId}`, {
+    //     rental_duration: rentalDuration,
+    //   }, {headers}).then(response => {
+    //     console.log('Success:', response.data);
+    //     this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
+    //   }).catch(error => {
+    //     console.error('Error:', error);
+    //   });
+    // },
+
+
     loadLocalCart() {
       // Charger le panier à partir de localStorage
       console.log(localStorage.getItem('cart'))
       const localCart = localStorage.getItem('cart');
       if (localCart) {
         this.moviesCart = JSON.parse(localCart);
+        console.log('Panier local chargé:', this.moviesCart);
       } else {
         // S'il n'y a pas de panier dans localStorage, utilisez des données fictives ou laissez le panier vide
         this.useMockData();
