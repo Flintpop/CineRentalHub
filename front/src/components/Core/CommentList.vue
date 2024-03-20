@@ -1,12 +1,34 @@
 <template>
   <div class="commentaires-container">
     <h1>Liste des commentaires</h1>
+    <div v-if="isUserLoggedIn">
+      <textarea v-model="newCommentText" placeholder="Ajoutez un commentaire..."></textarea>
+<!--      <Upload @imageUploaded="setImage"></Upload>-->
+      <button @click="addComment">Ajouter un commentaire</button>
+    </div>
+    <div v-else>
+      <p>Pour ajouter un commentaire, <router-link to="/login">connectez-vous</router-link>.</p>
+    </div>
+
     <div v-if="commentaires.length">
       <div class="commentaire" v-for="commentaire in commentaires" :key="commentaire.id">
         <div class="comment-header">
           <h3>{{ commentaire.user.first_name }}</h3>
         </div>
-        <p class="comment-text">{{ commentaire.comment_text }}</p>
+        <div v-if="editingComment && editingComment.id === commentaire.id">
+          <textarea v-model="editedText" placeholder="Modifiez votre commentaire..."></textarea>
+          <!-- Afficher le bouton d'upload uniquement si aucune image n'est associée au commentaire -->
+          <button v-if="!commentaire.image" @click="uploadImage">Ajouter une image</button>
+          <button @click="confirmEdit">Confirmer</button>
+          <button @click="cancelEdit">Annuler</button>
+        </div>
+        <div v-else>
+          <p class="comment-text">{{ commentaire.comment_text }}</p>
+          <div v-if="commentaire.user.id === userId">
+            <button @click="startEdit(commentaire)">Modifier</button>
+            <button @click="deleteComment(commentaire.id)">Supprimer</button>
+          </div>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -15,8 +37,14 @@
   </div>
 </template>
 
+
 <script>
+import Upload from "../User/Upload.vue";
+
 export default {
+  components: {
+    Upload,
+  },
   name: 'Commentaires',
   props: {
     movieId: {
@@ -27,10 +55,18 @@ export default {
   data() {
     return {
       commentaires: [],
+      newCommentText: '',
+      newCommentImage: null,
+      isUserLoggedIn: false,
+      userId: null,
+      editingComment: null, // L'objet commentaire en cours de modification
+      editedText: '', // Le texte modifié du commentairei
     };
   },
   created() {
     this.fetchCommentaires();
+    this.checkUserLoggedIn();
+    this.userId = parseInt(localStorage.getItem('userId'), 10); // Assurez-vous de stocker l'ID lors de la connexion
   },
   methods: {
     fetchCommentaires() {
@@ -38,7 +74,86 @@ export default {
         this.commentaires = res;
         console.log('Commentaires récupérés avec succès');
       });
-    }
+    },
+    checkUserLoggedIn() {
+      // Vérifiez l'existence d'un token dans localStorage pour déterminer si l'utilisateur est connecté
+      this.isUserLoggedIn = !!localStorage.getItem('token');
+    },
+    addComment() {
+      if (!this.newCommentText.trim()) return;
+
+      // Ici, vous ajouteriez le nouveau commentaire à votre base de données ou serveur backend
+      console.log('Ajout du commentaire:', this.newCommentText, 'Image:', this.newCommentImage);
+
+      const userId = localStorage.getItem('userId');
+      this.$addComment(this.movieId, userId, this.newCommentText)
+
+      const first_name = this.commentaires.find(c => c.user.id === userId).user.first_name;
+      // Après l'ajout, vous pourriez vouloir réinitialiser le champ de texte et rafraîchir la liste des commentaires
+      this.commentaires.push({
+        id: this.commentaires.length + 1,
+        comment_text: this.newCommentText,
+        user: {
+          id: userId,
+          first_name,
+        },
+      });
+      this.newCommentText = '';
+    },
+    setImage(image) {
+      // Supposons que le composant UploadImage émette un événement 'imageUploaded' avec l'image en tant que payload
+      this.newCommentImage = image;
+    },
+    previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.imagePreview = e.target.result;
+          this.imageBase64 = e.target.result.split(',')[1]; // Supprime le préfixe de la data URL
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    startEdit(commentaire) {
+      this.editingComment = commentaire;
+      this.editedText = commentaire.comment_text; // Initialiser avec le texte actuel du commentaire
+    },
+
+    confirmEdit() {
+      console.log("Modification confirmée pour:", this.editingComment.id, "avec le nouveau texte:", this.editedText);
+      // Ici, implémentez la logique pour envoyer la modification au serveur...
+
+      this.$updateComment(this.editingComment.id, this.editedText)
+
+      // Mettez à jour le commentaire dans votre liste de commentaires avec le texte modifié
+      const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
+      if (index !== -1) {
+        this.commentaires[index].comment_text = this.editedText;
+        // Optionnellement, réinitialisez l'état de modification ici
+        this.editingComment = null;
+        this.editedText = '';
+      }
+    },
+
+    cancelEdit() {
+      this.editingComment = null;
+      this.editedText = '';
+    },
+
+    uploadImage() {
+      // Ici, ajoutez la logique pour gérer l'upload d'une nouvelle image
+      alert("Ouvrir le dialogue d'upload d'image");
+    },
+    deleteComment(commentId) {
+      // Logique pour supprimer un commentaire
+      console.log("Supprimer le commentaire", commentId);
+      // Exemple de requête pour supprimer un commentaire (à adapter selon votre backend)
+      this.$deleteComment(commentId).then(() => {
+        // Retirer le commentaire de la liste des commentaires
+        this.commentaires = this.commentaires.filter(c => c.id !== commentId);
+      });
+    },
   }
 }
 </script>
@@ -67,5 +182,29 @@ export default {
   line-height: 1.5;
   color: #555;
   margin-top: 10px;
+}
+textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+p {
+  margin-top: 20px;
 }
 </style>

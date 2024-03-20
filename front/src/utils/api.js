@@ -120,5 +120,41 @@ export default {
                 this.$handleError(error);
             }
         }
+
+        app.config.globalProperties.$addComment = async function (movie_id, user_id, comment_text) {
+            try {
+                const response = await axios.post(`${this.$baseApiUrl}/comments/${movie_id}`, {
+                    movie_id,
+                    user_id,
+                    comment_text,
+                });
+                alert("Commentaire ajouté avec succès !");
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
+
+        app.config.globalProperties.$deleteComment = async function (commentId) {
+            try {
+                const response = await axios.delete(`${this.$baseApiUrl}/comments/manage/${commentId}`);
+                alert("Commentaire supprimé avec succès !");
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
+
+        app.config.globalProperties.$updateComment = async function (commentId, commentText) {
+            try {
+                const response = await axios.put(`${this.$baseApiUrl}/comments/manage/${commentId}`, {
+                    comment_text: commentText,
+                });
+                alert("Commentaire mis à jour avec succès !");
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
     }
 };
