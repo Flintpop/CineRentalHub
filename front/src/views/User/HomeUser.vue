@@ -94,17 +94,57 @@ export default {
       }
     },
     async fetchMovies() {
-      // Simulation de la récupération de données depuis la base de données
       await axios.get("http://localhost:3000/movies")
-          .then(async response => {
-            this.movies = response.data;
-
+          .then(response => {
+            if (response.data && response.data.length > 0) {
+              this.movies = response.data;
+            } else {
+              // Utiliser des données fictives si aucune donnée n'est récupérée
+              this.usefictiveData();
+            }
             this.clicked_added_movie = false;
             this.clicked_modification_movie = false;
           })
           .catch(error => {
-            console.log(error);
+            console.error("Erreur lors de la récupération des films:", error);
+            // Utiliser des données fictives en cas d'erreur
+            this.usefictiveData();
           });
+    },
+    usefictiveData() {
+      // Définir des données fictives pour les films:
+      // private int id;
+      // private byte available;
+      // private String title;
+      // private Date release_date;
+      // private BigDecimal daily_rental_price;
+      // private BigDecimal purchase_price;
+      // private String description;
+      // private String link;
+
+      this.movies = [
+        {
+id: 1,
+          available: 1,
+          title: "Film fictif 1",
+          release_date: "2023-01-01",
+          daily_rental_price: 5.99,
+          purchase_price: 19.99,
+          description: "Description du film fictif 1",
+          link: "https://www.example.com/film1"
+        },
+        {
+          id: 2,
+          available: 1,
+          title: "Film fictif 2",
+          release_date: "2023-01-02",
+          daily_rental_price: 6.99,
+          purchase_price: 21.99,
+          description: "Description du film fictif 2",
+          link: "https://www.example.com/film2"
+        },
+
+      ];
     },
     handleEditMovie(movieId) {
       this.selectedMovieId = movieId;

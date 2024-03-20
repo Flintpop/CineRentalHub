@@ -116,12 +116,31 @@ export default defineComponent({
       }
     },
     fetchMovieImages() {
-      console.log("Fetching images for movie with id", this.movie.id);
+      if (!this.movie || !this.movie.id) {
+        console.log("Movie is undefined or has no ID");
+        this.useFictiveImages();
+        return;
+      }
+
       axios.get(`http://localhost:3000/movies/images/${this.movie.id}`)
           .then(response => {
-            this.movieImages = response.data;
+            if (response.data.length > 0) {
+              this.movieImages = response.data;
+            } else {
+              this.useFictiveImages();
+            }
           })
-          .catch(error => console.error("Erreur lors de la récupération des images :", error));
+          .catch(error => {
+            console.error("Erreur lors de la récupération des images :", error);
+            this.useFictiveImages();
+          });
+    },
+    useFictiveImages() {
+      this.movieImages = [
+        { image_url: "https://www.picclickimg.com/QXQAAOSwm2JgR4Qq/Avatar-Affiche-Cinema-Originale-120x160-cm-roulee.webp" },
+        { image_url: "https://business-cool.com/wp-content/uploads/2023/07/raw_62c3e2f1a9694_0.jpeg" },
+        // Ajoutez plus d'images fictives si nécessaire
+      ];
     },
   },
   watch: {

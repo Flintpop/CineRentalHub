@@ -42,21 +42,27 @@ export default {
   methods: {
     async fetchMainImages() {
       if (!this.movies || this.movies.length === 0) {
-        console.log("Movies is undefined or empty");
+        this.useFictiveData(); // Utiliser des données fictives si aucune donnée n'est présente
         return;
       }
+
       await Promise.all(this.movies.map((movie, i) => {
         return axios.get(`http://localhost:3000/movies/main_image/${movie.id}`)
             .then(response => {
-              // console.log("URL de l'image principale du film", response.data.image_url);
               this.movies[i].main_image_url = response.data.image_url;
             })
             .catch(error => {
-              console.error(error.response.data);
-              console.error(error.response);
+              console.error("Error fetching image:", error);
+              this.movies[i].main_image_url = 'path/to/default/image.jpg'; // Utiliser une image par défaut
             });
       }));
-      console.log(this.movies); // Log après mise à jour des images
+    },
+    useFictiveData() {
+      this.movies = [
+        { id: 1, title: "Film fictif 1", main_image_url: "path/to/default/image1.jpg", description: "Description du film fictif 1", release_date: "2023" },
+        { id: 2, title: "Film fictif 2", main_image_url: "path/to/default/image2.jpg", description: "Description du film fictif 2", release_date: "2023" },
+        // Ajoutez plus de films fictifs si nécessaire
+      ];
     },
     goToMovieDetails(movieId) {
       // Utilisez Vue Router pour naviguer programmatically
