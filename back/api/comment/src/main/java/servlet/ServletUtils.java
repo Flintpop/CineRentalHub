@@ -8,12 +8,19 @@ import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class ServletUtils {
   public static <T> T readRequestBodyAndGetObject(HttpServletRequest request, Class<T> clazz) throws IOException, JsonSyntaxException {
@@ -28,8 +35,18 @@ public class ServletUtils {
   }
 
   private static <T> T convertObjectToJson(String json, Class<T> clazz) {
-    Gson gson = new Gson();
+    GsonBuilder builder = new GsonBuilder();
 
+    // Ajoute un désérialiseur personnalisé pour les objets Date
+    JsonDeserializer<Date> deserializer = (jsonDeserialize, typeOfT, context) -> {
+      try {
+        return new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).parse(jsonDeserialize.getAsJsonPrimitive().getAsString());
+      } catch (ParseException e) {
+        throw new RuntimeException(e); // Gérer l'exception comme il convient
+      }
+    };
+
+    Gson gson = builder.registerTypeAdapter(Date.class, deserializer).create();
     T object = gson.fromJson(json, clazz);
 
     for (Field field : clazz.getDeclaredFields()) {

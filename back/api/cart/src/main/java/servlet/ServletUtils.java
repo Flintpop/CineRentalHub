@@ -1,5 +1,6 @@
 package servlet;
 
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import exceptions.ApiException;
 import exceptions.IdMissingException;
@@ -7,12 +8,19 @@ import exceptions.IdValidationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class ServletUtils {
   public static <T> T readRequestBodyAndGetObject(HttpServletRequest request, Class<T> clazz) throws IOException, JsonSyntaxException {
@@ -27,8 +35,18 @@ public class ServletUtils {
   }
 
   private static <T> T convertObjectToJson(String json, Class<T> clazz) {
-    Gson gson = new Gson();
+    GsonBuilder builder = new GsonBuilder();
 
+    // Ajoute un désérialiseur personnalisé pour les objets Date
+    JsonDeserializer<Date> deserializer = (jsonDeserialize, typeOfT, context) -> {
+      try {
+        return new SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).parse(jsonDeserialize.getAsJsonPrimitive().getAsString());
+      } catch (ParseException e) {
+        throw new RuntimeException(e); // Gérer l'exception comme il convient
+      }
+    };
+
+    Gson gson = builder.registerTypeAdapter(Date.class, deserializer).create();
     T object = gson.fromJson(json, clazz);
 
     for (Field field : clazz.getDeclaredFields()) {
@@ -83,86 +101,72 @@ public class ServletUtils {
     }
   }
 
+
+  public static void sendErrorJsonResponseWithTraceback(HttpServletResponse response, int statusCode, Exception e) throws IOException {
+    JsonObject jsonResponse = new JsonObject();
+    Gson gson = new Gson();
+
+    String cleanMessage = cleanErrorMessage(e.getMessage());
+
+    if (e.getCause() instanceof java.text.ParseException pe) {
+      jsonResponse.addProperty("error", "Format de date incorrect.");
+      jsonResponse.addProperty("expected_format", "MMM DD, YYYY");
+      jsonResponse.addProperty("example", "Jan 01, 2021");
+      jsonResponse.addProperty("received_value", cleanErrorMessage(pe.getMessage().split(": ")[1]));
+    } else if (e instanceof JsonSyntaxException json) {
+      jsonResponse.addProperty("error", "Format JSON invalide, données incorrect.");
+      jsonResponse.addProperty("message", cleanErrorMessage(json.getMessage()));
+    } else {
+      if (e instanceof ApiException apiException) {
+        statusCode = apiException.getStatusCode();
+      } else if (isEntityNotFound(e)) {
+        statusCode = HttpServletResponse.SC_NOT_FOUND;
+      }
+      StringWriter sw = new StringWriter();
+      e.printStackTrace(new PrintWriter(sw));
+      String exceptionAsString = sw.toString();
+
+      jsonResponse.addProperty("error", cleanMessage);
+      jsonResponse.addProperty("traceback", exceptionAsString.replace("\n", "\\n").replace("\r", "\\r"));
+    }
+
+    sendJsonResponse(response, statusCode, gson.toJson(jsonResponse));
+  }
+
+  /**
+   * Nettoie le message d'erreur en retirant le numéro de connexion.
+   * @param errorMessage Le message d'erreur.
+   * @return Le message d'erreur nettoyé.
+   */
+  private static String cleanErrorMessage(String errorMessage) {
+    if (errorMessage != null) {
+      return errorMessage.replaceAll("\\(conn=\\d+\\)\\s*", "");
+    }
+    return "Erreur inconnue"; // Fallback pour les messages d'erreur null
+  }
+
+  // Implémentation de isEntityNotFound reste inchangée
+
   /**
    * Envoie une réponse JSON avec le code d'état HTTP spécifié.
    *
    * @param response   La réponse HTTP.
    * @param statusCode Le code d'état HTTP.
-   * @param message    Le message à envoyer.
+   * @param jsonResponse La réponse JSON.
    * @throws IOException Si une erreur d'entrée/sortie survient.
    */
-  public static void sendJsonResponse(HttpServletResponse response, int statusCode, String message) throws IOException {
+  public static void sendJsonResponse(HttpServletResponse response, int statusCode, String jsonResponse) throws IOException {
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
     response.setStatus(statusCode);
-    response.getWriter().write(message);
+    response.getWriter().write(jsonResponse);
     response.getWriter().flush();
-  }
-
-  /**
-   * En plus d'envoyer classiquement un json, supprime l'indication de la connexion si présente dans
-   * le message d'erreur.
-   *
-   * @param response     La réponse HTTP.
-   * @param statusCode   Le code d'état HTTP.
-   * @param errorMessage Le message d'erreur, en brut.
-   * @throws IOException Si une erreur d'entrée/sortie survient.
-   */
-  public static void sendErrorJsonResponse(HttpServletResponse response, int statusCode, String errorMessage) throws IOException {
-    if (errorMessage != null) {
-      errorMessage = errorMessage.replaceAll("\\(conn=\\d+\\)\\s*", ""); // Supprime l'indication de la connexion
-    } else {
-      throw new IllegalArgumentException("Le message d'erreur ne peut pas être null.");
-    }
-    response.setContentType("application/json");
-    response.setCharacterEncoding("UTF-8");
-    response.setStatus(statusCode);
-    response.getWriter().write(errorMessage);
-    response.getWriter().flush();
-  }
-
-  public static void sendErrorJsonResponseWithTraceback(HttpServletResponse response, int statusCode, Exception e) throws IOException {
-    int statusCodeToSend = statusCode;
-    if (e.getCause() instanceof java.text.ParseException pe) {
-      String jsonResponse = """
-              {
-                "error": "Format de date incorrect.",
-                "expected_format": "MMM DD, YYYY",
-                "example": "Jan 01, 2021",
-                "received_value": %s
-              }
-              """.formatted(pe.getMessage().split(": ")[1]);
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonResponse);
-    } else if (e instanceof JsonSyntaxException json) {
-      String jsonReponse = """
-              {
-                "error": "Format JSON invalide, données incorrect.",
-                "message": %s
-              }
-              """.formatted(json.getMessage());
-      ServletUtils.sendJsonResponse(response, HttpServletResponse.SC_BAD_REQUEST, jsonReponse);
-    } else {
-      if (e instanceof ApiException apiException) {
-        statusCodeToSend = apiException.getStatusCode();
-      } else if (isEntityNotFound(e)) {
-        statusCodeToSend = HttpServletResponse.SC_NOT_FOUND;
-      }
-      StringWriter sw = new StringWriter();
-      e.printStackTrace(new PrintWriter(sw));
-      String exceptionAsString = sw.toString();
-      String jsonResponse = """
-              {
-                "error": "%s",
-                "traceback": "%s"
-              }
-              """.formatted(e.getMessage(), exceptionAsString);
-      sendErrorJsonResponse(response, statusCodeToSend, jsonResponse);
-    }
   }
 
   private static boolean isEntityNotFound(Exception e) {
     String[] filters = {"Entity not found", "Aucun", "Not found", "No entity", "No result", "No entity found",
-            "Aucune entité", "Aucun résultat", "Entité non trouvée", "Résultat non trouvé", "non trouvé", "non trouvée"
+            "Aucune entité", "Aucun résultat", "Entité non trouvée", "Résultat non trouvé", "non trouvé", "non trouvée",
+            "existe pas"
     };
 
     for (String filter : filters) {
