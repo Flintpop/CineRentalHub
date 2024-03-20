@@ -75,6 +75,16 @@ export default {
       }
     },
     validateCart() {
+      if (this.isUserConnected) {
+        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+      } else {
+        alert('Veuiilez vous connecter pour valider votre panier');
+        setTimeout(() => {
+          this.$router.push('/Login');
+        }, 1000);
+      }
+
+
       // const userId = localStorage.getItem('userId');
       // const token = localStorage.getItem('token');
       //
