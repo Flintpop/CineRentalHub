@@ -31,11 +31,11 @@
               <input type="number" v-model.number="rentalDuration" id="rentalDuration" min="1"
                      @input="updateRentalPrice"/>
             </div>
-            <button @click="rentMovie(movie.id)" class="details-action-btn rent-btn">
+            <button @click="rentMovie(movie['id'])" class="details-action-btn rent-btn">
               Louer - {{ calculatedRentalPrice ? calculatedRentalPrice.toFixed(2) : '0.00' }}€
             </button>
 
-            <button @click="purchaseMovie(movie.id)" class="details-action-btn purchase-btn">
+            <button @click="purchaseMovie(movie['id'])" class="details-action-btn purchase-btn">
               Acheter - {{ movie.purchase_price.toFixed(2) }}€
             </button>
           </div>
@@ -311,7 +311,7 @@ export default defineComponent({
 
 .rental-options input[type="number"]:focus {
   border-color: #3498db; /* Changement de couleur à la sélection */
-  outline: none; /* Suppression de l'outline par défaut */
+  outline: none; /* Suppression de outline par défaut */
 }
 
 /* Styles des boutons */
