@@ -17,13 +17,16 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/[^/]+/?', methods: ['PUT'], roles: ['admin']},
         {path: '/movies/deactivated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
+        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user']},
+        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user']},
         {path: '/user/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['admin']},
         {path: '/users', methods: ['GET'], roles: ['admin']},
         {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
-        {path: '/movies/rentals/[^/]+?' ,methods : ['GET'], roles: ['user']},
-        {path: '/movies/purchases/[^/]+?' ,methods : ['GET'], roles: ['user']},
+
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
-        {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE'], roles: ['user'], selfOnly: false},
+        {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user'], selfOnly: false},
+        {path: '/comments/image', methods: ['POST'], roles: ['user'], selfOnly: false},
+        {path: '/comments/image/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false},
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
@@ -37,6 +40,8 @@ const verifyJWTAndRole = (req, res, next) => {
     if (isRouteOpen) {
         return next();
     }
+
+    let reasonOfError = ""
 
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
@@ -62,12 +67,23 @@ const verifyJWTAndRole = (req, res, next) => {
                 const userIdFromURL = urlParts[urlParts.length - 1]; // Supposer que l'ID utilisateur est le dernier segment
                 isUserAllowed = decoded.userId === userIdFromURL; // Vérifier si l'ID utilisateur du token correspond à l'ID dans l'URL
             }
+            if (!isUserAllowed) {
+                reasonOfError = "Action non autorisée sur la ressource";
+            }
+            if (!matchPath) {
+                reasonOfError = "Route invalide";
+            }
+
+            if (!methodAllowed) {
+                reasonOfError = "Méthode non autorisée";
+            }
+
 
             return matchPath && methodAllowed && roleAllowed && isUserAllowed;
         });
 
         if (!isProtectedRoute) {
-            return res.status(403).json({error: "Accès refusé, rôle non autorisé, route invalide, ou action non autorisée sur la ressource"});
+            return res.status(403).json({error: "Accès refusé, " + reasonOfError});
         }
 
         next();

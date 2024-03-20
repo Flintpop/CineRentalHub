@@ -1062,7 +1062,7 @@ DROP PROCEDURE IF EXISTS get_comment_by_id;
 CREATE PROCEDURE get_comment_by_id(IN id_comment INT)
 BEGIN
     IF NOT EXISTS (SELECT id FROM comments WHERE id = id_comment) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun commentaire trouvé';
     ELSE
         SELECT * FROM comments WHERE id = id_comment;
     END IF;

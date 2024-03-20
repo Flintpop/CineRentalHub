@@ -1,14 +1,14 @@
 package model;
 
 import database.MariaDB;
-import dto.CommentDTO;
-import dto.CommentImagePostDTO;
-import dto.CommentPostDTO;
-import dto.CommentPutDTO;
+import dto.*;
+import exceptions.BadRequestException;
+import exceptions.RessourceNotFoundException;
 import jakarta.persistence.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Comment {
@@ -150,6 +150,14 @@ public class Comment {
 
   public static void addImage(CommentImagePostDTO imagePostDTO) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
+    CommentGetDTO comment = getCommentById(imagePostDTO.getComment_id());
+    if (comment == null) {
+      throw new RessourceNotFoundException("Commentaire non trouvé");
+    }
+    if (!Objects.equals(comment.getImage_text(), null)) {
+      throw new BadRequestException("Image déjà existante pour ce commentaire");
+    }
+
     try {
       em.getTransaction().begin();
 
@@ -192,7 +200,7 @@ public class Comment {
     }
   }
 
-  public static Object getCommentById(Integer commentId) throws Exception {
+  public static CommentGetDTO getCommentById(Integer commentId) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
       em.getTransaction().begin();
@@ -204,11 +212,8 @@ public class Comment {
       @SuppressWarnings("unchecked")
       List<Object[]> result = query.getResultList();
       em.getTransaction().commit();
-      // retour:
-      // id, comment_text, comment_date, user_id, last_name, first_name
       return result.stream().map(
-              row -> new CommentDTO((Integer) row[0], (Integer) row[1], (Integer) row[2], (String) row[3], (Timestamp) row[4])).collect(
-              Collectors.toList());
+              row -> new CommentGetDTO((Integer) row[0], (Integer) row[1], (Integer) row[2], (String) row[3], (Timestamp) row[4], (String) row[5])).toList().get(0);
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
         em.getTransaction().rollback();

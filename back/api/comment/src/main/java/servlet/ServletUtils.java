@@ -162,7 +162,8 @@ public class ServletUtils {
 
   private static boolean isEntityNotFound(Exception e) {
     String[] filters = {"Entity not found", "Aucun", "Not found", "No entity", "No result", "No entity found",
-            "Aucune entité", "Aucun résultat", "Entité non trouvée", "Résultat non trouvé", "non trouvé", "non trouvée"
+            "Aucune entité", "Aucun résultat", "Entité non trouvée", "Résultat non trouvé", "non trouvé", "non trouvée",
+            "existe pas"
     };
 
     for (String filter : filters) {
