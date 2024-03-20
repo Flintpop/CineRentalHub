@@ -10,7 +10,8 @@
       <button @click="toggleEdit">Modifier</button>
     </div>
 
-    <UserEditForm v-else :user="user" @updateUser="updateUser" @close="toggleEdit"/>  </div>
+    <UserEditForm v-else :user="user" @updateUser="updateUser" @close="toggleEdit"/>
+  </div>
 </template>
 
 <script>
@@ -20,16 +21,15 @@ import axios from "axios";
 
 export default {
   name: 'MyAccount',
-  components: { NavbarUser, UserEditForm },
+  components: {NavbarUser, UserEditForm},
   data() {
     return {
       isEditing: false,
       user: {
-        id: 1,
-        first_name: 'Jean',
-        last_name: 'Dupont',
-        email: 'jean.dupont@example.com',
-        role: 'user',
+        first_name: '',
+        last_name: '',
+        email: '',
+        role: ''
       }
     };
   },
@@ -44,14 +44,35 @@ export default {
           'Content-Type': 'application/json',
           'authorization': 'Bearer ' + token
         };
-        const response = await axios.put(`http://localhost:3000/user/${user.id}`, user, {headers});
+        const UserId = localStorage.getItem('userId');
+        const response = await axios.put(`http://localhost:3000/user/${UserId}`, user, {headers});
         console.log('Mise à jour réussie', response.data);
-        this.fetchUsers(); // Rafraîchir la liste des utilisateurs après la mise à jour
+        this.user = response.data;
       } catch (error) {
         console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
       }
     },
+    fetchUser() {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+
+      axios.get(`http://localhost:3000/user/${userId}`, {headers})
+          .then(response => {
+            this.user = response.data;
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération du profil utilisateur:', error);
+          });
+    },
+  },
+  created() {
+    this.fetchUser();
   }
+
 };
 
 </script>
