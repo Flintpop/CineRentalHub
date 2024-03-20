@@ -245,17 +245,33 @@ VALUES (3, 6, '2024-03-01');
 
 -- jeux de données pour la table comments
 INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (1, 3, 'This is a great movie!', '2022-01-01 00:00:00');
-INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (2, 2, 'This is a great movie!', '2022-01-01 00:00:00');
-INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (3, 3, 'This is a great movie!', '2022-01-01 00:00:00');
-INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (4, 4, 'This is a great movie!', '2022-01-01 00:00:00');
-INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (5, 4, 'This is a great movie!', '2022-01-01 00:00:00');
-INSERT INTO comments (movie_id, user_id, comment_text, comment_date)
-VALUES (6, 3, 'THIS IS A GREAT MOVIE!', '2022-01-01 00:00:00');
+VALUES (1, 2, 'Un classique absolu. Les performances et la direction sont intouchables.', '2024-03-15 00:00:00'),
+       (1, 5, 'Ce film change la vie. Je le recommande à tous ceux qui cherchent un récit profond et significatif.',
+        '2024-03-16 00:00:00'),
+       (2, 6, 'Marlon Brando est phénoménal. Le meilleur film sur le crime organisé jamais réalisé.',
+        '2024-03-17 00:00:00'),
+       (2, 7, 'Le scénario, la mise en scène et la musique créent une atmosphère incroyable. À voir absolument.',
+        '2024-03-18 00:00:00'),
+       (3, 8, 'Heath Ledger en Joker est légendaire. Un film sombre qui redéfinit les films de super-héros.',
+        '2024-03-19 00:00:00'),
+       (3, 9, 'Christopher Nolan a créé un chef-d\'œuvre. Un film incontournable pour les amateurs de Batman.',
+        '2024-03-20 00:00:00'),
+       (5, 10, 'Tarantino à son meilleur. Dialogues incroyables et scènes mémorables.', '2024-03-21 00:00:00'),
+       (5, 11, 'Une exploration brillante de la violence et de la rédemption. Pulp Fiction reste intemporel.',
+        '2024-03-22 00:00:00'),
+       (6, 12,
+        'Une histoire poignante qui montre le meilleur et le pire de l\'humanité. Schindler\'s List est un incontournable.',
+        '2024-03-23 00:00:00'),
+       (6, 13, 'Ce film m\'a profondément ému. L\'importance de se souvenir et d\'apprendre de l\'histoire.',
+        '2024-03-24 00:00:00'),
+       (7, 14, 'Avatar est visuellement époustouflant et novateur. Cameron repousse les limites du cinéma.',
+        '2024-03-25 00:00:00'),
+       (7, 15, 'Une aventure immersive sur Pandora. Le message sur l\'environnement et la connexion est puissant.',
+        '2024-03-26 00:00:00'),
+       (8, 16, 'Iron Man a lancé l\'univers Marvel avec style. Robert Downey Jr. est né pour ce rôle.',
+        '2024-03-27 00:00:00'),
+       (8, 17, 'Action, humour et cœur. Iron Man a tout pour plaire et pose les bases d\'une saga épique.',
+        '2024-03-28 00:00:00');
 
 -- jeux de données pour la table images
 INSERT INTO images (movie_id, image_url, main_image)
@@ -757,8 +773,17 @@ BEGIN
     ELSE
 
         -- Prend tout le movie + rental
-        SELECT r.id, m.id as movie_id, m.available, m.title, m.release_date, m.description, m.daily_rental_price,
-               m.purchase_price, m.link, r.rental_date, r.return_date
+        SELECT r.id,
+               m.id as movie_id,
+               m.available,
+               m.title,
+               m.release_date,
+               m.description,
+               m.daily_rental_price,
+               m.purchase_price,
+               m.link,
+               r.rental_date,
+               r.return_date
         FROM rentals r
                  JOIN movies m ON r.movie_id = m.id
         WHERE r.user_id = user_id;
@@ -778,8 +803,16 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun achat trouvé pour cet utilisateur.';
     ELSE
         -- Prend tout le movie + purchase
-        SELECT p.id, m.id as movie_id, m.available, m.title, m.release_date, m.description, m.daily_rental_price,
-               m.purchase_price, m.link, p.purchase_date
+        SELECT p.id,
+               m.id as movie_id,
+               m.available,
+               m.title,
+               m.release_date,
+               m.description,
+               m.daily_rental_price,
+               m.purchase_price,
+               m.link,
+               p.purchase_date
         FROM purchases p
                  JOIN movies m ON p.movie_id = m.id
         WHERE p.user_id = user_id;
@@ -900,7 +933,6 @@ BEGIN
         DELETE FROM shopping_cart WHERE id = cart_id;
     END IF;
 END //
-
 
 
 DELIMITER //
