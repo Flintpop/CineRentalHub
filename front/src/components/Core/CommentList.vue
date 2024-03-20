@@ -3,11 +3,14 @@
     <h1>Liste des commentaires</h1>
     <div v-if="isUserLoggedIn">
       <textarea v-model="newCommentText" placeholder="Ajoutez un commentaire..."></textarea>
-<!--      <Upload @imageUploaded="setImage"></Upload>-->
+      <!--      <Upload @imageUploaded="setImage"></Upload>-->
       <button @click="addComment">Ajouter un commentaire</button>
     </div>
     <div v-else>
-      <p>Pour ajouter un commentaire, <router-link to="/login">connectez-vous</router-link>.</p>
+      <p>Pour ajouter un commentaire,
+        <router-link to="/login">connectez-vous</router-link>
+        .
+      </p>
     </div>
 
     <div v-if="commentaires.length">
@@ -18,7 +21,14 @@
         <div v-if="editingComment && editingComment.id === commentaire.id">
           <textarea v-model="editedText" placeholder="Modifiez votre commentaire..."></textarea>
           <!-- Afficher le bouton d'upload uniquement si aucune image n'est associée au commentaire -->
-          <button v-if="!commentaire.image" @click="uploadImage">Ajouter une image</button>
+          <div v-if="!commentaire.image_text">
+            <button @click="uploadImage">Ajouter une image</button>
+            <input type="file" @change="previewImage" accept="image/*" />
+            </div>
+          <button v-else @click="deleteImage(commentaire.id)">Supprimer l'image</button>
+          <div v-if="imagePreview">
+            <img :src="imagePreview" alt="Preview" style="max-width: 200px; max-height: 200px;" />
+          </div>
           <button @click="confirmEdit">Confirmer</button>
           <button @click="cancelEdit">Annuler</button>
         </div>
@@ -61,6 +71,8 @@ export default {
       userId: null,
       editingComment: null, // L'objet commentaire en cours de modification
       editedText: '', // Le texte modifié du commentairei
+      imagePreview: null, // L'aperçu de l'image
+      imageBase64: '', // L'image en base64 pour l'upload
     };
   },
   created() {
@@ -99,10 +111,6 @@ export default {
         },
       });
       this.newCommentText = '';
-    },
-    setImage(image) {
-      // Supposons que le composant UploadImage émette un événement 'imageUploaded' avec l'image en tant que payload
-      this.newCommentImage = image;
     },
     previewImage(event) {
       const file = event.target.files[0];
@@ -143,7 +151,19 @@ export default {
 
     uploadImage() {
       // Ici, ajoutez la logique pour gérer l'upload d'une nouvelle image
-      alert("Ouvrir le dialogue d'upload d'image");
+      this.$uploadImage(this.editingComment.id, this.imageBase64)
+          .then(() => {
+            console.log('Image uploaded successfully');
+            // Mettre à jour l'UI en conséquence, par exemple afficher l'aperçu de l'image
+            this.commentaires.find(c => c.id === this.editingComment.id).image = this.imagePreview;
+          })
+    },
+    deleteImage() {
+      this.$deleteImage(this.editingCommentId)
+          .then(() => {
+            console.log('Image deleted successfully');
+            this.imagePreview = null; // Supprime l'aperçu de l'image
+          })
     },
     deleteComment(commentId) {
       // Logique pour supprimer un commentaire
@@ -168,7 +188,7 @@ export default {
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .comment-header h3 {
@@ -183,6 +203,7 @@ export default {
   color: #555;
   margin-top: 10px;
 }
+
 textarea {
   width: 100%;
   margin-bottom: 10px;

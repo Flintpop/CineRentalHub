@@ -74,8 +74,8 @@ export default {
 
         app.config.globalProperties.$uploadImage = async function (commentId, imageBase64) {
             const payload = {
-                comment_id: 1,
-                image_base64: "askjsfk",
+                comment_id: commentId,
+                image_base64: imageBase64,
             };
 
             try {
