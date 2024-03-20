@@ -104,7 +104,18 @@ export default {
         app.config.globalProperties.$getCommentsByMovieId = async function (movieId) {
             try {
                 const response = await axios.get(`${this.$baseApiUrl}/comments/${movieId}`);
-                return response.data;
+                const userResponse = await axios.get(`${this.$baseApiUrl}/users`);
+                const comments = response.data;
+                const users = userResponse.data;
+                const commentsWithUsers = comments.map((comment) => {
+                    const user = users.find((user) => user.id === comment.user_id);
+                    return {
+                        ...comment,
+                        user,
+                    };
+                });
+                console.log(commentsWithUsers)
+                return commentsWithUsers;
             } catch (error) {
                 this.$handleError(error);
             }
