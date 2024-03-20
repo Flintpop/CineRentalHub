@@ -3,8 +3,11 @@
     <h1>Liste des commentaires</h1>
     <div v-if="isUserLoggedIn">
       <textarea v-model="newCommentText" placeholder="Ajoutez un commentaire..."></textarea>
-      <!--      <Upload @imageUploaded="setImage"></Upload>-->
       <button @click="addComment">Ajouter un commentaire</button>
+<!--      <input type="file" @change="previewImageAddComment" accept="image/*" />-->
+<!--      <div v-if="newCommentImage">-->
+<!--        <img :src="newCommentImage" alt="Preview" style="max-width: 200px; max-height: 200px;" />-->
+<!--      </div>-->
     </div>
     <div v-else>
       <p>Pour ajouter un commentaire,
@@ -18,23 +21,30 @@
         <div class="comment-header">
           <h3>{{ commentaire.user.first_name }}</h3>
         </div>
+        <div v-if="commentaire.image_text">
+          <img :src="'data:image/png;base64,' + commentaire.image_text" alt="Image du commentaire" style="max-width: 200px; max-height: 200px;">
+        </div>
         <div v-if="editingComment && editingComment.id === commentaire.id">
           <textarea v-model="editedText" placeholder="Modifiez votre commentaire..."></textarea>
           <!-- Afficher le bouton d'upload uniquement si aucune image n'est associée au commentaire -->
           <div v-if="!commentaire.image_text">
-            <button @click="uploadImage">Ajouter une image</button>
             <input type="file" @change="previewImage" accept="image/*" />
-            </div>
-          <button v-else @click="deleteImage(commentaire.id)">Supprimer l'image</button>
+          </div>
+          <div v-else>
+            <input type="checkbox" v-model="isImageBeingDeleted" id="deleteImage" />
+            <label for="deleteImage">Supprimer l'image</label>
+          </div>
           <div v-if="imagePreview">
             <img :src="imagePreview" alt="Preview" style="max-width: 200px; max-height: 200px;" />
           </div>
-          <button @click="confirmEdit">Confirmer</button>
-          <button @click="cancelEdit">Annuler</button>
+          <div class="button-container">
+            <button @click="confirmEdit">Confirmer</button>
+            <button @click="cancelEdit">Annuler</button>
+          </div>
         </div>
         <div v-else>
           <p class="comment-text">{{ commentaire.comment_text }}</p>
-          <div v-if="commentaire.user.id === userId">
+          <div v-if="commentaire.user.id === userId" class="button-container">
             <button @click="startEdit(commentaire)">Modifier</button>
             <button @click="deleteComment(commentaire.id)">Supprimer</button>
           </div>
@@ -67,12 +77,14 @@ export default {
       commentaires: [],
       newCommentText: '',
       newCommentImage: null,
+      newCommentImageBase64: '',
       isUserLoggedIn: false,
       userId: null,
       editingComment: null, // L'objet commentaire en cours de modification
       editedText: '', // Le texte modifié du commentairei
       imagePreview: null, // L'aperçu de l'image
       imageBase64: '', // L'image en base64 pour l'upload
+      isImageBeingDeleted: false,
     };
   },
   created() {
@@ -111,6 +123,8 @@ export default {
         },
       });
       this.newCommentText = '';
+      this.newCommentImage = null;
+
     },
     previewImage(event) {
       const file = event.target.files[0];
@@ -119,6 +133,17 @@ export default {
         reader.onload = (e) => {
           this.imagePreview = e.target.result;
           this.imageBase64 = e.target.result.split(',')[1]; // Supprime le préfixe de la data URL
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    previewImageAddComment(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.newCommentImage = e.target.result;
+          this.newCommentImageBase64 = e.target.result.split(',')[1]; // Supprime le préfixe de la data URL
         };
         reader.readAsDataURL(file);
       }
@@ -133,6 +158,19 @@ export default {
       // Ici, implémentez la logique pour envoyer la modification au serveur...
 
       this.$updateComment(this.editingComment.id, this.editedText)
+      if (this.imageBase64) {
+        this.$uploadImage(this.editingComment.id, this.imageBase64)
+      }
+
+      if (this.isImageBeingDeleted) {
+        this.$deleteImage(this.editingComment.id)
+            .then(() => {
+              console.log('Image deleted successfully');
+              this.imagePreview = null; // Supprime l'aperçu de l'image
+              this.isImageBeingDeleted = false; // Réinitialise la case à cocher
+              this.commentaires.find(c => c.id === this.editingComment.id).image_text = null; // Supprime l'image du commentaire
+            })
+      }
 
       // Mettez à jour le commentaire dans votre liste de commentaires avec le texte modifié
       const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
@@ -141,29 +179,18 @@ export default {
         // Optionnellement, réinitialisez l'état de modification ici
         this.editingComment = null;
         this.editedText = '';
+        this.isImageBeingDeleted = false;
       }
     },
 
     cancelEdit() {
       this.editingComment = null;
       this.editedText = '';
+      this.isImageBeingDeleted = false;
     },
 
-    uploadImage() {
-      // Ici, ajoutez la logique pour gérer l'upload d'une nouvelle image
-      this.$uploadImage(this.editingComment.id, this.imageBase64)
-          .then(() => {
-            console.log('Image uploaded successfully');
-            // Mettre à jour l'UI en conséquence, par exemple afficher l'aperçu de l'image
-            this.commentaires.find(c => c.id === this.editingComment.id).image = this.imagePreview;
-          })
-    },
     deleteImage() {
-      this.$deleteImage(this.editingCommentId)
-          .then(() => {
-            console.log('Image deleted successfully');
-            this.imagePreview = null; // Supprime l'aperçu de l'image
-          })
+      this.isImageBeingDeleted = true;
     },
     deleteComment(commentId) {
       // Logique pour supprimer un commentaire
@@ -227,5 +254,9 @@ button:hover {
 
 p {
   margin-top: 20px;
+}
+
+.button-container {
+  display: flex;
 }
 </style>

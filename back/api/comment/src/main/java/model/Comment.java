@@ -20,7 +20,7 @@ public class Comment {
    * @param movieId ID du film
    * @return Liste des commentaires
    */
-  public static List<CommentDTO> getCommentsByMovieId(Integer movieId) throws Exception {
+  public static List<CommentGetDTO> getCommentsByMovieId(Integer movieId) throws Exception {
     EntityManager em = MariaDB.getEntityManager();
     try {
       em.getTransaction().begin();
@@ -35,7 +35,7 @@ public class Comment {
       // retour:
       // id, comment_text, comment_date, user_id, last_name, first_name
       return result.stream().map(
-              row -> new CommentDTO((Integer) row[0], movieId, (Integer) row[2], (String) row[3], (Timestamp) row[4])).collect(
+              row -> new CommentGetDTO((Integer) row[0], movieId, (Integer) row[2], (String) row[3], (Timestamp) row[4], (String) row[5])).collect(
               Collectors.toList());
     } catch (PersistenceException e) {
       if (em.getTransaction().isActive()) {
