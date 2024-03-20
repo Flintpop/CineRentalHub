@@ -1,16 +1,16 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
+/*
 const MOVIE_API_SERVICE_URL = "http://localhost:8081";
 const USER_API_SERVICE_URL = "http://localhost:8082";
 const COMMENT_API_SERVICE_URL = "http://localhost:8083";
 const CART_API_SERVICE_URL = "http://localhost:8084";
+*/
 
-/*
 const MOVIE_API_SERVICE_URL = "http://movie-api:8080";
 const USER_API_SERVICE_URL = "http://user-api:8080";
 const COMMENT_API_SERVICE_URL = "http://comment-api:8080";
 const CART_API_SERVICE_URL = "http://cart-api:8080";
-*/
 const proxyOptions = target => ({
     target: target,
     changeOrigin: true,
