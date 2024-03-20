@@ -28,7 +28,6 @@
 <script>
 import NavbarUser from '../../components/User/NavbarUser.vue';
 import Footer from "../../components/Core/Footer.vue";
-import MoviesList from "../../components/Core/MoviesList.vue";
 import MovieForm from '../../components/Admin/MovieForm.vue';
 import axios from "axios";
 import EditMemberForm from "../../components/Admin/EditMemberForm.vue";
@@ -60,7 +59,8 @@ export default {
 
       try {
         const decoded = jwtDecode(token);
-        if (decoded.role === 'admin') {
+        //return decoded && 'role' in decoded && decoded.role === 'user';
+        if (!decoded || !('role' in decoded)) {
           console.log("Bienvenue dans l'espace administrateur");
           this.$router.push('/HomeAdmin');
         } else {
@@ -99,7 +99,7 @@ export default {
               this.movies = response.data;
             } else {
               // Utiliser des données fictives si aucune donnée n'est récupérée
-              this.usefictiveData();
+              this.useFictiveData();
             }
             this.clicked_added_movie = false;
             this.clicked_modification_movie = false;
@@ -107,10 +107,10 @@ export default {
           .catch(error => {
             console.error("Erreur lors de la récupération des films:", error);
             // Utiliser des données fictives en cas d'erreur
-            this.usefictiveData();
+            this.useFictiveData();
           });
     },
-    usefictiveData() {
+    useFictiveData() {
       this.movies = [
         {
           id: 1,
@@ -166,12 +166,9 @@ export default {
 </script>
 <style scoped>
 /* Styles existants adaptés pour la nouvelle thématique */
-.banner, .about, .contact {
-  padding: 40px 20px;
-  text-align: center;
-}
 
-.films, .about, .contact {
+
+.films {
   padding: 20px;
 }
 
@@ -190,7 +187,6 @@ footer {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; /* Technique pour l'effet de gradient sur le texte */
   margin: 0;
-  padding: 0;
-  padding-bottom: 100vh;
+  padding: 0 0 100vh;
 }
 </style>
