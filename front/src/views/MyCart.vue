@@ -66,6 +66,15 @@ export default {
         this.loadLocalCart();
       }
     },
+    removeFromCart(itemId) {
+      console.log('Suppression de l\'élément du panier avec ID', itemId);
+      if (this.isUserConnected) {
+        console.log('Suppression de l\'élément du panier avec ID', itemId);
+        this.removeItemFromServer(itemId);
+      } else {
+        this.removeItemLocal(itemId);
+      }
+    },
     mergeCarts(serverCart, localCart) {
       const mergedCart = [...serverCart];
 
@@ -126,10 +135,9 @@ export default {
     },
 
     removeItemFromServer(itemId) {
-      const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
       const headers = {'Authorization': `Bearer ${token}`};
-
+      console.log('Suppression de l\'élément du panier sur le serveur avec ID', itemId);
       return axios.delete(`http://localhost:3000/cart/${itemId}`, { headers });
     },
 
@@ -187,8 +195,14 @@ export default {
     },
     removeItem(id_item) {
       if (this.isUserConnected) {
-        // Ici, ajoutez la logique pour supprimer l'élément du panier sur le serveur
+        this.removeItemFromServer(id_item).then(() => {
+          console.log('Suppression de l\'élément du panier avec ID', id_item);
+          this.fetchCartItems();
+        }).catch(error => {
+          console.error('Erreur lors de la suppression de l\'élément du panier:', error);
+        });
       } else {
+        console.log('Suppression de l\'élément du panier avec ID', id_item);
         this.removeItemLocal(id_item);
       }
     },
