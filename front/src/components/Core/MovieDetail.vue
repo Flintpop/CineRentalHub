@@ -150,7 +150,7 @@ export default defineComponent({
         const newItem = {
           id: tempIdCounter, // Utiliser le compteur comme ID temporaire
           movie_id: movieId,
-          rental_duration: type === 'rental' ? rentalDuration : undefined,
+          rental_duration: type === 'rental' ? rentalDuration : 1,
           cart_type: type,
           user_id: null
         };
