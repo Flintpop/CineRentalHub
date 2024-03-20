@@ -59,8 +59,7 @@ export default {
 
       try {
         const decoded = jwtDecode(token);
-        //return decoded && 'role' in decoded && decoded.role === 'user';
-        if (!decoded || !('role' in decoded)) {
+        if (decoded && 'admin'==='role' in decoded ) {
           console.log("Bienvenue dans l'espace administrateur");
           this.$router.push('/HomeAdmin');
         } else {
