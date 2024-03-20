@@ -43,6 +43,9 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/cart/[^/]+/?', methods: ['GET', 'DELETE'], roles: ['user'], selfOnly: false},
         {path: '/cart/delete/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
         {path: '/cart/validate/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
+
+        {path: '/stats' ,methods : ['GET', 'POST'], roles: ['user'], selfOnly: false},
+        {path: '/stats/[^/]+?' ,methods : ['POST'], roles: ['user'], selfOnly: false},
     ];
 
     const reqPath = req.originalUrl.split('?')[0];
@@ -91,7 +94,7 @@ const verifyJWTAndRole = (req, res, next) => {
             }
 
             if (!methodAllowed) {
-                reasonOfError = "Méthode non autorisée";
+                reasonOfError = "Méthode non autorisée, " + reqMethod + " n'est pas autorisé pour un usage autre que le votre (user qui veut modifier un autre user par exemple)";
             }
 
 
