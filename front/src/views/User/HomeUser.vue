@@ -51,7 +51,6 @@ export default {
 
   mounted() {
     this.$nextTick(() => {
-
       const token = localStorage.getItem('token');
       if (!token) {
         console.log("Vous devez vous connecter pour accéder à cette page");
@@ -112,19 +111,9 @@ export default {
           });
     },
     usefictiveData() {
-      // Définir des données fictives pour les films:
-      // private int id;
-      // private byte available;
-      // private String title;
-      // private Date release_date;
-      // private BigDecimal daily_rental_price;
-      // private BigDecimal purchase_price;
-      // private String description;
-      // private String link;
-
       this.movies = [
         {
-id: 1,
+          id: 1,
           available: 1,
           title: "Film fictif 1",
           release_date: "2023-01-01",

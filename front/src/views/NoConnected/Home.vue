@@ -20,23 +20,21 @@
 
 
       <!-- Section Films -->
-<!--      <section class="films">-->
-<!--        <h2>Nos Films</h2>-->
-<!--        <div class="film-list">-->
-<!--          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>-->
-<!--        </div>-->
+      <!--      <section class="films">-->
+      <!--        <h2>Nos Films</h2>-->
+      <!--        <div class="film-list">-->
+      <!--          <MoviesList :movies="movies" @edit-movie="handleEditMovie"></MoviesList>-->
+      <!--        </div>-->
 
-        <section class="films" v-if="showMovieList">
-          <h2>Nos Films</h2>
-          <ListMovies :movies="movies" @movie-detail="handleMovieDetail" @edit-movie="handleEditMovie"></ListMovies>
-        </section>
+      <section class="films" v-if="showMovieList">
+        <h2>Nos Films</h2>
+        <ListMovies :movies="movies" @movie-detail="handleMovieDetail" @edit-movie="handleEditMovie"></ListMovies>
+      </section>
       <MovieDetail
           v-else-if="selectedMovie"
           :movie="selectedMovie"
           @close="handleCloseDetails"
       />
-
-
 
 
       <!-- Section Contact -->
@@ -93,32 +91,6 @@ export default {
   },
 
   methods: {
-    // async fetchMovies() {
-    //   // Simulation de la récupération de données depuis la base de données
-    //   await axios.get("http://localhost:3000/movies")
-    //       .then(async response => {
-    //         this.movies = response.data;
-    //
-    //         this.clicked_added_movie = false;
-    //         this.clicked_modification_movie = false;
-    //       })
-    //       .catch(error => {
-    //         console.log(error);
-    //       });
-    // },
-    // handleEditMovie(movieId) {
-    //   this.selectedMovieId = movieId;
-    //   // Trouver le film par son ID
-    //   const movieToEdit = this.movies.find(movie => movie.id === movieId);
-    //   if (movieToEdit) {
-    //     this.selectedMovie = movieToEdit;
-    //     this.clicked_modification_movie = true;
-    //     this.clicked_added_movie = false;
-    //   } else {
-    //     console.error("Film non trouvé");
-    //     this.selectedMovie = null;
-    //   }
-    // },
     handleCloseDetails() {
       this.selectedMovie = null; // Réinitialise le film sélectionné
       this.showMovieList = true; // Montre la liste des films
@@ -134,17 +106,47 @@ export default {
       }
     },
     async fetchMovies() {
-      // Simulation de la récupération de données depuis la base de données
       await axios.get("http://localhost:3000/movies")
-          .then(async response => {
-            this.movies = response.data;
-
+          .then(response => {
+            if (response.data && response.data.length > 0) {
+              this.movies = response.data;
+            } else {
+              // Utiliser des données fictives si aucune donnée n'est récupérée
+              this.usefictiveData();
+            }
             this.clicked_added_movie = false;
             this.clicked_modification_movie = false;
           })
           .catch(error => {
-            console.log(error);
+            console.error("Erreur lors de la récupération des films:", error);
+            // Utiliser des données fictives en cas d'erreur
+            this.usefictiveData();
           });
+    },
+    usefictiveData() {
+      this.movies = [
+        {
+          id: 1,
+          available: 1,
+          title: "Film fictif 1",
+          release_date: "2023-01-01",
+          daily_rental_price: 5.99,
+          purchase_price: 19.99,
+          description: "Description du film fictif 1",
+          link: "https://www.example.com/film1"
+        },
+        {
+          id: 2,
+          available: 1,
+          title: "Film fictif 2",
+          release_date: "2023-01-02",
+          daily_rental_price: 6.99,
+          purchase_price: 21.99,
+          description: "Description du film fictif 2",
+          link: "https://www.example.com/film2"
+        },
+
+      ];
     },
     handleEditMovie(movieId) {
       this.selectedMovieId = movieId;
