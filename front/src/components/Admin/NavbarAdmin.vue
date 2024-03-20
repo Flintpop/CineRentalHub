@@ -6,7 +6,7 @@
         <router-link to="/HomeAdmin">Accueil</router-link>
         <router-link to="/ManageMovies">Gérer les films</router-link>
         <router-link to="/ManageUsers">Gérer les utilisateurs</router-link>
-        <router-link to="/">Déconnexion</router-link>
+        <router-link to="/" @click.native="logout">Déconnexion</router-link> <!-- Lien de déconnexion -->
         <!-- Ajoutez d'autres liens de navigation ici -->
       </div>
     </div>
@@ -15,8 +15,17 @@
 
 <script>
 export default {
-  name: 'NavbarAdmin',
-};
+  methods: {
+    logout() {
+      // Supprimez les informations de l'utilisateur de la session ou du local storage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Redirigez l'utilisateur vers la page de connexion
+      this.$router.push('/');
+    }
+  }
+}
 </script>
 
 <style scoped>

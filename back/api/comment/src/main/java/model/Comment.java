@@ -2,6 +2,7 @@ package model;
 
 import database.MariaDB;
 import dto.CommentDTO;
+import dto.CommentImagePostDTO;
 import dto.CommentPostDTO;
 import dto.CommentPutDTO;
 import jakarta.persistence.*;
@@ -145,5 +146,77 @@ public class Comment {
       em.close();
     }
 
+  }
+
+  public static void addImage(CommentImagePostDTO imagePostDTO) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("add_image_to_comment")
+              .registerStoredProcedureParameter("comment_id", Integer.class, ParameterMode.IN)
+              .registerStoredProcedureParameter("image_base64", String.class, ParameterMode.IN)
+              .setParameter("comment_id", imagePostDTO.getComment_id())
+              .setParameter("image_base64", imagePostDTO.getImage_base64());
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  public static void deleteImageFromComment(Integer commentId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("delete_image_from_comment")
+              .registerStoredProcedureParameter("comment_id", Integer.class, ParameterMode.IN)
+              .setParameter("comment_id", commentId);
+
+      query.execute();
+      em.getTransaction().commit();
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      ModelUtils.generateException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  public static Object getCommentById(Integer commentId) throws Exception {
+    EntityManager em = MariaDB.getEntityManager();
+    try {
+      em.getTransaction().begin();
+
+      StoredProcedureQuery query = em.createStoredProcedureQuery("get_comment_by_id")
+              .registerStoredProcedureParameter("id_comment", Integer.class, ParameterMode.IN)
+              .setParameter("id_comment", commentId);
+
+      @SuppressWarnings("unchecked")
+      List<Object[]> result = query.getResultList();
+      em.getTransaction().commit();
+      // retour:
+      // id, comment_text, comment_date, user_id, last_name, first_name
+      return result.stream().map(
+              row -> new CommentDTO((Integer) row[0], (Integer) row[1], (Integer) row[2], (String) row[3], (Timestamp) row[4])).collect(
+              Collectors.toList());
+    } catch (PersistenceException e) {
+      if (em.getTransaction().isActive()) {
+        em.getTransaction().rollback();
+      }
+      ModelUtils.generateException(e);
+      return null;
+    } finally {
+      em.close();
+    }
   }
 }

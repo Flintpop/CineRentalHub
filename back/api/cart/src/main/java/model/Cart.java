@@ -90,10 +90,21 @@ public class Cart {
     }
   }
 
-  private static Boolean isItTheSameCommand(CartPostDTO cartToCompare) throws Exception {
-    List<CartDTO> cart = getCartByUserId(cartToCompare.getUser_id());
-    if (cart == null)
+  private static Boolean isItTheSameCommand(CartPostDTO cartToCompare) throws RuntimeException {
+    List<CartDTO> cart;
+    try {
+      cart = getCartByUserId(cartToCompare.getUser_id());
+    } catch (Exception e) {
+      if (e.getMessage().toLowerCase().contains("aucun")) {
+        return false;
+      } else {
+        throw new RuntimeException(e);
+      }
+    }
+
+    if (cart == null) {
       return false;
+    }
 
     for (CartDTO c : cart) {
       if (Objects.equals(c.getMovie_id(), cartToCompare.getMovie_id()) && Objects.equals(c.getUser_id(), cartToCompare.getUser_id())) {

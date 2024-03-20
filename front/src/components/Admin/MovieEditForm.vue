@@ -35,9 +35,6 @@
             <input type="text" id="link" v-model="movie.link">
           </div>
 
-          <div class="form-group">
-            <label for="available">Disponibilité</label>
-          </div>
         </div>
         <button type="submit" class="submit-button">Modifier le film</button>
       </div>
@@ -81,10 +78,15 @@ export default {
 
       console.log("Body de la requête : ", movieData);
       const url = `http://localhost:3000/movies/${this.movie.id}`;
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
 
       try {
 
-        await axios.put(url, movieData);
+        await axios.put(url, movieData, {headers});
         alert(`Film modifié avec succès !`);
         this.resetForm();
         this.$emit('movie-added');

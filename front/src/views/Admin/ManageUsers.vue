@@ -3,7 +3,7 @@
     <NavbarAdmin/>
     <div class="main-content">
       <h1>Gestion des utilisateurs</h1>
-      <button class="create-user-button" @click="createUser">Créer un utilisateur</button>
+      <button @click.stop="selectUser({}, 'createUser')">Ajouter un utilisateur</button>
       <div class="content-wrapper">
         <div class="user-list">
 
@@ -22,10 +22,10 @@
                 <div class="user-actions">
 
                   <!-- Boutons d'actions, notez l'utilisation de stop pour empêcher la propagation de l'événement au conteneur parent -->
-                  <button @click.stop="selectUser(user, 'edit')"> Modifier </button>
-                  <button @click.stop="deleteUser(user)"> Supprimer </button>
-                  <button @click.stop="selectUser(user, 'rentedMovies')"> Films loués </button>
-                  <button @click.stop="selectUser(user, 'purchasedMovies')"> Films achetés </button>
+                  <button @click.stop="selectUser(user, 'edit')"> Modifier</button>
+                  <button @click.stop="deleteUser(user)"> Supprimer</button>
+                  <button @click.stop="selectUser(user, 'rentedMovies')"> Films loués</button>
+                  <button @click.stop="selectUser(user, 'purchasedMovies')"> Films achetés</button>
                 </div>
               </div>
             </div>
@@ -40,9 +40,7 @@
             <!-- Affichage conditionnel basé sur l'utilisateur sélectionné -->
             <div v-if="selectedUser">
               <component v-if="currentAction" :is="components[currentAction]" :user="selectedUser"
-                         @close="currentAction = null"></component>
-
-
+                         @close="currentAction = null" :updateUser="updateUser" @userCreated="fetchUsers"></component>
             </div>
           </div>
         </div>
@@ -56,13 +54,17 @@
 import NavbarAdmin from '../../components/Admin/NavbarAdmin.vue';
 import Footer from '../../components/Core/Footer.vue';
 import axios from 'axios';
-import UserEditForm from "../../components/Admin/UserEditForm.vue";
+import UserEditForm from "../../components/Core/UserEditForm.vue";
+import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
+import CreateUserForm from "../../components/Admin/CreateUserForm.vue";
 
 export default {
   components: {
     NavbarAdmin,
     Footer,
     UserEditForm,
+    UserRentedMovies,
+    CreateUserForm,
 
   },
 
@@ -80,8 +82,8 @@ export default {
       return {
         // 'details': UserDetailsComponent,
         'edit': UserEditForm,
-        // 'delete': UserDeleteComponent,
-        // 'rentedMovies': UserRentedMoviesComponent,
+        'rentedMovies': UserRentedMovies,
+        'createUser': CreateUserForm,
         // 'purchasedMovies': UserPurchasedMoviesComponent,
       };
     },
@@ -89,8 +91,13 @@ export default {
   methods: {
 
     async fetchUsers() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application / json',
+        'authorization': 'Bearer ' + token
+      };
       try {
-        const response = await axios.get('http://localhost:3000/users');
+        const response = await axios.get('http://localhost:3000/users', {headers});
         this.users = response.data;
       } catch (error) {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
@@ -100,22 +107,46 @@ export default {
       return this.users.filter(user => user.role === role);
     },
     selectUser(user, action) {
-      this.selectedUser = user;
+      if (action === 'createUser') {
+        this.selectedUser = {
+          firstName: '',
+          lastName: '',
+          email: '',
+          role: 'user', // Valeur par défaut
+          activated: true, // Valeur par défaut
+        };
+      } else {
+        this.selectedUser = user;
+      }
       this.currentAction = action;
     },
     async deleteUser(user) {
       try {
-        await axios.delete(`http://localhost:3000/users/${user.id}`);
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application / json',
+          'authorization': 'Bearer ' + token
+        };
+        console.log('Suppression de l\'utilisateur', user, user.id);
+        await axios.delete(`http://localhost:3000/user/${user.id}`, {headers});
         this.users = this.users.filter(u => u.id !== user.id);
       } catch (error) {
         console.error("Erreur lors de la suppression de l'utilisateur:", error);
       }
     },
-    showRentedMovies(user) {
-      // Logique pour afficher les films loués par l'utilisateur
-    },
-    showPurchasedMovies(user) {
-      // Logique pour afficher les films achetés par l'utilisateur
+    async updateUser(user) {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = {
+          'Content-Type': 'application/json',
+          'authorization': 'Bearer ' + token
+        };
+        const response = await axios.put(`http://localhost:3000/user/${user.id}`, user, {headers});
+        console.log('Mise à jour réussie', response.data);
+        this.fetchUsers(); // Rafraîchir la liste des utilisateurs après la mise à jour
+      } catch (error) {
+        console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
+      }
     },
   },
   mounted() {
@@ -132,6 +163,7 @@ export default {
   max-height: 100vh;
   overflow-y: hidden;
 }
+
 .main-content {
   display: flex;
   flex-direction: column;

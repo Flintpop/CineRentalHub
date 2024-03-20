@@ -2,24 +2,63 @@
   <div class="MyMovies">
     <NavbarUser/>
     <h1>Mes films</h1>
-    <!-- Ici, vous pouvez ajouter le code pour afficher les articles dans le panier -->
+    <div class="cart-items">
+      <MyMovieList :rentMovies="rentMovies" :buyMovies="buyMovies"/>
+    </div>
   </div>
 </template>
 
 <script>
 import NavbarUser from "../../components/User/NavbarUser.vue";
+import MyMovieList from "../../components/User/MyMovieList.vue";
+import axios from "axios";
 
 export default {
-  name: 'MyMovies',
-  components: {NavbarUser},
+  components: {NavbarUser, MyMovieList},
   data() {
     return {
-      // Ici, vous pouvez ajouter les données nécessaires pour votre panier
+      rentMovies: [],
+      buyMovies: [],
     };
   },
   methods: {
-    // Ici, vous pouvez ajouter les méthodes nécessaires pour votre panier
+    fetchRentMovies() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+
+      const userId = localStorage.getItem('userId');
+      axios.get(`http://localhost:3000/movies/rentals/${userId}`, {headers})
+          .then(response => {
+            this.rentMovies = response.data;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+    },
+    fetchBuyMovies() {
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        'authorization': 'Bearer ' + token
+      };
+
+      const userId = localStorage.getItem('userId');
+      axios.get(`http://localhost:3000/movies/purchases/${userId}`, {headers})
+          .then(response => {
+            this.buyMovies = response.data;
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+    },
   },
+  created() {
+    this.fetchRentMovies();
+    this.fetchBuyMovies();
+  }
 };
 </script>
 

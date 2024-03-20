@@ -111,6 +111,7 @@ CREATE TABLE purchases
 
 
 -- Création de la table Commentaires
+DROP TABLE IF EXISTS comments;
 CREATE TABLE IF NOT EXISTS comments
 (
     id           INT AUTO_INCREMENT PRIMARY KEY,
@@ -118,6 +119,7 @@ CREATE TABLE IF NOT EXISTS comments
     user_id      INT      NOT NULL,
     comment_text TEXT     NOT NULL,
     comment_date DATETIME NOT NULL,
+    image_text   TEXT,
     FOREIGN KEY (movie_id) REFERENCES movies (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
@@ -171,30 +173,30 @@ VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
 -- jeux de données pour la table users
 INSERT INTO users (last_name, first_name, email, password, role)
 VALUES ('User', 'Anonyme', 'anonyme@exemple.com', SHA2('anonyme', 512), 'user'),
-    ('Doe', 'John', 'john.doe@exemple.com', SHA2('password123', 512), 'user'),
-    ('Smith', 'Jane', 'jane.smith@example.com', SHA2('password456', 512), 'admin'),
-    ('Brown', 'Bob', 'bob.brown@example.com', SHA2('password789', 512), 'user'),
-    ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin'),
-    ('Garcia', 'Maria', 'Maria.Garcia@gmail.com', SHA2('password123', 512), 'user'),
-    ('Smith', 'John', 'John.Smith@gmail.com', SHA2('password124', 512), 'user'),
-    ('Brown', 'Sarah', 'Sarah.Brown@gmail.com', SHA2('password125', 512), 'user'),
-    ('Johnson', 'Mike', 'Mike.Johnson@gmail.com', SHA2('password126', 512), 'user'),
-    ('Lee', 'Karen', 'Karen.Lee@gmail.com', SHA2('password127', 512), 'user'),
-    ('Patel', 'Raj', 'Raj.Patel@gmail.com', SHA2('password128', 512), 'user'),
-    ('Davis', 'Jessica', 'Jessica.Davis@gmail.com', SHA2('password129', 512), 'user'),
-    ('Martinez', 'Carlos', 'Carlos.Martinez@gmail.com', SHA2('password130', 512), 'user'),
-    ('Nguyen', 'Linda', 'Linda.Nguyen@gmail.com', SHA2('password131', 512), 'user'),
-    ('Clark', 'James', 'James.Clark@gmail.com', SHA2('password132', 512), 'user'),
-    ('Wilson', 'Emma', 'Emma.Wilson@gmail.com', SHA2('password233', 512), 'user'),
-    ('Moore', 'Jack', 'Jack.Moore@gmail.com', SHA2('password234', 512), 'user'),
-    ('Taylor', 'Olivia', 'Olivia.Taylor@gmail.com', SHA2('password235', 512), 'user'),
-    ('Anderson', 'George', 'George.Anderson@gmail.com', SHA2('password236', 512), 'user'),
-    ('Thomas', 'Mia', 'Mia.Thomas@gmail.com', SHA2('password237', 512), 'user'),
-    ('Jackson', 'Ethan', 'Ethan.Jackson@gmail.com', SHA2('password238', 512), 'user'),
-    ('White', 'Sophia', 'Sophia.White@gmail.com', SHA2('password239', 512), 'user'),
-    ('Harris', 'Noah', 'Noah.Harris@gmail.com', SHA2('password240', 512), 'user'),
-    ('Martin', 'Amelia', 'Amelia.Martin@gmail.com', SHA2('password241', 512), 'user'),
-    ('Garcia', 'Lucas', 'Lucas.Garcia@gmail.com', SHA2('password242', 512), 'user');
+       ('Doe', 'John', 'john.doe@exemple.com', SHA2('password123', 512), 'user'),
+       ('Smith', 'Jane', 'jane.smith@example.com', SHA2('password456', 512), 'admin'),
+       ('Brown', 'Bob', 'bob.brown@example.com', SHA2('password789', 512), 'user'),
+       ('Johnson', 'Alice', 'alice.johnson@example.com', SHA2('password321', 512), 'admin'),
+       ('Garcia', 'Maria', 'Maria.Garcia@gmail.com', SHA2('password123', 512), 'user'),
+       ('Smith', 'John', 'John.Smith@gmail.com', SHA2('password124', 512), 'user'),
+       ('Brown', 'Sarah', 'Sarah.Brown@gmail.com', SHA2('password125', 512), 'user'),
+       ('Johnson', 'Mike', 'Mike.Johnson@gmail.com', SHA2('password126', 512), 'user'),
+       ('Lee', 'Karen', 'Karen.Lee@gmail.com', SHA2('password127', 512), 'user'),
+       ('Patel', 'Raj', 'Raj.Patel@gmail.com', SHA2('password128', 512), 'user'),
+       ('Davis', 'Jessica', 'Jessica.Davis@gmail.com', SHA2('password129', 512), 'user'),
+       ('Martinez', 'Carlos', 'Carlos.Martinez@gmail.com', SHA2('password130', 512), 'user'),
+       ('Nguyen', 'Linda', 'Linda.Nguyen@gmail.com', SHA2('password131', 512), 'user'),
+       ('Clark', 'James', 'James.Clark@gmail.com', SHA2('password132', 512), 'user'),
+       ('Wilson', 'Emma', 'Emma.Wilson@gmail.com', SHA2('password233', 512), 'user'),
+       ('Moore', 'Jack', 'Jack.Moore@gmail.com', SHA2('password234', 512), 'user'),
+       ('Taylor', 'Olivia', 'Olivia.Taylor@gmail.com', SHA2('password235', 512), 'user'),
+       ('Anderson', 'George', 'George.Anderson@gmail.com', SHA2('password236', 512), 'user'),
+       ('Thomas', 'Mia', 'Mia.Thomas@gmail.com', SHA2('password237', 512), 'user'),
+       ('Jackson', 'Ethan', 'Ethan.Jackson@gmail.com', SHA2('password238', 512), 'user'),
+       ('White', 'Sophia', 'Sophia.White@gmail.com', SHA2('password239', 512), 'user'),
+       ('Harris', 'Noah', 'Noah.Harris@gmail.com', SHA2('password240', 512), 'user'),
+       ('Martin', 'Amelia', 'Amelia.Martin@gmail.com', SHA2('password241', 512), 'user'),
+       ('Garcia', 'Lucas', 'Lucas.Garcia@gmail.com', SHA2('password242', 512), 'user');
 
 
 -- jeux de données pour la table shopping_cart
@@ -745,6 +747,48 @@ DELIMITER ;
 
 -- CALL delete_image_by_id(8);
 
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_movies_rented_by_user;
+CREATE PROCEDURE get_movies_rented_by_user(IN user_id INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des locations
+    IF (SELECT COUNT(*) FROM rentals WHERE rentals.user_id = user_id) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucune location trouvée pour cet utilisateur.';
+    ELSE
+
+        -- Prend tout le movie + rental
+        SELECT r.id, m.id as movie_id, m.available, m.title, m.release_date, m.description, m.daily_rental_price,
+               m.purchase_price, m.link, r.rental_date, r.return_date
+        FROM rentals r
+                 JOIN movies m ON r.movie_id = m.id
+        WHERE r.user_id = user_id;
+    END IF;
+end //
+DELIMITER ;
+
+CALL get_movies_rented_by_user(2);
+
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_movies_purchased_by_user;
+CREATE PROCEDURE get_movies_purchased_by_user(IN user_id INT)
+BEGIN
+    -- Vérifier si l'utilisateur a des achats
+    IF (SELECT COUNT(*) FROM purchases WHERE purchases.user_id = user_id) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Aucun achat trouvé pour cet utilisateur.';
+    ELSE
+        -- Prend tout le movie + purchase
+        SELECT p.id, m.id as movie_id, m.available, m.title, m.release_date, m.description, m.daily_rental_price,
+               m.purchase_price, m.link, p.purchase_date
+        FROM purchases p
+                 JOIN movies m ON p.movie_id = m.id
+        WHERE p.user_id = user_id;
+    END IF;
+end //
+DELIMITER ;
+
+CALL get_movies_purchased_by_user(2);
+
 
 -- Créer un nouvel utilisateur
 DELIMITER //
@@ -1009,10 +1053,22 @@ BEGIN
         SELECT * FROM comments WHERE movie_id = id_movie;
     END IF;
 END //
-
 DELIMITER ;
 
 -- CALL get_comments_by_movie_id(1);
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS get_comment_by_id;
+CREATE PROCEDURE get_comment_by_id(IN id_comment INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = id_comment) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        SELECT * FROM comments WHERE id = id_comment;
+    END IF;
+END //
+
+# CALL get_comment_by_comment_id(1);
 
 -- modifier un commentaire
 DELIMITER //
@@ -1026,3 +1082,33 @@ BEGIN
     END IF;
 END //
 
+-- Ajouter une image à un commentaire
+DELIMITER //
+DROP PROCEDURE IF EXISTS add_image_to_comment;
+CREATE PROCEDURE add_image_to_comment(IN comment_id INT, IN image_base64 TEXT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = comment_id) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSE
+        UPDATE comments SET comments.image_text = image_base64 WHERE id = comment_id;
+    END IF;
+END //
+DELIMITER ;
+
+# CALL add_image_to_comment(1, 'base64imagestring');
+
+DELIMITER //
+DROP PROCEDURE IF EXISTS delete_image_from_comment;
+CREATE PROCEDURE delete_image_from_comment(IN id_comment INT)
+BEGIN
+    IF NOT EXISTS (SELECT id FROM comments WHERE id = id_comment) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'existe pas.';
+    ELSEIF NOT EXISTS (SELECT image_text FROM comments WHERE id = id_comment AND image_text IS NOT NULL) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Le commentaire n\'a pas d\'image.';
+    ELSE
+        UPDATE comments SET image_text = NULL WHERE id = id_comment;
+    END IF;
+END //
+DELIMITER ;
+
+# CALL delete_image_from_comment(1);

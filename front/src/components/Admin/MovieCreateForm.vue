@@ -64,13 +64,13 @@ export default {
   data() {
     return {
       movie: {
-        available: 'true',
-        title: 'avatar',
-        release_date: '2021-01-01',
-        daily_rental_price: 2,
-        purchase_price: 2,
-        description: 'avatar',
-        link: 'avatar',
+        available: '',
+        title: '',
+        release_date: '',
+        daily_rental_price: null,
+        purchase_price: null,
+        description: '',
+        link: '',
       }
     };
   },
@@ -101,20 +101,80 @@ export default {
 };
 </script>
 <style scoped>
-/* Votre CSS ici. Vous pouvez réutiliser les styles de MovieForm si approprié. */
-.image-upload-label {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px dashed #ccc;
+.movie-form-wrapper {
+  position: relative;
+  max-width: 800px;
+  margin: auto;
   padding: 20px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.movie-form {
+  display: flex;
+  gap: 20px;
+}
+
+.left-section, .right-section {
+  flex: 1;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ff6347;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.main-image-preview {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.text-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Continuez à utiliser deux colonnes */
+  gap: 20px; /* Réglez l'écart comme vous le souhaitez */
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+.form-group textarea#description {
+  grid-column: 1 / -1; /* Faites s'étendre la textarea sur toutes les colonnes */
+  min-height: 150px; /* Réglez la hauteur comme vous le souhaitez */
+}
+
+
+.form-group.full-width {
+  grid-column: 1 / span 2; /* Faites s'étendre le form-group sur deux colonnes */
+}
+.submit-button {
+  margin-top: auto; /* Push the button to the bottom */
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.image-upload-placeholder {
-  text-align: center;
-  color: #aaa;
+.radio-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre les boutons radio et leurs labels */
 }
 
-/* Reste de votre CSS... */
+.radio-buttons label {
+  margin-right: 20px; /* Espace après le label avant le prochain bouton radio */
+}
 </style>

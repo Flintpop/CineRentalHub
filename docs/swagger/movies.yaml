@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Cine Rental Hub API
-  version: 1.0.0
+  version: 1.5.0
   description: API for managing movies, users, carts, and comments in the Cine Rental Hub.
 paths:
   /movies:
@@ -163,6 +163,44 @@ paths:
       responses:
         '204':
           description: Image successfully deleted
+  /movies/rentals/{userId}:
+    get:
+      summary: Get all movies rented for one user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movies successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieRented'
+  /movies/purchases/{userId}:
+    get:
+      summary: Get all movies purchased for one user
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Movies successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MoviePurchased'
+
+
 components:
   schemas:
     Movie:
@@ -187,6 +225,64 @@ components:
           type: string
         link:
           type: string
+    MovieRented:
+      type: object
+      properties:
+        id:
+          type: integer
+        movie_id:
+          type: integer
+        available:
+          type: boolean
+        title:
+          type: string
+        release_date:
+          type: string
+          format: date
+        daily_rental_price:
+          type: number
+          format: float
+        purchase_price:
+          type: number
+          format: float
+        description:
+          type: string
+        link:
+          type: string
+        rental_date:
+          type: string
+          format: date-time
+        return_date:
+          type: string
+          format: date-time
+    MoviePurchased:
+      type: object
+      properties:
+        id:
+          type: integer
+        movie_id:
+          type: integer
+        available:
+          type: boolean
+        title:
+          type: string
+        release_date:
+          type: string
+          format: date
+        daily_rental_price:
+          type: number
+          format: float
+        purchase_price:
+          type: number
+          format: float
+        description:
+          type: string
+        link:
+          type: string
+        purchase_date:
+          type: string
+          format: date
+
     Image:
       type: object
       properties:

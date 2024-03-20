@@ -7,8 +7,9 @@
         <router-link to="/MyMovies">Mes films</router-link>
         <router-link to="/MyHistory">Mon historique</router-link>
         <router-link to="/MyAccount">Mon profil</router-link>
+        <router-link to="/MyMessages">Mes messages</router-link>
         <router-link to="/MyCart">Mon panier</router-link>
-        <router-link to="/">Déconnexion</router-link>
+        <router-link to="/" @click.native="logout">Déconnexion</router-link> <!-- Lien de déconnexion -->
 
         <!-- Ajoutez d'autres liens de navigation ici -->
       </div>
@@ -18,8 +19,17 @@
 
 <script>
 export default {
-  name: 'NavbarUser',
-};
+  methods: {
+    logout() {
+      // Supprimez les informations de l'utilisateur de la session ou du local storage
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+
+      // Redirigez l'utilisateur vers la page de connexion
+      this.$router.push('/');
+    }
+  }
+}
 </script>
 
 <style scoped>
