@@ -42,27 +42,50 @@ export default {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
-      // Si l'utilisateur est connecté, récupérer le panier du serveur
       if (this.isUserConnected) {
         axios.get(`http://localhost:3000/cart/${userId}`, {
           headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
-          // Si des éléments existent dans le panier serveur, les utiliser
           if (response.data && response.data.length > 0) {
-            this.moviesCart = response.data;
+            this.mergeCarts(response.data, JSON.parse(localStorage.getItem('cart') || '[]'));
           } else {
-            // Sinon, utiliser le panier local s'il existe
             this.loadLocalCart();
           }
         }).catch(error => {
           console.error('Erreur lors de la récupération des éléments du panier:', error);
-          this.loadLocalCart(); // Charger le panier local en cas d'erreur
+          this.loadLocalCart();
         });
       } else {
-        // Si l'utilisateur n'est pas connecté, utiliser le panier local
-        console.log('Utilisateur non connecté. Charger le panier local.');
         this.loadLocalCart();
       }
+    },
+    mergeCarts(serverCart, localCart) {
+      const mergedCart = [...serverCart];
+
+      localCart.forEach(localItem => {
+        if (!mergedCart.some(item => item.movie_id === localItem.movie_id)) {
+          this.addToCart(localItem.movie_id, localItem.rental_duration, localItem.cart_type);
+        }
+      });
+
+      this.moviesCart = mergedCart;
+    },
+    addToCart(movieId, rentalDuration, type) {
+      const userId = localStorage.getItem('userId');
+      const token = localStorage.getItem('token');
+      const headers = {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`};
+
+      axios.post('http://localhost:3000/cart', {
+        cart_type: type,
+        movie_id: movieId,
+        user_id: userId,
+        rental_duration: rentalDuration,
+      }, {headers}).then(response => {
+        console.log('Success:', response.data);
+        this.fetchCartItems(); // Rafraîchir le panier pour refléter les changements
+      }).catch(error => {
+        console.error('Error:', error);
+      });
     },
     loadLocalCart() {
       // Charger le panier à partir de localStorage
