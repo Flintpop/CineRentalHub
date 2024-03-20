@@ -100,5 +100,14 @@ export default {
                 this.$handleError(error);
             }
         }
+
+        app.config.globalProperties.$getCommentsByMovieId = async function (movieId) {
+            try {
+                const response = await axios.get(`${this.$baseApiUrl}/comments/${movieId}`);
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
     }
 };

@@ -13,7 +13,7 @@ import MovieDetailsPage from "../views/MovieDetailsPage.vue";
 import ManageUsers from "../views/Admin/ManageUsers.vue";
 import ManageMovies from "../views/Admin/ManageMovies.vue";
 import HomeAdmin from "../views/Admin/HomeAdmin.vue";
-import MyMessages from "../views/MyMessages.vue";
+import MyMessages from "../views/User/MyMessages.vue";
 
 
 
