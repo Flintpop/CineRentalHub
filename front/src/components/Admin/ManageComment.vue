@@ -74,7 +74,7 @@ export default {
           .catch(error => console.error('Erreur lors de la récupération des commentaires:', error));
     },
     fetchAuthor(authorId) {
-      axios.get(`http://localhost:3000/users/${authorId}`)
+      axios.get(`http://localhost:3000/user/${authorId}`)
           .then(response => {
             return response.data.last_name; // Retourne le nom de l'auteur
           })
