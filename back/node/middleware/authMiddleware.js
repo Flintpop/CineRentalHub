@@ -11,6 +11,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/main_image/[^/]+/?', methods: ['GET']},
         {path: '/sign_in', methods: ['POST']},
         {path: '/user', methods: ['POST']},
+        {path: '/comments/[^/]+/?', methods: ['GET']},
     ];
 
     const protectedRoutes = [
@@ -31,9 +32,9 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/user/password/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false},
 
         {path: '/users', methods: ['GET'], roles: ['admin']},
-        {path: '/comments/[^/]+/?', methods: ['POST', 'GET'], roles: ['user'], selfOnly: false},
 
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
+        {path: '/comments', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user'], selfOnly: false},
         {path: '/comments/image', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/image/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false},

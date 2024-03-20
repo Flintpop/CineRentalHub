@@ -41,6 +41,7 @@
           </div>
         </div>
       </div>
+      <CommentList :movie-id="this.movie.id"></CommentList>
     </div>
   </div>
 </template>
@@ -51,10 +52,12 @@ import axios from "axios";
 import {defineComponent} from "vue";
 import {Carousel, Slide, Pagination, Navigation} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
+import CommentList from "./CommentList.vue";
 
 export default defineComponent({
   name: 'MovieDetailsComponent',
   components: {
+    CommentList,
     Carousel,
     Slide,
     Pagination,
