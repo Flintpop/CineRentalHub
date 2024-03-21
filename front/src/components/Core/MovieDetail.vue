@@ -101,6 +101,7 @@ export default defineComponent({
       }, {headers})
           .then(response => {
             console.log('Success:', response.data);
+            this.confirmationMessage = 'Le film a été ajouté dans votre panier.';
           })
           .catch((error) => {
             console.error('Error:', error);
@@ -121,22 +122,14 @@ export default defineComponent({
         // Vérifiez si l'utilisateur est connecté
         const token = localStorage.getItem('token');
         if (token) {
-          const reponse = this.addToCart(movieId, this.rentalDuration, 'rental');
-          if(reponse){
-            this.isAddedToCart = true;
-            console.log(`Le film ${movieId} a été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
-            this.isRented = true; // Supposons que la location est toujours réussie pour l'exemple
-            this.showConfirmation = true;
-            this.confirmationMessage = 'Le film a été ajouté dans votre panier.';
-            setTimeout(() => this.showConfirmation = false, 3000); // Masque la confirmation après 3 secondes
-          }else{
-            this.isAddedToCart = false;
-            console.log(`Le film ${movieId} n'a pas été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
-            this.isRented = false;
-            this.showConfirmation = true;
-            this.confirmationMessage = 'Le film n\'a pas été ajouté dans votre panier.';
-            setTimeout(() => this.showConfirmation = false, 3000); // Masque la confirmation après 3 secondes
-          }
+          this.confirmationMessage = 'Le film n\'a pas été ajouté à votre panier.';
+          this.addToCart(movieId, this.rentalDuration, 'rental');
+          this.isAddedToCart = true;
+          console.log(`Le film ${movieId} a été ajouté au panier pour ${this.rentalDuration} jour(s) à ${this.calculatedRentalPrice.toFixed(2)}€.`);
+          this.isRented = true; // Supposons que la location est toujours réussie pour l'exemple
+          this.showConfirmation = true;
+          setTimeout(() => this.showConfirmation = false, 3000); // Masque la confirmation après 3 secondes
+
         } else {
           // Stockez le panier en localStorage si l'utilisateur n'est pas connecté
           this.saveToLocalStorage(movieId, this.rentalDuration, 'rental');
