@@ -1,5 +1,5 @@
 <template>
-  <Navbar></Navbar>
+  <NavbarUser></NavbarUser>
   <div class="viewing-history">
     <h2>Historique de visionnage</h2>
     <ul>
@@ -11,11 +11,11 @@
 </template>
 
 <script>
-import Navbar from "../../components/NoConnected/Navbar.vue";
+import NavbarUser from "../../components/User/NavbarUser.vue";
 
 export default {
   name: 'MyHistory',
-  components: {Navbar},
+  components: {NavbarUser},
   data() {
     return {
       viewingHistory: []
