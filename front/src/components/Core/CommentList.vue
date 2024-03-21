@@ -35,6 +35,7 @@
             <input type="checkbox" v-model="isImageBeingDeleted" id="deleteImage"/>
             <label for="deleteImage">Supprimer l'image</label>
           </div>
+          Taille limite : 10kb
           <div v-if="imagePreview">
             <img :src="imagePreview" alt="Preview" style="max-width: 200px; max-height: 200px;"/>
           </div>
