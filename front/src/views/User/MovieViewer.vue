@@ -4,12 +4,25 @@
     <div class="movie-details">
       <h1>{{ movie.title }}</h1>
       <p>{{ movie.description }}</p>
-      <p> lien de la vidéo : {{ movie.link }} </p>
-      <video width="750" controls>
-        <source :src="movie.link" type="video/mp4">
-        Votre navigateur ne supporte pas la balise vidéo.
-      </video>
+
+      <a :href="movie.link">Voir le film</a>
+
+
     </div>
+<!--    <video width="750" controls>-->
+<!--      <source :src="movie.link" type="video/mp4">-->
+<!--      Votre navigateur ne supporte pas la balise vidéo.-->
+<!--    </video>-->
+
+    <iframe
+        width="1080"
+        height="720"
+
+        :src="movie.link"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+    ></iframe>
   </div>
   <div v-else>
     <p>Chargement du film...</p>
