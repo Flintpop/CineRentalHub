@@ -2,7 +2,7 @@
   <div class="details-component" v-if="movie">
     <div class="details-wrapper">
       <button @click="closeDetails" class="details-close-btn">
-        <span class="material-icons">close</span>
+        <span class="material-icons">X</span>
       </button>
       <div class="details-content">
         <div class="details-image-container">
