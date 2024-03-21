@@ -39,42 +39,42 @@ export default {
     },
   },
   created() {
-    this.fetchUserPurchases();
+    // this.fetchUserPurchases();
   },
   methods: {
-    fetchUserPurchases() {
-      if (!this.isUserConnected) {
-        return;
-      }
-      const userId = localStorage.getItem('userId');
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Content-Type': 'application/json',
-        'authorization': 'Bearer ' + token
-      };
-
-      axios.get(`http://localhost:3000/movies/purchases${userId}`, {headers})
-          .then(response => {
-            this.filterLocalCart(response.data);
-          })
-          .catch(error => {
-            console.error('Erreur lors de la récupération des achats de l\'utilisateur:', error);
-          });
-    },
-
-    filterLocalCart(userPurchases) {
-      let localCart = JSON.parse(localStorage.getItem('cart')) || [];
-
-      // Filtrer le panier local pour enlever les films déjà achetés par l'utilisateur
-      localCart = localCart.filter(localItem => {
-        return !userPurchases.some(purchase => purchase.movie_id === localItem.movie_id);
-      });
-
-      // Mettre à jour le panier local dans le localStorage
-      localStorage.setItem('cart', JSON.stringify(localCart));
-
-      console.log('Panier local filtré:', localCart);
-    },
+    // fetchUserPurchases() {
+    //   if (!this.isUserConnected) {
+    //     return;
+    //   }
+    //   const userId = localStorage.getItem('userId');
+    //   const token = localStorage.getItem('token');
+    //   const headers = {
+    //     'Content-Type': 'application/json',
+    //     'authorization': 'Bearer ' + token
+    //   };
+    //
+    //   axios.get(`http://localhost:3000/movies/purchases${userId}`, {headers})
+    //       .then(response => {
+    //         this.filterLocalCart(response.data);
+    //       })
+    //       .catch(error => {
+    //         console.error('Erreur lors de la récupération des achats de l\'utilisateur:', error);
+    //       });
+    // },
+    //
+    // filterLocalCart(userPurchases) {
+    //   let localCart = JSON.parse(localStorage.getItem('cart')) || [];
+    //
+    //   // Filtrer le panier local pour enlever les films déjà achetés par l'utilisateur
+    //   localCart = localCart.filter(localItem => {
+    //     return !userPurchases.some(purchase => purchase.movie_id === localItem.movie_id);
+    //   });
+    //
+    //   // Mettre à jour le panier local dans le localStorage
+    //   localStorage.setItem('cart', JSON.stringify(localCart));
+    //
+    //   console.log('Panier local filtré:', localCart);
+    // },
 
     fetchCartItems() {
       const userId = localStorage.getItem('userId');
