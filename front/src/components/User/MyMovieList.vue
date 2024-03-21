@@ -122,8 +122,12 @@ export default {
     },
     viewMovie(movie) {
       // Implement the logic to view the movie
-      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.id } });
+      const userId = localStorage.getItem('userId');
+      console.log(`Viewing movie: ${movie.title} with ID: ${movie.id}`);
+      console.log(`User ID: ${userId}`);
+      this.$newStats(movie.id, userId)
       console.log(`Viewing movie: ${movie.title}`);
+      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.id } });
     },
     isMovieAvailable(movie) {
       if (movie.rental_date) {
@@ -154,7 +158,21 @@ export default {
           return this.filteredRentMovies.some(filteredMovie => filteredMovie.id === movie.id);
         });
       }
-      return allMovies;
+      if (allMovies.length > 0) {
+        return allMovies;
+      }
+      // Film fictif
+      return [
+        {
+          id: 1,
+          title: 'Film fictif',
+          rental_date: '2024-03-21',
+          return_date: '2024-03-22',
+          daily_rental_price: 2,
+          purchase_price: 10,
+          purchase_date: '2021-01-01',
+        }
+      ]
     }
   },
   created() {
