@@ -93,11 +93,6 @@ export default {
     this.checkUserLoggedIn();
     this.userId = parseInt(localStorage.getItem('userId'), 10); // Assurez-vous de stocker l'ID lors de la connexion
   },
-  watch: {
-    commentaires() {
-      console.log('Commentaires mis à jour:', this.commentaires);
-    },
-  },
   methods: {
     fetchCommentaires() {
       this.$getCommentsByMovieId(this.movieId).then((res) => {
@@ -182,15 +177,14 @@ export default {
             })
       }
 
-      // Mettez à jour le commentaire dans votre liste de commentaires avec le texte modifié
-      // const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
-      // if (index !== -1) {
-      //   this.commentaires[index].comment_text = this.editedText;
-      //   // Optionnellement, réinitialisez l'état de modification ici
-      //   this.editingComment = null;
-      //   this.editedText = '';
-      //   this.isImageBeingDeleted = false;
-      // }
+      const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
+      if (index !== -1) {
+        this.commentaires[index].comment_text = this.editedText;
+        // Optionnellement, réinitialisez l'état de modification ici
+        this.editingComment = null;
+        this.editedText = '';
+        this.isImageBeingDeleted = false;
+      }
       this.fetchCommentaires()
     },
 
