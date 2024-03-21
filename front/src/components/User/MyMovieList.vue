@@ -165,12 +165,12 @@ export default {
       return [
         {
           id: 1,
-          title: 'Film fictif',
-          rental_date: '2024-03-21',
-          return_date: '2024-03-22',
-          daily_rental_price: 2,
-          purchase_price: 10,
-          purchase_date: '2021-01-01',
+          title: 'Vous n\'avez pas encore de films',
+          rental_date: '0000',
+          return_date: '0000',
+          daily_rental_price: 0,
+          purchase_price: 0,
+          purchase_date: '0000',
         }
       ]
     }
