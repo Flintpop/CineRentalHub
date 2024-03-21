@@ -9,7 +9,6 @@ import MyMovies from "../views/User/MyMovies.vue";
 import MyHistory from "../views/User/MyHistory.vue";
 import MyAccount from "../views/User/MyAccount.vue";
 import MyCart from "../views/MyCart.vue";
-import MovieDetailsPage from "../views/MovieDetailsPage.vue";
 import ManageUsers from "../views/Admin/ManageUsers.vue";
 import ManageMovies from "../views/Admin/ManageMovies.vue";
 import HomeAdmin from "../views/Admin/HomeAdmin.vue";
@@ -70,12 +69,6 @@ const routes = [
         path: '/MyCart',
         name: 'MyCart',
         component: MyCart,
-    },
-    // ...autres routes
-    {
-        path: '/MovieDetailsPage/:movieId',
-        name: 'MovieDetailsPage',
-        component: MovieDetailsPage
     },
     {
         path: '/HomeAdmin',

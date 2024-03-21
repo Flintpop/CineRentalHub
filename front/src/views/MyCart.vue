@@ -179,6 +179,9 @@ export default {
           headers: {Authorization: `Bearer ${token}`}
         }).then(response => {
           // Handle successful validation
+          alert('Votre panier a été validé avec succès');
+          this.moviesCart = [];
+          this.clearLocalCart();
           console.log('Cart validated successfully:', response.data);
         }).catch(error => {
           // Handle error during validation
@@ -190,6 +193,7 @@ export default {
           this.$router.push('/Login');
         });
       }
+
 
 
     },
@@ -233,6 +237,7 @@ export default {
         }).then(() => {
           this.moviesCart = [];
           console.log('Panier vidé avec succès');
+
         }).catch(error => {
           console.error('Erreur lors du vidage du panier:', error);
         });
