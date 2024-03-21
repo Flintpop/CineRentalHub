@@ -14,6 +14,7 @@ import ManageUsers from "../views/Admin/ManageUsers.vue";
 import ManageMovies from "../views/Admin/ManageMovies.vue";
 import HomeAdmin from "../views/Admin/HomeAdmin.vue";
 import MyMessages from "../views/User/MyMessages.vue";
+import MovieViewer from "../views/User/MovieViewer.vue";
 
 
 
@@ -95,7 +96,14 @@ const routes = [
         path: '/MyMessages',
         name: 'MyMessages',
         component: MyMessages,
-    }
+    },
+    {
+        path: '/movie/:movieId',
+        name: 'MovieViewer',
+        component: MovieViewer,
+        props: true
+    },
+
 ];
 
 const router = createRouter({

@@ -127,6 +127,7 @@ export default {
       console.log(`User ID: ${userId}`);
       this.$newStats(movie.id, userId)
       console.log(`Viewing movie: ${movie.title}`);
+      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.id } });
     },
     isMovieAvailable(movie) {
       if (movie.rental_date) {
