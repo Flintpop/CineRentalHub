@@ -123,11 +123,11 @@ export default {
     viewMovie(movie) {
       // Implement the logic to view the movie
       const userId = localStorage.getItem('userId');
-      console.log(`Viewing movie: ${movie.title} with movie ID: ${movie.id}`);
+      console.log(`Viewing movie: ${movie.title} with ID: ${movie.movie_id}`);
       console.log(`User ID: ${userId}`);
       this.$newStats(movie.id, userId)
       console.log(`Viewing movie: ${movie.title}`);
-      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.id } });
+      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.movie_id } });
     },
     isMovieAvailable(movie) {
       if (movie.rental_date) {

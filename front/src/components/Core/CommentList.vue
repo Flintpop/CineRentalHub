@@ -112,18 +112,20 @@ export default {
 
       const userId = localStorage.getItem('userId');
       this.$addComment(this.movieId, userId, this.newCommentText)
-      //
-      // const first_name = this.commentaires.find(c => c.user.id === userId).user.first_name;
-      // // Après l'ajout, vous pourriez vouloir réinitialiser le champ de texte et rafraîchir la liste des commentaires
-      // this.commentaires.push({
-      //   id: this.commentaires.length + 1,
-      //   comment_text: this.newCommentText,
-      //   user: {
-      //     id: userId,
-      //     first_name,
-      //   },
-      // });
-      this.fetchCommentaires()
+          .then(() => {
+            console.log('Commentaire ajouté avec succès');
+            this.fetchCommentaires();
+          });
+      const first_name = this.commentaires.find(c => c.user.id === userId).user.first_name;
+      // Après l'ajout, vous pourriez vouloir réinitialiser le champ de texte et rafraîchir la liste des commentaires
+      this.commentaires.push({
+        id: this.commentaires.length + 1,
+        comment_text: this.newCommentText,
+        user: {
+          id: userId,
+          first_name,
+        },
+      });
       this.newCommentText = '';
       this.newCommentImage = null;
 
@@ -175,7 +177,6 @@ export default {
             })
       }
 
-      // Mettez à jour le commentaire dans votre liste de commentaires avec le texte modifié
       const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
       if (index !== -1) {
         this.commentaires[index].comment_text = this.editedText;
@@ -184,6 +185,7 @@ export default {
         this.editedText = '';
         this.isImageBeingDeleted = false;
       }
+      this.fetchCommentaires()
     },
 
     cancelEdit() {
