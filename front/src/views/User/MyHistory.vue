@@ -3,8 +3,13 @@
   <div class="viewing-history">
     <h2>Historique de visionnage</h2>
     <ul>
-      <li v-for="entry in viewingHistory" :key="entry.id">
-        Utilisateur ID: {{ entry.user_id }}, Film ID: {{ entry.movie_id }}, Date de visionnage: {{ entry.view_date }}
+      <li v-for="entry in viewingHistory" :key="entry.id" class="history-entry">
+        <div class="entry-content">
+          Utilisateur ID: {{ entry.user_id }}, Film ID: {{ entry.movie_id }}, Date de visionnage: {{ entry.view_date }}
+        </div>
+        <button @click="deleteHistory(entry.id)" class="delete-btn">
+          <font-awesome-icon icon="trash-alt" />
+        </button>
       </li>
     </ul>
   </div>
@@ -42,6 +47,13 @@ export default {
         this.viewingHistory = this.defaultData();
       }
     },
+    deleteHistory(statId) {
+      this.$deleteUserStat(statId).then(() => {
+        this.fetchHistory(); // Recharge l'historique après suppression
+      }).catch(error => {
+        console.error("Erreur lors de la suppression de l'entrée: ", error);
+      });
+    },
     defaultData() {
       return [
         {
@@ -64,7 +76,7 @@ export default {
         }
       ];
     }
-  }
+  },
 }
 </script>
 
@@ -88,10 +100,31 @@ export default {
 }
 
 .viewing-history li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background-color: #fff;
   margin: 10px 0;
   padding: 10px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-</style>
+
+.delete-btn {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #545454; /* Gris foncé pour l'icône non survolée */
+}
+
+.delete-btn:hover {
+  background-color: #e57373; /* Rouge moins saturé pour l'état survolé */
+  color: white; /* Couleur du texte (icône) lors du survol */
+}
+
+.font-awesome-icon {
+  color: #333; /* Couleur de l'icône, ajustez selon votre design */
+}</style>

@@ -163,7 +163,6 @@ export default {
                     movie_id,
                     user_id,
                 });
-                alert("Statistiques ajoutées avec succès !");
                 return response.data;
             } catch (error) {
                 this.$handleError(error);
@@ -185,6 +184,15 @@ export default {
                 }
                 console.log("Final user stats ", userStats)
                 return userStats;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
+
+        app.config.globalProperties.$deleteUserStat = async function (statsId) {
+            try {
+                const response = await axios.delete(`${this.$baseApiUrl}/stats/${statsId}`);
+                return response.data;
             } catch (error) {
                 this.$handleError(error);
             }
