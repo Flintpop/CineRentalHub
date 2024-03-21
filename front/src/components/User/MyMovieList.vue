@@ -122,6 +122,7 @@ export default {
     },
     viewMovie(movie) {
       // Implement the logic to view the movie
+      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.id } });
       console.log(`Viewing movie: ${movie.title}`);
     },
     isMovieAvailable(movie) {
