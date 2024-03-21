@@ -56,6 +56,7 @@ import axios from 'axios';
 import UserEditForm from "../../components/Core/UserEditForm.vue";
 import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
 import CreateUserForm from "../../components/Admin/CreateUserForm.vue";
+import UserPurchasedMovies from "../../components/Admin/UserBoughtMovies.vue";
 
 export default {
   components: {
@@ -64,7 +65,7 @@ export default {
     UserEditForm,
     UserRentedMovies,
     CreateUserForm,
-
+    UserPurchasedMovies,
   },
 
 
@@ -84,7 +85,7 @@ export default {
         'rentedMovies': UserRentedMovies,
         'createUser': CreateUserForm,
         'updateUser': UserEditForm,
-        // 'purchasedMovies': UserPurchasedMoviesComponent,
+        'purchasedMovies': UserPurchasedMovies,
       };
     },
   },
@@ -98,7 +99,8 @@ export default {
       };
       try {
         const response = await axios.get('http://localhost:3000/users', {headers});
-        this.users = response.data;
+        // Enlève l'user d'id 1
+        this.users = response.data.filter(user => user.id != 1);
       } catch (error) {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
       }
