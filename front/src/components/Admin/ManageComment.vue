@@ -114,7 +114,7 @@ export default {
       this.editingCommentText = commentText;
     },
     updateComment(commentId) {
-      axios.put(`http://localhost:3000/comments/manage/${commentId}`, {text: this.editingCommentText})
+      axios.put(`http://localhost:3000/comments/manage/${commentId}`, {comment_text: this.editingCommentText})
           .then(() => {
             console.log('Commentaire modifié avec succès');
             this.fetchComments(); // Recharger les commentaires pour afficher les modifications
