@@ -141,34 +141,27 @@ CREATE TABLE IF NOT EXISTS images
 -- jeux de données pour la table movies
 INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
 VALUES (TRUE, 'The Shawshank Redemption', '1994-09-23', 2.99, 9.99, 'Two imprisoned',
-        'https://www.youtube.com/watch?v=6hB3S9bIaco');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'The Godfather', '1972-03-24', 2.99, 9.99,
+        'https://www.youtube.com/embed/6hB3S9bIaco'),
+       (TRUE, 'The Godfather', '1972-03-24', 2.99, 9.99,
         'The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.',
-        'https://www.youtube.com/watch?v=sY1S34973zA');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'The Dark Knight', '2008-07-18', 2.99, 9.99, 'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept
-    one of the greatest psychological and physical tests of his ability to fight injustice.',
-        'https://www.youtube.com/watch?v=EXeTwQWrcwY');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (FALSE, 'The Lord of the Rings: The Return of the King', '2003-12-17', 2.99, 9.99, 'Gandalf and Aragorn',
-        'https://www.youtube.com/watch?v=r5X-hFf6Bwo');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'Pulp Fiction', '1994-10-14', 2.99, 9.99,
+        'https://www.youtube.com/embed/sY1S34973zA'),
+       (TRUE, 'The Dark Knight', '2008-07-18', 2.99, 9.99,
+        'When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.',
+        'https://www.youtube.com/embed/EXeTwQWrcwY'),
+       (FALSE, 'The Lord of the Rings: The Return of the King', '2003-12-17', 2.99, 9.99, 'Gandalf and Aragorn',
+        'https://www.youtube.com/embed/r5X-hFf6Bwo'),
+       (TRUE, 'Pulp Fiction', '1994-10-14', 2.99, 9.99,
         'The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.',
-        'https://www.youtube.com/watch?v=s7EdQ4FqbhY');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'Schindler\'s List', '1994-02-04', 2.99, 9.99,
+        'https://www.youtube.com/embed/s7EdQ4FqbhY'),
+       (TRUE, 'Schindler\'s List', '1994-02-04', 2.99, 9.99,
         'In German-occupied Poland during World War II, industrialist Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution',
-        'https://www.youtube.com/watch?v=gG22XNhtnoY');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'Avatar', '2009-12-18', 3.99, 14.99,
+        'https://www.youtube.com/embed/gG22XNhtnoY'),
+       (TRUE, 'Avatar', '2009-12-18', 3.99, 14.99,
         'A paraplegic Marine dispatched to the moon Pandora on a unique mission becomes torn between following his orders and protecting the world he feels is his home.',
-        'https://www.youtube.com/watch?v=5PSNL1qE6VY');
-INSERT INTO movies (available, title, release_date, daily_rental_price, purchase_price, description, link)
-VALUES (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
+        'https://www.youtube.com/embed/5PSNL1qE6VY'),
+       (TRUE, 'Iron man', '2008-05-02', 3.99, 14.99,
         'After being held captive in an Afghan cave, billionaire engineer Tony Stark creates a unique weaponized suit of armor to fight evil.',
-        'https://www.youtube.com/watch?v=8hYlB38asDY');
+        'https://www.youtube.com/embed/8hYlB38asDY');
 
 -- jeux de données pour la table users
 INSERT INTO users (last_name, first_name, email, password, role)
