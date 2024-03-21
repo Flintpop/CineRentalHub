@@ -49,7 +49,10 @@ export default {
         const response = await axios.put(`http://localhost:3000/user/${UserId}`, user, {headers});
         console.log('Mise à jour réussie', response.data);
       } catch (error) {
-        console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
+        console.error('Erreur lors de la mise à jour du profil utilisateur:', error);
+        if (error.response.data.error) {
+          alert(error.response.data.error)
+        }
       }
     },
     fetchUser() {
