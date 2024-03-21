@@ -36,6 +36,7 @@ export default {
   methods: {
     toggleEdit() {
       this.isEditing = !this.isEditing;
+      this.fetchUser();
     },
     updateUser: async (user) => {
       try {
@@ -47,7 +48,6 @@ export default {
         const UserId = localStorage.getItem('userId');
         const response = await axios.put(`http://localhost:3000/user/${UserId}`, user, {headers});
         console.log('Mise à jour réussie', response.data);
-        this.user = response.data;
       } catch (error) {
         console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
       }
