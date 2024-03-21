@@ -1,8 +1,17 @@
 <template>
-  <div class="MyHistory">
-    <NavbarUser/>
-    <h1>Mon Historique</h1>
-    <!-- Ici, vous pouvez ajouter le code pour afficher les articles dans le panier -->
+  <NavbarUser></NavbarUser>
+  <div class="viewing-history">
+    <h2>Historique de visionnage</h2>
+    <ul>
+      <li v-for="entry in viewingHistory" :key="entry.id" class="history-entry">
+        <div class="entry-content">
+          Utilisateur ID: {{ entry.user_id }}, Film ID: {{ entry.movie_id }}, Date de visionnage: {{ entry.view_date }}
+        </div>
+        <button @click="deleteHistory(entry.id)" class="delete-btn">
+          <font-awesome-icon icon="trash-alt" />
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -14,17 +23,108 @@ export default {
   components: {NavbarUser},
   data() {
     return {
-      // Ici, vous pouvez ajouter les données nécessaires pour votre panier
-    };
+      viewingHistory: []
+    }
+  },
+  mounted() {
+    this.fetchHistory();
   },
   methods: {
-    // Ici, vous pouvez ajouter les méthodes nécessaires pour votre panier
+    fetchHistory() {
+      try {
+        // Remplacez `fetchViewingHistory` par la fonction globale réelle
+        let userId = localStorage.getItem('userId');
+        this.$getViewingStats(userId).then((res) => {
+          this.viewingHistory = res
+        });
+        if (!this.viewingHistory) {
+          this.viewingHistory = this.defaultData();
+        }
+        console.log("Historique de visionnage : ", this.viewingHistory)
+        console.log("Différence avec default data :", this.defaultData())
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'historique de visionnage: ", error);
+        this.viewingHistory = this.defaultData();
+      }
+    },
+    deleteHistory(statId) {
+      this.$deleteUserStat(statId).then(() => {
+        this.fetchHistory(); // Recharge l'historique après suppression
+      }).catch(error => {
+        console.error("Erreur lors de la suppression de l'entrée: ", error);
+      });
+    },
+    defaultData() {
+      return [
+        {
+          "id": 1,
+          "user_id": 1,
+          "movie_id": 1,
+          "view_date": "Jan 1, 2020, 8:00:00PM"
+        },
+        {
+          "id": 2,
+          "user_id": 4,
+          "movie_id": 1,
+          "view_date": "Mar 21, 2024, 8:42:11AM"
+        },
+        {
+          "id": 3,
+          "user_id": 6,
+          "movie_id": 1,
+          "view_date": "Mar 21, 2024, 8:49:50AM"
+        }
+      ];
+    }
   },
-};
+}
 </script>
 
 <style scoped>
-.mycart {
-  /* Ici, vous pouvez ajouter le style pour votre panier */
+.viewing-history {
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
 }
-</style>
+
+.viewing-history h2 {
+  text-align: center;
+  color: #333;
+}
+
+.viewing-history ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.viewing-history li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.delete-btn {
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #545454; /* Gris foncé pour l'icône non survolée */
+}
+
+.delete-btn:hover {
+  background-color: #e57373; /* Rouge moins saturé pour l'état survolé */
+  color: white; /* Couleur du texte (icône) lors du survol */
+}
+
+.font-awesome-icon {
+  color: #333; /* Couleur de l'icône, ajustez selon votre design */
+}</style>

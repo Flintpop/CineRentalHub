@@ -17,7 +17,6 @@
               <div class="user-info" @click="selectUser(user, 'details')">
                 <h3>{{ user.last_name }} {{ user.first_name }}</h3>
                 <p><strong> Email : </strong> {{ user.email }}</p>
-                <p><strong> Activé : </strong> {{ user.activated ? 'Oui' : 'Non' }}</p>
                 <p><strong> Rôle : </strong> {{ user.role }}</p>
                 <div class="user-actions">
 
@@ -57,6 +56,7 @@ import axios from 'axios';
 import UserEditForm from "../../components/Core/UserEditForm.vue";
 import UserRentedMovies from "../../components/Admin/UserRentedMovies.vue";
 import CreateUserForm from "../../components/Admin/CreateUserForm.vue";
+import UserPurchasedMovies from "../../components/Admin/UserBoughtMovies.vue";
 
 export default {
   components: {
@@ -65,7 +65,7 @@ export default {
     UserEditForm,
     UserRentedMovies,
     CreateUserForm,
-
+    UserPurchasedMovies,
   },
 
 
@@ -84,7 +84,8 @@ export default {
         'edit': UserEditForm,
         'rentedMovies': UserRentedMovies,
         'createUser': CreateUserForm,
-        // 'purchasedMovies': UserPurchasedMoviesComponent,
+        'updateUser': UserEditForm,
+        'purchasedMovies': UserPurchasedMovies,
       };
     },
   },
@@ -98,7 +99,8 @@ export default {
       };
       try {
         const response = await axios.get('http://localhost:3000/users', {headers});
-        this.users = response.data;
+        // Enlève l'user d'id 1
+        this.users = response.data.filter(user => user.id != 1);
       } catch (error) {
         console.error("Erreur lors de la récupération des utilisateurs:", error);
       }
@@ -139,13 +141,13 @@ export default {
         const token = localStorage.getItem('token');
         const headers = {
           'Content-Type': 'application/json',
-          'authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + token
         };
-        const response = await axios.put(`http://localhost:3000/user/${user.id}`, user, {headers});
-        console.log('Mise à jour réussie', response.data);
-        this.fetchUsers(); // Rafraîchir la liste des utilisateurs après la mise à jour
+        await axios.put(`http://localhost:3000/user/${user.id}`, user, { headers });
+        console.log('Utilisateur mis à jour avec succès');
+        this.fetchUsers(); // Recharge la liste des utilisateurs pour refléter les modifications
       } catch (error) {
-        console.error('Erreur lors de la mise à jour de l\'utilisateur', error);
+        console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
       }
     },
   },

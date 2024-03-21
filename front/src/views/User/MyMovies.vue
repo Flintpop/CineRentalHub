@@ -68,7 +68,5 @@ export default {
 </script>
 
 <style scoped>
-.mycart {
-  /* Ici, vous pouvez ajouter le style pour votre panier */
-}
+
 </style>

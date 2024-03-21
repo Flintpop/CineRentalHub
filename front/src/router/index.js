@@ -9,11 +9,11 @@ import MyMovies from "../views/User/MyMovies.vue";
 import MyHistory from "../views/User/MyHistory.vue";
 import MyAccount from "../views/User/MyAccount.vue";
 import MyCart from "../views/MyCart.vue";
-import MovieDetailsPage from "../views/MovieDetailsPage.vue";
 import ManageUsers from "../views/Admin/ManageUsers.vue";
 import ManageMovies from "../views/Admin/ManageMovies.vue";
 import HomeAdmin from "../views/Admin/HomeAdmin.vue";
 import MyMessages from "../views/User/MyMessages.vue";
+import MovieViewer from "../views/User/MovieViewer.vue";
 
 
 
@@ -70,12 +70,6 @@ const routes = [
         name: 'MyCart',
         component: MyCart,
     },
-    // ...autres routes
-    {
-        path: '/MovieDetailsPage/:movieId',
-        name: 'MovieDetailsPage',
-        component: MovieDetailsPage
-    },
     {
         path: '/HomeAdmin',
         name: 'HomeAdmin',
@@ -95,7 +89,14 @@ const routes = [
         path: '/MyMessages',
         name: 'MyMessages',
         component: MyMessages,
-    }
+    },
+    {
+        path: '/movie/:movieId',
+        name: 'MovieViewer',
+        component: MovieViewer,
+        props: true
+    },
+
 ];
 
 const router = createRouter({

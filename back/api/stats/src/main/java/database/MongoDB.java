@@ -18,8 +18,8 @@ public class MongoDB {
   private static volatile MongoClient mongoClient = null;
   private static MongoCollection<StatsDTO> collection = null;
   private static final String DATABASE_NAME = "stats";
-//  private static final String CONNECTION_URL = "mongodb://mongo:27017";
-  private static final String CONNECTION_URL = "mongodb://localhost:27017";
+  private static final String CONNECTION_URL = "mongodb://mongo:27017";
+//  private static final String CONNECTION_URL = "mongodb://localhost:27017";
 
   private MongoDB() {
     // Constructeur privé pour éviter l'instanciation
