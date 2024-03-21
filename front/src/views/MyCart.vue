@@ -172,18 +172,18 @@ export default {
     },
     validateCart() {
       if (this.isUserConnected) {
-        // const userId = localStorage.getItem('userId');
-        // const token = localStorage.getItem('token');
-        //
-        // axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
-        //   headers: {Authorization: `Bearer ${token}`}
-        // }).then(response => {
-        //   // Handle successful validation
-        //   console.log('Cart validated successfully:', response.data);
-        // }).catch(error => {
-        //   // Handle error during validation
-        //   console.error('Error during cart validation:', error);
-        // });
+        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('token');
+
+        axios.patch(`http://localhost:3000/cart/validate/${userId}`,{
+          headers: {Authorization: `Bearer ${token}`}
+        }).then(response => {
+          // Handle successful validation
+          console.log('Cart validated successfully:', response.data);
+        }).catch(error => {
+          // Handle error during validation
+          console.error('Error during cart validation:', error);
+        });
       } else {
         alert('Veuillez vous connecter pour valider votre panier');
         this.$nextTick(() => {
