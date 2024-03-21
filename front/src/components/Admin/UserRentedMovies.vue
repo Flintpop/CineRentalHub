@@ -3,7 +3,7 @@
     <h3>Films loués par {{ user.last_name }} {{ user.first_name }}</h3>
     <ul>
       <li v-for="movie in rentedMovies" :key="movie.id">
-        {{ movie.title }} - Loué le : {{ movie.rented_on }}
+        {{ movie.title }} - Loué le : {{ movie.rental_date }} - Rendu le : {{ movie.return_date }}
       </li>
     </ul>
     <button @click="$emit('close')">Fermer</button>
@@ -33,7 +33,7 @@ export default {
           'Content-Type': 'application/json',
         };
         console.log('Récupération des films loués par l\'utilisateur', this.user.id);
-        const response = await axios.get(`http://localhost:3000/movies/rented/${this.user.id}`, { headers });
+        const response = await axios.get(`http://localhost:3000/movies/rentals/${this.user.id}`, { headers });
         this.rentedMovies = response.data;
       } catch (error) {
         console.error('Erreur lors de la récupération des films loués:', error);

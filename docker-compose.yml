@@ -21,6 +21,14 @@ services:
     networks:
       - ubo-network
 
+#  front:
+#    build:
+#      context: ./front
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - ubo-network
+
   mongo:
     build:
       context: ./back/mongodb

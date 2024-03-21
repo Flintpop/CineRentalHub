@@ -38,13 +38,51 @@ export default {
       }
     },
   },
+  created() {
+    // this.fetchUserPurchases();
+  },
   methods: {
+    // fetchUserPurchases() {
+    //   if (!this.isUserConnected) {
+    //     return;
+    //   }
+    //   const userId = localStorage.getItem('userId');
+    //   const token = localStorage.getItem('token');
+    //   const headers = {
+    //     'Content-Type': 'application/json',
+    //     'authorization': 'Bearer ' + token
+    //   };
+    //
+    //   axios.get(`http://localhost:3000/movies/purchases${userId}`, {headers})
+    //       .then(response => {
+    //         this.filterLocalCart(response.data);
+    //       })
+    //       .catch(error => {
+    //         console.error('Erreur lors de la récupération des achats de l\'utilisateur:', error);
+    //       });
+    // },
+    //
+    // filterLocalCart(userPurchases) {
+    //   let localCart = JSON.parse(localStorage.getItem('cart')) || [];
+    //
+    //   // Filtrer le panier local pour enlever les films déjà achetés par l'utilisateur
+    //   localCart = localCart.filter(localItem => {
+    //     return !userPurchases.some(purchase => purchase.movie_id === localItem.movie_id);
+    //   });
+    //
+    //   // Mettre à jour le panier local dans le localStorage
+    //   localStorage.setItem('cart', JSON.stringify(localCart));
+    //
+    //   console.log('Panier local filtré:', localCart);
+    // },
 
     fetchCartItems() {
       const userId = localStorage.getItem('userId');
       const token = localStorage.getItem('token');
 
       if (this.isUserConnected) {
+        //FILTRAGE du panier local en enlevant les déja existant dans les film acheté de l'utilisateur
+
         console.log('Récupération des éléments du panier pour l\'utilisateur', userId);
         axios.get(`http://localhost:3000/cart/${userId}`, {
           headers: {Authorization: `Bearer ${token}`}
@@ -66,6 +104,7 @@ export default {
         this.loadLocalCart();
       }
     },
+
     removeFromCart(itemId) {
       console.log('Suppression de l\'élément du panier avec ID', itemId);
       if (this.isUserConnected) {
@@ -172,24 +211,28 @@ export default {
     },
     validateCart() {
       if (this.isUserConnected) {
-        // const userId = localStorage.getItem('userId');
-        // const token = localStorage.getItem('token');
-        //
-        // axios.post(`http://localhost:3000/cart/validate/${userId}`, this.moviesCart, {
-        //   headers: {Authorization: `Bearer ${token}`}
-        // }).then(response => {
-        //   // Handle successful validation
-        //   console.log('Cart validated successfully:', response.data);
-        // }).catch(error => {
-        //   // Handle error during validation
-        //   console.error('Error during cart validation:', error);
-        // });
+        const userId = localStorage.getItem('userId');
+        const token = localStorage.getItem('token');
+
+        axios.patch(`http://localhost:3000/cart/validate/${userId}`,{
+          headers: {Authorization: `Bearer ${token}`}
+        }).then(response => {
+          // Handle successful validation
+          alert('Votre panier a été validé avec succès');
+          this.moviesCart = [];
+          this.clearLocalCart();
+          console.log('Cart validated successfully:', response.data);
+        }).catch(error => {
+          // Handle error during validation
+          console.error('Error during cart validation:', error);
+        });
       } else {
         alert('Veuillez vous connecter pour valider votre panier');
         this.$nextTick(() => {
           this.$router.push('/Login');
         });
       }
+
 
 
     },
@@ -233,6 +276,7 @@ export default {
         }).then(() => {
           this.moviesCart = [];
           console.log('Panier vidé avec succès');
+
         }).catch(error => {
           console.error('Erreur lors du vidage du panier:', error);
         });

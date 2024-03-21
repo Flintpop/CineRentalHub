@@ -83,6 +83,9 @@ export default {
             })
             .catch(error => {
               console.error('Erreur lors de l\'inscription:', error);
+              if (error.response.data.error) {
+                alert(error.response.data.error)
+              }
             });
 
       }

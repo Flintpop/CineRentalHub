@@ -122,7 +122,12 @@ export default {
     },
     viewMovie(movie) {
       // Implement the logic to view the movie
+      const userId = localStorage.getItem('userId');
+      console.log(`Viewing movie: ${movie.title} with ID: ${movie.movie_id}`);
+      console.log(`User ID: ${userId}`);
+      this.$newStats(movie.id, userId)
       console.log(`Viewing movie: ${movie.title}`);
+      this.$router.push({ name: 'MovieViewer', params: { movieId: movie.movie_id } });
     },
     isMovieAvailable(movie) {
       if (movie.rental_date) {
@@ -153,55 +158,41 @@ export default {
           return this.filteredRentMovies.some(filteredMovie => filteredMovie.id === movie.id);
         });
       }
-      return allMovies;
+      if (allMovies.length > 0) {
+        return allMovies;
+      }
+      // Film fictif
+      return [
+        {
+          id: 1,
+          title: 'Vous n\'avez pas encore de films',
+          rental_date: '0000',
+          return_date: '0000',
+          daily_rental_price: 0,
+          purchase_price: 0,
+          purchase_date: '0000',
+        }
+      ]
     }
   },
   created() {
-    // if (this.rentMovies.length === 0) {
-    //   // Use fictitious data for testing
-    //   this.localRentMovies = [
-    //     {
-    //       id: 1,
-    //       title: 'The Shawshank Redemption',
-    //       rental_date: '2021-01-01',
-    //       return_date: '2021-01-15',
-    //       daily_rental_price: 1.5
-    //     },
-    //     {
-    //       id: 2,
-    //       title: 'The Godfather',
-    //       rental_date: '2024-01-01',
-    //       return_date: '2024-12-15',
-    //       daily_rental_price: 1.5,
-    //     },
-    //   ];
-    // }
-    // else{
-    //   this.localRentMovies = this.rentMovies;
-    // }//test si aucun film n'as été recu:
-    // if (this.buyMovies.length === 0) {
-    //   // Use fictitious data for testing
-    //   this.localBuyMovies = [
-    //     {
-    //       id: 1,
-    //       title: 'The Shawshank Redemption',
-    //       purchase_price: 10,
-    //       purchase_date: '2021-01-01',
-    //     },
-    //     {
-    //       id: 2,
-    //       title: 'The Godfather',
-    //       purchase_price: 10,
-    //       purchase_date: '2024-01-01',
-    //     },
-    //   ];
-    // }else {
-    //   this.localBuyMovies = this.buyMovies;
-    // }
+
 
     this.localRentMovies = this.rentMovies;
     this.localBuyMovies = this.buyMovies;
-  }
+    console.log("films loués local:",this.localRentMovies);
+    console.log("films achetés local:",this.localBuyMovies);
+  },
+  watch: {
+    rentMovies(newVal) {
+      this.localRentMovies = newVal;
+      console.log("Mise à jour des films loués local:", this.localRentMovies);
+    },
+    buyMovies(newVal) {
+      this.localBuyMovies = newVal;
+      console.log("Mise à jour des films achetés local:", this.localBuyMovies);
+    },
+  },
 
 };
 </script>

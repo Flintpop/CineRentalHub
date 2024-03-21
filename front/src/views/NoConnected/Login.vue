@@ -86,7 +86,7 @@ export default {
           this.$router.push('/HomeUser');
         }
       } catch (error) {
-        console.error('Erreur lors de la connexion', error.response ? error.response.data : error);
+        this.$handleError(error);
       }
     }
 

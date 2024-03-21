@@ -4,10 +4,10 @@
     <div v-if="isUserLoggedIn">
       <textarea v-model="newCommentText" placeholder="Ajoutez un commentaire..."></textarea>
       <button @click="addComment">Ajouter un commentaire</button>
-<!--      <input type="file" @change="previewImageAddComment" accept="image/*" />-->
-<!--      <div v-if="newCommentImage">-->
-<!--        <img :src="newCommentImage" alt="Preview" style="max-width: 200px; max-height: 200px;" />-->
-<!--      </div>-->
+      <!--      <input type="file" @change="previewImageAddComment" accept="image/*" />-->
+      <!--      <div v-if="newCommentImage">-->
+      <!--        <img :src="newCommentImage" alt="Preview" style="max-width: 200px; max-height: 200px;" />-->
+      <!--      </div>-->
     </div>
     <div v-else>
       <p>Pour ajouter un commentaire,
@@ -22,20 +22,22 @@
           <h3>{{ commentaire.user.first_name }}</h3>
         </div>
         <div v-if="commentaire.image_text">
-          <img :src="'data:image/png;base64,' + commentaire.image_text" alt="Image du commentaire" style="max-width: 200px; max-height: 200px;">
+          <img :src="'data:image/png;base64,' + commentaire.image_text" alt="Image du commentaire"
+               style="max-width: 200px; max-height: 200px;">
         </div>
         <div v-if="editingComment && editingComment.id === commentaire.id">
           <textarea v-model="editedText" placeholder="Modifiez votre commentaire..."></textarea>
           <!-- Afficher le bouton d'upload uniquement si aucune image n'est associée au commentaire -->
           <div v-if="!commentaire.image_text">
-            <input type="file" @change="previewImage" accept="image/*" />
+            <input type="file" @change="previewImage" accept="image/*"/>
           </div>
           <div v-else>
-            <input type="checkbox" v-model="isImageBeingDeleted" id="deleteImage" />
+            <input type="checkbox" v-model="isImageBeingDeleted" id="deleteImage"/>
             <label for="deleteImage">Supprimer l'image</label>
           </div>
+          Taille limite : 10kb
           <div v-if="imagePreview">
-            <img :src="imagePreview" alt="Preview" style="max-width: 200px; max-height: 200px;" />
+            <img :src="imagePreview" alt="Preview" style="max-width: 200px; max-height: 200px;"/>
           </div>
           <div class="button-container">
             <button @click="confirmEdit">Confirmer</button>
@@ -111,7 +113,10 @@ export default {
 
       const userId = localStorage.getItem('userId');
       this.$addComment(this.movieId, userId, this.newCommentText)
-
+          .then(() => {
+            console.log('Commentaire ajouté avec succès');
+            this.fetchCommentaires();
+          });
       const first_name = this.commentaires.find(c => c.user.id === userId).user.first_name;
       // Après l'ajout, vous pourriez vouloir réinitialiser le champ de texte et rafraîchir la liste des commentaires
       this.commentaires.push({
@@ -124,6 +129,7 @@ export default {
       });
       this.newCommentText = '';
       this.newCommentImage = null;
+
 
     },
     previewImage(event) {
@@ -172,7 +178,6 @@ export default {
             })
       }
 
-      // Mettez à jour le commentaire dans votre liste de commentaires avec le texte modifié
       const index = this.commentaires.findIndex(c => c.id === this.editingComment.id);
       if (index !== -1) {
         this.commentaires[index].comment_text = this.editedText;
@@ -181,6 +186,7 @@ export default {
         this.editedText = '';
         this.isImageBeingDeleted = false;
       }
+      this.fetchCommentaires()
     },
 
     cancelEdit() {

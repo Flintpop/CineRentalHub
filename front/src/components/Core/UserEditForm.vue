@@ -51,10 +51,10 @@ export default {
       type: Object,
       required: true
     },
-    // updateUser: {
-    //   type: Function,
-    //   required: true
-    // }
+    updateUser: {
+      type: Function,
+      required: true
+    }
   },
   data() {
     return {
@@ -72,8 +72,9 @@ export default {
     }
   },
   mounted() {
-    const userRole = localStorage.getItem('userRole'); // Supposons que le rôle est stocké sous la clé 'userRole'
+    const userRole = localStorage.getItem('role'); // Supposons que le rôle est stocké sous la clé 'userRole'
     this.isAdmin = userRole === 'admin';
+    console.log('isAdmin', this.isAdmin);
     if (!this.isAdmin) {
       this.editFormData.role = 'user'; // Force le rôle à 'user' si l'utilisateur actuel n'est pas admin
     }
@@ -81,11 +82,14 @@ export default {
 
   methods: {
     async submitEdit() {
+
       // Logique de mise à jour de l'utilisateur
-      console.log('Submitted', this.editFormData);
-      // Mise à jour via API...
-      // this.updateUser(this.editFormData);
-      this.$emit('updateUser', this.editFormData);
+      console.log('Formulaire soumis', this.editFormData);
+      if(this.isAdmin) {
+        this.updateUser(this.editFormData);
+      }else{
+        this.$emit('updateUser', this.editFormData);
+      }
       this.$emit('close');
     },
     async submitPasswordChange() {

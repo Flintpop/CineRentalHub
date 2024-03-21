@@ -22,7 +22,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/images/[^/]+/?', methods: ['POST', 'DELETE'], roles: ['admin']},
         {path: '/movies/main_image/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
-        {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['user'], selfOnly: false},
+        {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['user', 'admin'], selfOnly: false},
         {path: '/movies/purchases/[^/]+?', methods: ['GET'], roles: ['user'], selfOnly: false},
 
         {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['admin']},
@@ -34,7 +34,7 @@ const verifyJWTAndRole = (req, res, next) => {
 
         // Pb d'id, je ne sais pas comment récupérer l'id du commentaire à modifier
         {path: '/comments/[^/]+/?', methods: ['POST'], roles: ['user'], selfOnly: false},
-        {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user'], selfOnly: false},
+        {path: '/comments/manage/[^/]+/?', methods: ['PUT', 'DELETE', 'GET'], roles: ['user', 'admin'], selfOnly: false},
         {path: '/comments/image', methods: ['POST'], roles: ['user'], selfOnly: false},
         {path: '/comments/image/[^/]+/?', methods: ['DELETE'], roles: ['user'], selfOnly: false},
 
@@ -45,7 +45,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/cart/validate/[^/]+/?', methods: ['PATCH'], roles: ['user'], selfOnly: false}, // TODO: Implementer verification que l'id de l'url
 
         {path: '/stats', methods: ['GET', 'POST'], roles: ['user'], selfOnly: false},
-        {path: '/stats/[^/]+?', methods: ['POST'], roles: ['user'], selfOnly: false},
+        {path: '/stats/[^/]+?', methods: ['DELETE'], roles: ['user'], selfOnly: false},
     ];
 
     const reqPath = req.originalUrl.split('?')[0];

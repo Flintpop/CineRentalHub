@@ -156,5 +156,46 @@ export default {
                 this.$handleError(error);
             }
         }
+
+        app.config.globalProperties.$newStats = async function (movie_id, user_id) {
+            try {
+                const response = await axios.post(`${this.$baseApiUrl}/stats`, {
+                    movie_id,
+                    user_id,
+                });
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
+
+        app.config.globalProperties.$getViewingStats = async function (userId) {
+            try {
+                const response = await axios.get(`${this.$baseApiUrl}/stats`);
+                // Filtrer les statistiques pour ne garder que celles de l'utilisateur connecté, faire
+                // ça en boucle for pour debugger
+                let userStats = []
+                for (let i = 0; i < response.data.length; i++) {
+                    console.log("Comparing", response.data[i].user_id, userId)
+                    if (response.data[i].user_id == userId) {
+                        console.log(response.data[i])
+                        userStats.push(response.data[i])
+                    }
+                }
+                console.log("Final user stats ", userStats)
+                return userStats;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
+
+        app.config.globalProperties.$deleteUserStat = async function (statsId) {
+            try {
+                const response = await axios.delete(`${this.$baseApiUrl}/stats/${statsId}`);
+                return response.data;
+            } catch (error) {
+                this.$handleError(error);
+            }
+        }
     }
 };

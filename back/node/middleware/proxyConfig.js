@@ -9,6 +9,7 @@ const MOVIE_API_SERVICE_URL = "http://movie-api:8080";
 const USER_API_SERVICE_URL = "http://user-api:8080";
 const COMMENT_API_SERVICE_URL = "http://comment-api:8080";
 const CART_API_SERVICE_URL = "http://cart-api:8080";
+const STATS_API_SERVICE_URL = "http://stats-api:8080";
 const proxyOptions = target => ({
     target: target,
     changeOrigin: true,
@@ -31,4 +32,5 @@ module.exports = function(app) {
     app.use('/users', createProxyMiddleware(proxyOptions(USER_API_SERVICE_URL)));
     app.use('/comments', createProxyMiddleware(proxyOptions(COMMENT_API_SERVICE_URL)));
     app.use('/cart', createProxyMiddleware(proxyOptions(CART_API_SERVICE_URL)));
+    app.use('/stats', createProxyMiddleware(proxyOptions(STATS_API_SERVICE_URL)));
 };
