@@ -157,51 +157,23 @@ export default {
     }
   },
   created() {
-    // if (this.rentMovies.length === 0) {
-    //   // Use fictitious data for testing
-    //   this.localRentMovies = [
-    //     {
-    //       id: 1,
-    //       title: 'The Shawshank Redemption',
-    //       rental_date: '2021-01-01',
-    //       return_date: '2021-01-15',
-    //       daily_rental_price: 1.5
-    //     },
-    //     {
-    //       id: 2,
-    //       title: 'The Godfather',
-    //       rental_date: '2024-01-01',
-    //       return_date: '2024-12-15',
-    //       daily_rental_price: 1.5,
-    //     },
-    //   ];
-    // }
-    // else{
-    //   this.localRentMovies = this.rentMovies;
-    // }//test si aucun film n'as été recu:
-    // if (this.buyMovies.length === 0) {
-    //   // Use fictitious data for testing
-    //   this.localBuyMovies = [
-    //     {
-    //       id: 1,
-    //       title: 'The Shawshank Redemption',
-    //       purchase_price: 10,
-    //       purchase_date: '2021-01-01',
-    //     },
-    //     {
-    //       id: 2,
-    //       title: 'The Godfather',
-    //       purchase_price: 10,
-    //       purchase_date: '2024-01-01',
-    //     },
-    //   ];
-    // }else {
-    //   this.localBuyMovies = this.buyMovies;
-    // }
+
 
     this.localRentMovies = this.rentMovies;
     this.localBuyMovies = this.buyMovies;
-  }
+    console.log("films loués local:",this.localRentMovies);
+    console.log("films achetés local:",this.localBuyMovies);
+  },
+  watch: {
+    rentMovies(newVal) {
+      this.localRentMovies = newVal;
+      console.log("Mise à jour des films loués local:", this.localRentMovies);
+    },
+    buyMovies(newVal) {
+      this.localBuyMovies = newVal;
+      console.log("Mise à jour des films achetés local:", this.localBuyMovies);
+    },
+  },
 
 };
 </script>
