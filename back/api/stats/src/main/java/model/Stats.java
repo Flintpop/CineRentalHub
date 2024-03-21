@@ -19,11 +19,15 @@ public class Stats {
     return convertToList(collection);
   }
 
-  public static void addStats(StatsPostDTO statsPostDTO) {
-    MongoCollection<StatsDTO> collection = MongoDB.getCollection();
-    StatsDTO statsDTOToInsert = new StatsDTO(statsPostDTO);
-    statsDTOToInsert.setId(getNextStatsId());
-    collection.insertOne(statsDTOToInsert);
+  public static void addStats(StatsPostDTO statsPostDTO) throws Exception {
+    try {
+      MongoCollection<StatsDTO> collection = MongoDB.getCollection();
+      StatsDTO statsDTOToInsert = new StatsDTO(statsPostDTO);
+      statsDTOToInsert.setId(getNextStatsId());
+      collection.insertOne(statsDTOToInsert);
+    } catch (Exception e) {
+      throw new Exception("Erreur lors de l'ajout de la stat : " + e.getMessage());
+    }
   }
 
   private static Integer getNextStatsId() {
