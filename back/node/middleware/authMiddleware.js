@@ -21,7 +21,7 @@ const verifyJWTAndRole = (req, res, next) => {
         {path: '/movies/deactivated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/activated/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
         {path: '/movies/images/[^/]+/?', methods: ['POST', 'DELETE'], roles: ['admin']},
-        {path: '/movies/main_image/[^/]+/?', methods: ['PATCH'], roles: ['admin']},
+        {path: '/movies/main_image/[^/]+/?', methods: ['PUT'], roles: ['admin']},
         {path: '/movies/rentals/[^/]+?', methods: ['GET'], roles: ['user', 'admin'], selfOnly: false},
         {path: '/movies/purchases/[^/]+?', methods: ['GET'], roles: ['user'], selfOnly: false},
 
