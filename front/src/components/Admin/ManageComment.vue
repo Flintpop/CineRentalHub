@@ -98,10 +98,11 @@ export default {
     addComment() {
       const commentText = window.prompt('Veuillez entrer le texte du commentaire');
       if (commentText) {
-        // const id_user = $_SESSION['user_id'];
+        const id_user = localStorage.getItem('userId');
 
 
-        axios.post(`http://localhost:3000/comments/${this.movieId}`, {user_id: id_user, comment_text: commentText})
+        axios.post(`http://localhost:3000/comments/${this.movieId}`, {user_id: id_user, comment_text: commentText,
+          movie_id: this.movieId})
             .then(() => {
               console.log('Commentaire ajouté avec succès');
               this.fetchComments(); // Recharger les commentaires pour afficher les modifications
