@@ -1,0 +1,158 @@
+openapi: 3.1.0
+info:
+  title: Cine Rental Hub API
+  version: 1.0.0
+  description: API for managing movies, users, shopping carts, rentals, purchases, and comments in the Cine Rental Hub.
+servers:
+  - url: 'http://localhost:8080'
+    description: Local server
+paths:
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Userlow'
+  /user:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPost'
+      responses:
+        '201':
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /user/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Get user details
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Userlow'
+    put:
+      summary: Update user details
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Userlow'
+      responses:
+        '200':
+          description: User successfully updated
+    delete:
+      summary: Delete a user
+      responses:
+        '204':
+          description: User successfully disabled
+
+  /user/password/{userId}:
+    put:
+      summary: Update user password
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Password'
+      responses:
+        '200':
+          description: Password successfully updated
+    get:
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      summary: Get the user password
+      responses:
+        '200':
+          description: Password successfully retrieved
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        last_name:
+          type: string
+        first_name:
+          type: string
+        email:
+          type: string
+        state:
+          type: string
+          enum: [active, inactive]
+        password:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+    Userlow:
+      type: object
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+        email:
+          type: string
+        state:
+          type: string
+          enum: [active, inactive]
+        role:
+          type: string
+          enum: [user, admin]
+    UserPost:
+      type: object
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+        email:
+          type: string
+        state:
+          type: string
+          enum: [active, inactive]
+        password:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+    Password:
+      type: object
+      properties:
+        password:
+          type: string

@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: Movie Comments API
+  description: API pour gérer les commentaires sur les films.
+  version: 1.0.0
+
+paths:
+
+  /comments/{movieId}:
+    get:
+      summary: Récupère tous les commentaires d'un film
+      parameters:
+        - in: path
+          name: movieId
+          required: true
+          schema:
+            type: integer
+          description: L'ID du film pour lequel récupérer les commentaires
+      responses:
+        '200':
+          description: Une liste de commentaires
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '404':
+          description: Film introuvable
+
+    post:
+      summary: Ajoute un commentaire sur un film
+      parameters:
+        - in: path
+          name: movieId
+          required: true
+          schema:
+            type: integer
+          description: L'ID du film sur lequel poster un commentaire
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPost'
+      responses:
+        '201':
+          description: Commentaire créé
+
+  /comments/manage/{commentId}:
+    delete:
+      summary: Supprime un commentaire précis
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: L'ID du commentaire à supprimer
+      responses:
+        '204':
+          description: Commentaire supprimé
+
+    put:
+      summary: Modifie un commentaire
+      parameters:
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: L'ID du commentaire à modifier
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentPut'
+      responses:
+        '200':
+          description: Commentaire mis à jour
+
+components:
+  schemas:
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        movie_id:
+          type: integer
+        user_id:
+          type: integer
+        comment_text:
+          type: string
+        comment_date:
+          type: string
+          format: date-time
+        image_text:
+          type: string
+          format: image
+
+    CommentPost:
+      type: object
+      properties:
+        movie_id:
+          type: integer
+        user_id:
+          type: integer
+        comment_text:
+          type: string
+
+    CommentPut:
+      type: object
+      properties:
+        comment_text:
+          type: string

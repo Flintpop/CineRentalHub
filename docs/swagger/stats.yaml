@@ -1,0 +1,70 @@
+openapi: 3.1.0
+info:
+  title: Cine Rental Hub API
+  version: 1.5.0
+  description: API for managing movies, users, carts, stats, and comments in the Cine Rental Hub.
+paths:
+  /stats:
+    get:
+      summary: Retrieve all stats
+      responses:
+        '200':
+          description: Stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StatsDTO'
+    post:
+      summary: Create a new stat entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatsPostDTO'
+      responses:
+        '201':
+          description: Stat entry created successfully
+  /stats/{statsId}:
+    parameters:
+      - name: statsId
+        in: path
+        required: true
+        schema:
+          type: integer
+    delete:
+      summary: Delete a specific stat entry
+      responses:
+        '200':
+          description: Stat entry deleted successfully
+components:
+  schemas:
+    StatsDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        movie_id:
+          type: integer
+        view_date:
+          type: string
+          format: date-time
+      required:
+        - id
+        - user_id
+        - movie_id
+        - view_date
+    StatsPostDTO:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        movie_id:
+          type: integer
+      required:
+        - user_id
+        - movie_id

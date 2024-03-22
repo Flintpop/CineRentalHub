@@ -1,0 +1,109 @@
+openapi: 3.1.0
+info:
+  title: Cine Rental Hub API
+  version: 1.5.0
+  description: API for managing movies, users, carts, and comments in the Cine Rental Hub.
+paths:
+  /cart:
+    post:
+      summary: Create or update cart items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartPostDTO'
+      responses:
+        '201':
+          description: Cart item created successfully
+  /cart/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Retrieve the user's cart
+      responses:
+        '200':
+          description: Cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CartDTO'
+  /cart/{cartId}:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        schema:
+          type: integer
+    delete:
+      summary: Delete a specific cart item
+      responses:
+        '200':
+          description: Cart deleted successfully
+  /cart/delete/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    delete:
+      summary: Delete the entire cart for a user
+      responses:
+        '200':
+          description: Entire cart deleted successfully
+  /cart/validate/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+    patch:
+      summary: Validate the cart, completing the purchase or rental
+      responses:
+        '200':
+          description: Cart validated successfully
+components:
+  schemas:
+    CartDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        cart_type:
+          type: string
+        user_id:
+          type: integer
+        movie_id:
+          type: integer
+        rental_duration:
+          type: integer
+      required:
+        - id
+        - cart_type
+        - user_id
+        - movie_id
+        - rental_duration
+    CartPostDTO:
+      type: object
+      properties:
+        cart_type:
+          type: string
+        user_id:
+          type: integer
+        movie_id:
+          type: integer
+        rental_duration:
+          type: integer
+      required:
+        - cart_type
+        - user_id
+        - movie_id
+        - rental_duration
