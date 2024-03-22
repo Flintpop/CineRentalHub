@@ -109,7 +109,7 @@ export default {
       await axios.get("http://localhost:3000/movies")
           .then(response => {
             if (response.data && response.data.length > 0) {
-              this.movies = response.data;
+              this.movies = response.data.filter(movie => movie.available === 1); // Filtrage côté client, au cas où
             } else {
               // Utiliser des données fictives si aucune donnée n'est récupérée
               this.usefictiveData();

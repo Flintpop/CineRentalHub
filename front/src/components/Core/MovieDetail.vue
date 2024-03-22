@@ -173,14 +173,21 @@ export default defineComponent({
           rental_duration: type === 'rental' ? rentalDuration : 1,
           cart_type: type,
           user_id: null
+
         };
 
         cart.push(newItem);
         localStorage.setItem('cart', JSON.stringify(cart));
         console.log(`Le film ${movieId} (temp ID: ${tempIdCounter}) a été ajouté au panier.`);
+        this.confirmationMessage = 'Le film a été ajouté dans votre panier.';
+        this.showConfirmation = true;
+
       } else {
         console.log(`Le film ${movieId} est déjà présent dans le panier.`);
+        this.confirmationMessage = 'Le film est déja dans votre panier.';
+        this.showConfirmation = true;
       }
+      setTimeout(() => this.showConfirmation = false, 3000);
     },
     inYourCart(movieId) {
       if (this.isUserConnected) {
